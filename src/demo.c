@@ -1,9 +1,6 @@
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdbool.h>
-
 #include "HashTable.h"
+#include <stdio.h>
 
 int main ( int argc, char **argv )
 {
