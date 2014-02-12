@@ -33,14 +33,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-enum HashTableErrorCode {
-	HT_OP_ERROR_NONE = 0,
-	HT_OP_ERROR_NO_KEY,
-	HT_OP_ERROR_NO_KEY_LENGTH,
-	HT_OP_ERROR_NO_VALUE,
-	HT_OP_ERROR_KEY_EXISTS
-};
-
 /*
  * This value will be used to determine how many slots to allocate.
  */
@@ -63,36 +55,16 @@ struct hashtable_s {
 	size_t size;
 	size_t entries;
 	struct entry_s ** entry;
-	enum HashTableErrorCode lastError;
+	int lastError;
 	void * userData;
 };
 
 typedef struct hashtable_s hashtable_t;
 
-/* Function: NewHashTable
- *
- * Description
- *
- *     Create a new HashTable of an arbitrary size with private userData.
- *
- * Parameters
- *
- * size:
- *
- *      The number of hash table entries or "list slots" to allocate. If this
- *      parameter is ZERO, then the implementation defined value of
- *      HT_DEFAULT_RESERVE_SLOTS will be used.
- *
- * userData:
- *
- *     A pointer to any data the user must associate with the returned hash
- *     table reference.
- *
- * Return Value
- *
- *     New HashTable reference.
- *
- */
+#define HashTable_c
+	#include "HashTable.h"
+#undef HashTable_c
+
 hashtable_t *
 NewHashTable ( size_t size, void * userData )
 {
@@ -116,13 +88,12 @@ NewHashTable ( size_t size, void * userData )
 
 }
 
-/* Hash a binary input */
+/* INTERNAL: Hash a binary input */
 static
 size_t
 hashBinaryInput ( char * input, size_t length )
 {
 	size_t hash, i;
-
 	/* Use: Jenkins' "One At a Time Hash" === Perl "Like" Hashing */
 	for ( hash = i = 0; i < length; ++i ) {
 		hash += input[i], hash += ( hash << 10 ), hash ^= ( hash >> 6 );
@@ -132,10 +103,11 @@ hashBinaryInput ( char * input, size_t length )
 	return hash;
 }
 
+/* INTERNAL: distribute a hash over the number of available slots */
 #define HashTableIndexOf(table, key, length) \
 ( hashBinaryInput ( key, length ) % (table->size) )
 
-/* Create a key-value pair. */
+/* INTERNAL: Create a key-value pair. */
 static
 hashtable_entry_t *
 hashTableCreateEntry ( )
@@ -239,7 +211,7 @@ HashTablePutDouble(
 
 const void *
 HashTableGet (
-hashtable_t * hashTable, void * key, size_t * valueLength
+hashtable_t * hashTable, char * key, size_t * valueLength
 )
 {
 	if ( !hashTable ) return NULL;
@@ -284,39 +256,41 @@ hashtable_t * hashTable, void * key, size_t * valueLength
 }
 
 int
-HashTableGetInt(hashtable_t * hashTable, char * key, size_t * length) {
-	const int *value = HashTableGet(hashTable, key, length);
+HashTableGetInt(hashtable_t * hashTable, char * key) {
+	const int *value = HashTableGet(hashTable, key, NULL);
 	if (value) return *value;
 	return 0;
 }
 
 double
-HashTableGetDouble(hashtable_t * hashTable, char * key, size_t * length) {
-	const double *value = HashTableGet(hashTable, key, length);
+HashTableGetDouble(hashtable_t * hashTable, char * key) {
+	const double *value = HashTableGet(hashTable, key, NULL);
 	if (value) return *value;
 	return 0;
 }
 
 bool
-HashTableDelete ( hashtable_t * hashTable, void * key, size_t keyLength )
+HashTableDelete ( hashtable_t * hashTable, char * key )
 {
-	if ( !hashTable || !key ) return false;
+	if ( !hashTable ) return false;
 
 	if ( !key ) {
 		hashTable->lastError = HT_OP_ERROR_NO_KEY;
-		return 0;
+		return false;
 	}
+
+	size_t keyLength = strlen(key);
 
 	if ( !keyLength ) {
 		hashTable->lastError = HT_OP_ERROR_NO_KEY_LENGTH;
-		return 0;
+		return false;
 	}
 
 	/* Retrieve Query Index */
 	size_t list = HashTableIndexOf ( hashTable, key, keyLength );
 
 	/* Think Outside The Box */
-	hashtable_entry_t * previousItem, * currentItem = hashTable->entry [ list ];
+	hashtable_entry_t * previousItem, * currentItem = hashTable->entry[list];
 
 	previousItem = currentItem;
 
@@ -330,7 +304,7 @@ HashTableDelete ( hashtable_t * hashTable, void * key, size_t keyLength )
 
 	if ( !currentItem ) {
 		hashTable->lastError = HT_OP_ERROR_NO_VALUE;
-		return 0;
+		return false;
 	}
 
 	if ( previousItem == currentItem ) { /* delete the list head */
@@ -359,7 +333,7 @@ HashTableGetEntryCount ( hashtable_t * hashTable )
 enum HashTableErrorCode
 HashTableGetLastError ( hashtable_t * hashTable )
 {
-	if ( !hashTable ) return 0;
+	if ( !hashTable ) return HT_OP_ERROR_NO_HASH_TABLE;
 	enum HashTableErrorCode result = hashTable->lastError;
 	if ( result ) hashTable->lastError = HT_OP_ERROR_NONE;
 	return result;
@@ -378,4 +352,42 @@ HashTablePutPrivate ( hashtable_t * hashTable, void * userData )
 	if ( !hashTable ) return false;
 	hashTable->userData = userData;
 	return true;
+}
+
+bool
+HashTableHasEntry ( hashtable_t * hashTable, char * key )
+{
+	if ( !hashTable ) return false;
+
+	if ( !key ) {
+		hashTable->lastError = HT_OP_ERROR_NO_KEY;
+		return false;
+	}
+
+	size_t keyLength = strlen(key);
+
+	if ( !keyLength ) {
+		hashTable->lastError = HT_OP_ERROR_NO_KEY_LENGTH;
+		return false;
+	}
+
+	/* Think Outside The Box */
+	hashtable_entry_t * search = hashTable->entry[
+		HashTableIndexOf ( hashTable, key, keyLength )
+	];
+
+	/* Locate Target */
+	while ( search ) {
+		if ( search->keyLength == keyLength &&
+		!memcmp ( key, search->key, keyLength )
+		) /* Target Located */ break;
+		else search = search->successor;
+	}
+
+	if ( !search ) {
+		return false;
+	}
+
+	return true;
+
 }
