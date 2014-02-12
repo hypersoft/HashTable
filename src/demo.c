@@ -15,7 +15,7 @@ int main ( int argc, char **argv )
 	double value = 123.444;
 
 	if ( HashTablePutDouble(hashTable, key, value, true) ) {
-		double got = HashTableGetDouble(hashTable, key, NULL);
+		double got = HashTableGetDouble(hashTable, key);
 		printf ( "%s == %g\n", key, got );
 	} else {
 		e = HashTableGetLastError ( hashTable );
