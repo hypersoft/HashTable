@@ -1,40 +1,41 @@
 CFLAGS = -O3
 
-OUTPUT ?= .
+BUILD_OUTPUT ?= .
 
-SRCDIR ?= src
+BUILD_SRC ?= src
 
-BIN ?= bin
+BUILD_BIN ?= bin
 
-void != test -d $(BIN) || mkdir $(BIN);
+void != test -d $(BUILD_BIN) || mkdir $(BUILD_BIN);
 
-ARCHIVE = $(OUTPUT)/HashTable.a
-HEADER = $(OUTPUT)/HashTable.h
+ARCHIVE = $(BUILD_OUTPUT)/HashTable.a
+HEADER = $(BUILD_OUTPUT)/HashTable.h
 
 all: $(ARCHIVE)
 
-$(BIN)/HashTable.o: $(SRCDIR)/HashTable.c $(SRCDIR)/HashTable.h
+$(BUILD_BIN)/HashTable.o: $(BUILD_SRC)/HashTable.c $(BUILD_SRC)/HashTable.h
 	$(COMPILE.c) -o $@ $<
 
 $(HEADER):
-	@cp $(SRCDIR)/HashTable.h $(OUTPUT)
+	@cp $(BUILD_SRC)/HashTable.h $(BUILD_OUTPUT)
 
-$(ARCHIVE): $(BIN)/HashTable.o $(HEADER)
+$(ARCHIVE): $(BUILD_BIN)/HashTable.o $(HEADER)
 	@echo -e '\n'Building $(BUILD_NAME) \
 		$(BUILD_MAJOR).$(BUILD_MINOR).$(THIS_BUILD_REVISION) archive...'\n' >&2;
 	$(AR) -vr $@ $<
 	@$(push-stats)
 
-$(BIN)/demo.o: $(SRCDIR)/demo.c
+$(BUILD_BIN)/demo.o: $(BUILD_SRC)/demo.c
 	@echo -e '\n'Building $(BUILD_NAME) \
 		$(BUILD_MAJOR).$(BUILD_MINOR).$(BUILD_REVISION) demo...'\n' >&2;
 	$(COMPILE.c) -o $@ $^
 
-$(BIN)/demo: $(BIN)/demo.o  $(BIN)/HashTable.o
+$(BUILD_BIN)/demo: $(BUILD_BIN)/demo.o  $(BUILD_BIN)/HashTable.o
 	$(LINK.c) -o $@ $^
 
 clean:
-	@$(RM) -v $(BIN)/HashTable.o $(ARCHIVE) $(HEADER) $(BIN)/demo $(BIN)/demo.o
+	@$(RM) -v $(BUILD_BIN)/HashTable.o $(ARCHIVE) $(HEADER) \
+		$(BUILD_BIN)/demo $(BUILD_BIN)/demo.o
 
 NOTICE=FALSE
 include mktools/MakeStats.mk
