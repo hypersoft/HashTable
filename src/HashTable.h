@@ -35,59 +35,367 @@
 #include <stdbool.h>
 
 enum HashTableErrorCode {
-  HT_OP_ERROR_NONE = 0,
-  HT_OP_ERROR_NO_KEY,
-  HT_OP_ERROR_NO_KEY_LENGTH,
-  HT_OP_ERROR_NO_VALUE
+	HT_OP_ERROR_NONE = 0,
+	HT_OP_ERROR_NO_HASH_TABLE,
+	HT_OP_ERROR_NO_KEY,
+	HT_OP_ERROR_NO_KEY_LENGTH,
+	HT_OP_ERROR_NO_VALUE,
+	HT_OP_ERROR_KEY_EXISTS
 };
 
-typedef void HashTable;
+#ifdef HashTable_c
+	#define HashTableLinkage
+	#define HashTable hashtable_t
+#else
+	#define HashTableLinkage extern
+	typedef void HashTable;
+#endif
 
-extern bool
+HashTableLinkage bool
 HashTablePutPrivate ( HashTable * hashTable, void * userData );
 
-extern void *
+HashTableLinkage void *
 HashTableGetPrivate ( HashTable * hashTable );
 
-extern enum HashTableErrorCode
+/* Function: HashTableGetLastError
+ *
+ * Description
+ *
+ *     Retrieve AND clear the last error code for a HashTable.
+ *
+ * Parameters
+ *
+ * hashTable:
+ *
+ *     The HashTable reference returned from NewHashTable()
+ *
+* Return Value
+ *
+ *     Exactly 1 member of an enumeration value from HashTableErrorCode.
+ *
+ */
+HashTableLinkage enum HashTableErrorCode
 HashTableGetLastError ( HashTable * hashTable );
 
-extern size_t
+/* Function: HashTableEntryCount
+ *
+ * Description
+ *
+ *     Retrieve the number of entries stored in a HashTable.
+ *
+ * Parameters
+ *
+ * hashTable:
+ *
+ *     The HashTable reference returned from NewHashTable()
+ *
+* Return Value
+ *
+ *     The number of entries stored in this HashTable, or ZERO if the
+ *     HashTable doesn't exist.
+ *
+ */
+HashTableLinkage size_t
 HashTableGetEntryCount ( HashTable * hashTable );
 
-extern bool
-HashTableDelete ( HashTable * hashTable, char * key, size_t keyLength );
+/* Function: HashTableDelete
+ *
+ * Description
+ *
+ *     Remove an entry from the hash table, and release the allocated data
+ *     for the corresponding entry key.
+ *
+ * Parameters
+ *
+ * hashTable:
+ *
+ *     The HashTable reference returned from NewHashTable()
+ *
+ * key:
+ *
+ *     A zero terminated string of bytes to use as an identifier.
+ *
+ * Return Value
+ *
+ *     Boolean status: true: success, false: failed
+ *
+ */
+HashTableLinkage bool
+HashTableDelete ( HashTable * hashTable, char * key);
 
-extern const void *
-HashTableGet (HashTable *hashTable, void * key, size_t * valueLength);
+/* Function: HashTableGet
+ *
+ * Description
+ *
+ *     Retrieve the constant pointer stored in the hash table for any particular
+ *     entry. If the operation fails, a NULL pointer will be returned and an
+ *     error code will be set. See also: HashTableGetLastError(), and
+ *     HashTableErrorCode.
+ *
+ * Parameters
+ *
+ * hashTable:
+ *
+ *     The HashTable reference returned from NewHashTable()
+ *
+ * key:
+ *
+ *     A zero terminated string of bytes to use as an identifier.
+ *
+ * valueLength:
+ *
+ *     An optional pointer to a size_t value to store the length of the entry
+ *     data. If the operation fails, this data will not be modified.
+ *
+ * Return Value
+ *
+ *     A constant pointer to the internalized hash table entry data for this
+ *     key.Use HashTableDelete() to free this data.
+ *
+ */
+HashTableLinkage const void *
+HashTableGet (HashTable *hashTable, char * key, size_t * valueLength);
 
-extern int
-HashTableGetInt(HashTable * hashTable, char * key, size_t * length);
+/* Function: HashTableGetInt
+ *
+ * Description
+ *
+ *     Retrieve the constant pointer stored in the hash table for an int sized
+ *     value. If the operation fails, a NULL pointer will be returned and an
+ *     error code will be set. See also: HashTableGetLastError(), and
+ *     HashTableErrorCode.
+ *
+ * Parameters
+ *
+ * hashTable:
+ *
+ *     The HashTable reference returned from NewHashTable()
+ *
+ * key:
+ *
+ *     A zero terminated string of bytes to use as an identifier.
+ *
+ * Return Value
+ *
+ *     The int sized value stored in the HashTable for this entry or zero
+ *     if the entry is undefined.
+ *     You should use the length parameter to verify that the data is of the
+ *     expected return type length (sizeof(int)).
+ *
+ */
+HashTableLinkage int
+HashTableGetInt(HashTable * hashTable, char * key);
 
-extern double
-HashTableGetDouble(HashTable * hashTable, char * key, size_t * length);
+/* Function: HashTableGetDouble
+ *
+ * Description
+ *
+ *     Retrieve the constant pointer stored in the hash table for a double sized
+ *     value. If the operation fails, a NULL pointer will be returned and an
+ *     error code will be set. See also: HashTableGetLastError(), and
+ *     HashTableErrorCode.
+ *
+ * Parameters
+ *
+ * hashTable:
+ *
+ *     The HashTable reference returned from NewHashTable()
+ *
+ * key:
+ *
+ *     A zero terminated string of bytes to use as an identifier.
+ *
+ * Return Value
+ *
+ *     The double sized value stored in the HashTable for this entry or zero
+ *     if the entry is undefined. If this value is ZERO (0) you should check
+ *     the last error code if it matters to your process.
+ *
+ */
+HashTableLinkage double
+HashTableGetDouble(HashTable * hashTable, char * key);
 
-extern bool
+/* Function: HashTablePut
+ *
+ * Description
+ *
+ *     Place a UTF-8 identified entry into the hash table.
+ *
+ * Parameters
+ *
+ * hashTable:
+ *
+ *     The HashTable reference returned from NewHashTable()
+ *
+ * key:
+ *
+ *     A zero terminated string of bytes to use as an identifier.
+ *
+ * value:
+ *
+ *     A pointer to the binary data to associate with the key.
+ *
+ * valueLength:
+ *
+ *     The size in bytes of the value data.
+ *
+ * padding:
+ *
+ *     The number of zero terminated bytes to follow the supplied data.
+ *
+ * overwrite:
+ *
+ *     Boolean value. True if the operation should destroy existing data with
+ *     the same key.
+ *
+ * Return Value
+ *
+ *     Boolean status: true: success, false: failed
+ *
+ */
+HashTableLinkage bool
 HashTablePut ( HashTable * hashTable,
 	char * key, void * value, size_t valueLength, size_t padding, bool overwrite
 );
 
-extern bool
+/* Function: HashTablePutUTF8
+ *
+ * Description
+ *
+ *     Place a UTF-8 identified entry consisting of UTF-8 data into the hash
+ *     table.
+ *
+ * Parameters
+ *
+ * hashTable:
+ *
+ *     The HashTable reference returned from NewHashTable()
+ *
+ * key:
+ *
+ *     A zero terminated string of bytes to use as an identifier.
+ *
+ * value:
+ *
+ *     A pointer to the zero terminated string of bytes to store for this key.
+ *
+ * overwrite:
+ *
+ *     Boolean value. True if the operation should destroy existing data with
+ *     the same key.
+ *
+ * Return Value
+ *
+ *     Boolean status: true: success, false: failed
+ *
+ */
+HashTableLinkage bool
 HashTablePutUTF8(
 	HashTable * hashTable, char * key, char * value, bool overwrite
 );
 
-extern bool
+/* Function: HashTablePutInt
+ *
+ * Description
+ *
+ *     Place a UTF-8 identified entry consisting of an int sized value into the
+ *     hash table.
+ *
+ * Parameters
+ *
+ * hashTable:
+ *
+ *     The HashTable reference returned from NewHashTable()
+ *
+ * key:
+ *
+ *     A zero terminated string of bytes to use as an identifier.
+ *
+ * value:
+ *
+ *     Any platform sized int value.
+ *
+ * overwrite:
+ *
+ *     Boolean value. True if the operation should destroy existing data with
+ *     the same key.
+ *
+ * Return Value
+ *
+ *     Boolean status: true: success, false: failed
+ *
+ */
+HashTableLinkage bool
 HashTablePutInt(
 	HashTable * hashTable, char * key, int value, bool overwrite
 );
 
-extern bool
+/* Function: HashTablePutDouble
+ *
+ * Description
+ *
+ *     Place a UTF-8 identified entry consisting of a double sized value into
+ *     the hash table.
+ *
+ * Parameters
+ *
+ * hashTable:
+ *
+ *     The HashTable reference returned from NewHashTable()
+ *
+ * key:
+ *
+ *     A zero terminated string of bytes to use as an identifier.
+ *
+ * value:
+ *
+ *     Any platform sized double value.
+ *
+ * overwrite:
+ *
+ *     Boolean value. True if the operation should destroy existing data with
+ *     the same key.
+ *
+ * Return Value
+ *
+ *     Boolean status: true: success, false: failed
+ *
+ */
+HashTableLinkage bool
 HashTablePutDouble(
 	HashTable * hashTable, char * key, double value, bool overwrite
 );
 
-extern HashTable *
+/* Function: NewHashTable
+ *
+ * Description
+ *
+ *     Create a new HashTable of an arbitrary size with private userData.
+ *
+ * Parameters
+ *
+ * size:
+ *
+ *      The number of hash table entries or "list slots" to allocate. If this
+ *      parameter is ZERO, then the implementation defined value of
+ *      HT_DEFAULT_RESERVE_SLOTS will be used.
+ *
+ * userData:
+ *
+ *     A pointer to any data the user must associate with the returned hash
+ *     table reference.
+ *
+ * Return Value
+ *
+ *     New HashTable reference.
+ *
+ */
+HashTableLinkage HashTable *
 NewHashTable ( size_t size, void * userData );
+
+HashTableLinkage bool
+HashTableHasEntry ( HashTable * hashTable, char * key );
+
+#undef HashTableLinkage
 
 #endif /* HashTable_h */
