@@ -59,9 +59,7 @@ extern bool
 HashTableDelete ( HashTable * hashTable, char * key, size_t keyLength );
 
 extern const void *
-HashTableGet (
-HashTable *hashTable, void * key, size_t * valueLength
-);
+HashTableGet (HashTable *hashTable, void * key, size_t * valueLength);
 
 extern int
 HashTableGetInt(HashTable * hashTable, char * key, size_t * length);
@@ -71,11 +69,13 @@ HashTableGetDouble(HashTable * hashTable, char * key, size_t * length);
 
 extern bool
 HashTablePut ( HashTable * hashTable,
-char * key, void * value, size_t valueLength, size_t padding, bool overwrite
+	char * key, void * value, size_t valueLength, size_t padding, bool overwrite
 );
 
 extern bool
-HashTablePutUTF8(HashTable * hashTable, char * key, char * value, bool overwrite);
+HashTablePutUTF8(
+	HashTable * hashTable, char * key, char * value, bool overwrite
+);
 
 extern bool
 HashTablePutInt(
