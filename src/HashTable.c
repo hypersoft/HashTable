@@ -28,9 +28,6 @@
 
 /* Special Thanks to: https://gist.github.com/tonious/1377667 */
 
-#include <stdlib.h>
-#include <stddef.h>
-#include <stdbool.h>
 #include <string.h>
 
 /*
