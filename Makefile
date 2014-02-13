@@ -38,7 +38,7 @@ $(ARCHIVE): $(BUILD_BIN)/HashTable.o $(HEADER)
 
 $(BUILD_BIN)/demo.o: $(BUILD_SRC)/demo.c
 	@echo -e Building $(BUILD_NAME) \
-		$(BUILD_MAJOR).$(BUILD_MINOR).$(BUILD_REVISION) demo...'\n' >&2;
+		$(BUILD_MAJOR).$(BUILD_MINOR).$(THIS_BUILD_REVISION) demo...'\n' >&2;
 	$(COMPILE.c) -o $@ $^
 	@echo
 
