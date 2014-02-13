@@ -6,6 +6,8 @@ BUILD_SRC ?= src
 
 BUILD_BIN ?= bin
 
+void != echo >&2;
+
 void != test -d $(BUILD_BIN) || mkdir $(BUILD_BIN);
 
 ARCHIVE = $(BUILD_OUTPUT)/HashTable.a
