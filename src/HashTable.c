@@ -37,6 +37,12 @@
 #define HT_DEFAULT_RESERVE_SLOTS 32L
 #endif
 
+// Compile Makefile Definitions
+const char * HashTableVendor = HT_VERSION_VENDOR;
+const char * HashTableVersion = HT_VERSION_TRIPLET;
+const char * HashTableDescription = HT_VERSION_DESCRIPTION;
+const long HashTableBuildNumber = HT_VERSION_BUILDNO;
+
 struct entry_s {
 	size_t hitCount;
 	void * key;
@@ -83,6 +89,25 @@ NewHashTable ( size_t size, void * userData )
 	/* Return Dataset */
 	return hashTable;
 
+}
+
+bool
+DestroyHashTable (hashtable_t * hashTable) {
+	if (!hashTable) return false; // can't destroy something that does not exist
+	size_t slot, limit = hashTable->size;
+	for (slot = 0; (slot < limit) && hashTable->entries; slot++) {
+		hashtable_entry_t * parent = hashTable->entry[slot], * child;
+		while (parent) {
+			child = parent->successor;
+			/* free up the resources */
+			free ( parent->value ), free ( parent->key ),
+			free ( parent );
+			hashTable->entries--;
+			parent = child;
+		}
+	}
+	free(hashTable->entry),	free(hashTable);
+	return true;
 }
 
 /* INTERNAL: Hash a binary input */

@@ -67,7 +67,7 @@ HashTableGetPrivate ( HashTable * hashTable );
  *
  * hashTable:
  *
- *     The HashTable reference returned from NewHashTable()
+ *     Any HashTable reference returned from NewHashTable()
  *
 * Return Value
  *
@@ -87,7 +87,7 @@ HashTableGetLastError ( HashTable * hashTable );
  *
  * hashTable:
  *
- *     The HashTable reference returned from NewHashTable()
+ *     Any HashTable reference returned from NewHashTable()
  *
 * Return Value
  *
@@ -109,7 +109,7 @@ HashTableGetEntryCount ( HashTable * hashTable );
  *
  * hashTable:
  *
- *     The HashTable reference returned from NewHashTable()
+ *     Any HashTable reference returned from NewHashTable()
  *
  * key:
  *
@@ -136,7 +136,7 @@ HashTableDelete ( HashTable * hashTable, char * key);
  *
  * hashTable:
  *
- *     The HashTable reference returned from NewHashTable()
+ *     Any HashTable reference returned from NewHashTable()
  *
  * key:
  *
@@ -169,7 +169,7 @@ HashTableGet (HashTable *hashTable, char * key, size_t * valueLength);
  *
  * hashTable:
  *
- *     The HashTable reference returned from NewHashTable()
+ *     Any HashTable reference returned from NewHashTable()
  *
  * key:
  *
@@ -198,7 +198,7 @@ HashTableGetInt(HashTable * hashTable, char * key);
  *
  * hashTable:
  *
- *     The HashTable reference returned from NewHashTable()
+ *     Any HashTable reference returned from NewHashTable()
  *
  * key:
  *
@@ -228,7 +228,7 @@ HashTableGetPointer(HashTable * hashTable, char * key);
  *
  * hashTable:
  *
- *     The HashTable reference returned from NewHashTable()
+ *     Any HashTable reference returned from NewHashTable()
  *
  * key:
  *
@@ -254,7 +254,7 @@ HashTableGetDouble(HashTable * hashTable, char * key);
  *
  * hashTable:
  *
- *     The HashTable reference returned from NewHashTable()
+ *     Any HashTable reference returned from NewHashTable()
  *
  * key:
  *
@@ -298,7 +298,7 @@ HashTablePut ( HashTable * hashTable,
  *
  * hashTable:
  *
- *     The HashTable reference returned from NewHashTable()
+ *     Any HashTable reference returned from NewHashTable()
  *
  * key:
  *
@@ -334,7 +334,7 @@ HashTablePutUTF8(
  *
  * hashTable:
  *
- *     The HashTable reference returned from NewHashTable()
+ *     Any HashTable reference returned from NewHashTable()
  *
  * key:
  *
@@ -370,7 +370,7 @@ HashTablePutInt(
  *
  * hashTable:
  *
- *     The HashTable reference returned from NewHashTable()
+ *     Any HashTable reference returned from NewHashTable()
  *
  * key:
  *
@@ -406,7 +406,7 @@ HashTablePutPointer(
  *
  * hashTable:
  *
- *     The HashTable reference returned from NewHashTable()
+ *     Any HashTable reference returned from NewHashTable()
  *
  * key:
  *
@@ -457,6 +457,27 @@ HashTablePutDouble(
  */
 HashTableLinkage HashTable *
 NewHashTable ( size_t size, void * userData );
+
+/* Function: DestroyHashTable
+ *
+ * Description
+ *
+ *     Deallocates all HashTable allocated data, then destroys the HashTable
+ *     itself.
+ *
+ * Parameters
+ *
+ * hashTable:
+ *
+ *     Any HashTable reference returned from NewHashTable()
+ *
+ * Return Value
+ *
+ *     Boolean status: true: success, false: failed
+ *
+ */
+HashTableLinkage bool
+DestroyHashTable (HashTable * hashTable);
 
 HashTableLinkage bool
 HashTableHasEntry ( HashTable * hashTable, char * key );

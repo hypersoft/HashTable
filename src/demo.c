@@ -37,13 +37,18 @@ int main ( int argc, char **argv )
 	} else HashTableGetLastError(hashTable); // belay that order...
 
 	if (HashTableDelete(hashTable, key)) {
-			printf("%s: Succesfully deleted %s\n", argv[0], key);
+			printf("Succesfully deleted %s\n", key);
 	} else {
 		e = HashTableGetLastError(hashTable);
 		fprintf(stderr, "%s: Couldn't delete %s: Last Error: %lu\n",
 			argv[0], key, e
 		);
 		return e;
+	}
+
+	if (!DestroyHashTable(hashTable)) {
+		fprintf(stderr, "%s: Couldn't destroy HashTable %p\n", hashTable);
+		return 1;
 	}
 
 	return 0;
