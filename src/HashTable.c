@@ -200,6 +200,13 @@ HashTablePutInt(
 }
 
 bool
+HashTablePutPointer(
+	hashtable_t * hashTable, char * key, void * value, bool overwrite
+) {
+	return HashTablePut(hashTable, key, &value, sizeof(void *), 0, overwrite);
+}
+
+bool
 HashTablePutDouble(
 	hashtable_t * hashTable, char * key, double value, bool overwrite
 ) {
@@ -255,6 +262,13 @@ hashtable_t * hashTable, char * key, size_t * valueLength
 int
 HashTableGetInt(hashtable_t * hashTable, char * key) {
 	const int *value = HashTableGet(hashTable, key, NULL);
+	if (value) return *value;
+	return 0;
+}
+
+void *
+HashTableGetPointer(hashtable_t * hashTable, char * key) {
+	void * const * value = HashTableGet(hashTable, key, NULL);
 	if (value) return *value;
 	return 0;
 }
