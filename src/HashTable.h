@@ -186,6 +186,35 @@ HashTableGet (HashTable *hashTable, char * key, size_t * valueLength);
 HashTableLinkage int
 HashTableGetInt(HashTable * hashTable, char * key);
 
+/* Function: HashTableGetPointer
+ *
+ * Description
+ *
+ *     Retrieve the pointer stored in the hash table. If the operation fails, 
+ *     a NULL pointer will be returned and an error code will be set. See also:
+ *     HashTableGetLastError(), and HashTableErrorCode.
+ *
+ * Parameters
+ *
+ * hashTable:
+ *
+ *     The HashTable reference returned from NewHashTable()
+ *
+ * key:
+ *
+ *     A zero terminated string of bytes to use as an identifier.
+ *
+ * Return Value
+ *
+ *     The int sized value stored in the HashTable for this entry or zero
+ *     if the entry is undefined.
+ *     You should use the length parameter to verify that the data is of the
+ *     expected return type length (sizeof(int)).
+ *
+ */
+HashTableLinkage void *
+HashTableGetPointer(HashTable * hashTable, char * key);
+
 /* Function: HashTableGetDouble
  *
  * Description
@@ -328,6 +357,42 @@ HashTablePutUTF8(
 HashTableLinkage bool
 HashTablePutInt(
 	HashTable * hashTable, char * key, int value, bool overwrite
+);
+
+/* Function: HashTablePutPointer
+ *
+ * Description
+ *
+ *     Place a UTF-8 identified entry consisting of any pointer value into the
+ *     hash table.
+ *
+ * Parameters
+ *
+ * hashTable:
+ *
+ *     The HashTable reference returned from NewHashTable()
+ *
+ * key:
+ *
+ *     A zero terminated string of bytes to use as an identifier.
+ *
+ * value:
+ *
+ *     Any pointer value.
+ *
+ * overwrite:
+ *
+ *     Boolean value. True if the operation should destroy existing data with
+ *     the same key.
+ *
+ * Return Value
+ *
+ *     Boolean status: true: success, false: failed
+ *
+ */
+HashTableLinkage bool
+HashTablePutPointer(
+	HashTable * hashTable, char * key, void * value, bool overwrite
 );
 
 /* Function: HashTablePutDouble
