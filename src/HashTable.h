@@ -157,6 +157,38 @@ HashTableDelete ( HashTable * hashTable, char * key);
 HashTableLinkage const void *
 HashTableGet (HashTable *hashTable, char * key, size_t * valueLength);
 
+/* Function: HashTableGetUTF8
+ *
+ * Description
+ *
+ *     Retrieve the constant pointer stored in the hash table for a UTF8
+ *     entry. If the operation fails, a NULL pointer will be returned and an
+ *     error code will be set. See also: HashTableGetLastError(), and
+ *     HashTableErrorCode.
+ *
+ * Parameters
+ *
+ * hashTable:
+ *
+ *     Any HashTable reference returned from NewHashTable()
+ *
+ * key:
+ *
+ *     A zero terminated string of bytes to use as an identifier.
+ *
+ * valueLength:
+ *
+ *     An optional pointer to a size_t value to store the length of the UTF8
+ *     data. If the operation fails, this data will not be modified.
+ *
+ * Return Value
+ *
+ *     A constant pointer to the internalized hash table UTF8 data for this
+ *     key.Use HashTableDelete() to free this data.
+ *
+ */
+#define HashTableGetUTF8 HashTableGet
+
 /* Function: HashTableGetInt
  *
  * Description
