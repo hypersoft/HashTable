@@ -18,6 +18,7 @@ void != test -d $(BUILD_BIN) || mkdir $(BUILD_BIN);
 void != test -d $(BUILD_OUTPUT) || mkdir $(BUILD_OUTPUT);
 
 ARCHIVE = $(BUILD_OUTPUT)/HashTable.a
+SHARED = $(BUILD_OUTPUT)/libhashtable.so
 HEADER = $(BUILD_OUTPUT)/HashTable.h
 
 all: $(ARCHIVE)
@@ -36,6 +37,9 @@ $(ARCHIVE): $(BUILD_BIN)/HashTable.o $(HEADER)
 	@$(push-stats)
 	@echo
 
+$(SHARED): $(BUILD_BIN)/HashTable.o
+	$(LINK.c) -shared $(BUILD_FLAGS) -o $@ $^
+
 $(BUILD_BIN)/demo.o: $(BUILD_SRC)/demo.c
 	@echo -e Building $(BUILD_NAME) \
 		$(BUILD_MAJOR).$(BUILD_MINOR).$(THIS_BUILD_REVISION) demo...'\n' >&2;
@@ -47,7 +51,7 @@ $(BUILD_BIN)/demo: $(BUILD_BIN)/demo.o  $(BUILD_BIN)/HashTable.o
 	@echo
 
 clean:
-	@$(RM) -v $(BUILD_BIN)/HashTable.o $(ARCHIVE) $(HEADER) \
+	@$(RM) -v $(BUILD_BIN)/HashTable.o $(ARCHIVE) $(HEADER) $(SHARED) \
 		$(BUILD_BIN)/demo $(BUILD_BIN)/demo.o
 	@echo
 
