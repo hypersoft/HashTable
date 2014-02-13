@@ -53,10 +53,10 @@ enum HashTableErrorCode {
 #endif
 
 HashTableLinkage bool
-HashTablePutData ( HashTable * hashTable, void * userData );
+HashTablePutPrivate ( HashTable * hashTable, void * userData );
 
 HashTableLinkage void *
-HashTableGetData ( HashTable * hashTable );
+HashTableGetPrivate ( HashTable * hashTable );
 
 /* Function: HashTableGetLastError
  *
