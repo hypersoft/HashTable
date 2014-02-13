@@ -193,22 +193,35 @@ char * key, void * value, size_t valueLength, size_t padding, bool overwrite
 	}
 
 	thisItem = hashTableCreateEntry ( );
-	thisItem->key = memcpy ( malloc ( keyLength ), key, keyLength );
-	thisItem->keyLength = keyLength;
-	thisItem->valueLength = valueLength,
-	thisItem->successor = NULL;
+	void * data = malloc ( keyLength );
 
-	void * storage = memcpy ( malloc ( valueLength + padding ), value, valueLength );
-	thisItem->value = storage;
-	if (padding) storage += valueLength, memset(storage, 0, padding);
+	if (data) {
+		thisItem->key = memcpy ( data, key, keyLength );
+		thisItem->keyLength = keyLength;
+	} else {
+		free(thisItem);
+		hashTable->lastError = HT_OP_ERROR_ALLOCATION_FAILURE;
+		return false;
+	}
+
+	data = malloc ( valueLength + padding );
+
+	if (data) {
+		thisItem->value = memcpy ( data, key, valueLength + padding );
+		if (padding) memset(data + valueLength, 0, padding);
+		thisItem->valueLength = valueLength;
+	} else {
+		free(thisItem->key), free(thisItem);
+		hashTable->lastError = HT_OP_ERROR_ALLOCATION_FAILURE;
+		return false;
+	}
 
 	if ( !primaryItem ) {
 		hashTable->entry[index] = thisItem;
 	} else if ( primaryItem == currentItem ) primaryItem->successor = thisItem;
 	else previousItem->successor = thisItem;
 
-	hashTable->entries++;
-	return ( thisItem != NULL );
+	return (hashTable->entries += 1);
 
 }
 
