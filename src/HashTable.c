@@ -389,14 +389,14 @@ HashTableGetLastError ( hashtable_t * hashTable )
 }
 
 void *
-HashTableGetPrivate ( hashtable_t * hashTable )
+HashTableGetData ( hashtable_t * hashTable )
 {
 	if ( !hashTable ) return NULL;
 	return hashTable->userData;
 }
 
 bool
-HashTablePutPrivate ( hashtable_t * hashTable, void * userData )
+HashTablePutData ( hashtable_t * hashTable, void * userData )
 {
 	if ( !hashTable ) return false;
 	hashTable->userData = userData;
