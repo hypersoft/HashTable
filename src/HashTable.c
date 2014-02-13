@@ -138,20 +138,17 @@ hashTableCreateEntry ( )
 	return thisItem;
 }
 
-bool
-HashTablePut ( hashtable_t * hashTable,
-char * key, void * value, size_t valueLength, size_t padding, bool overwrite
+bool HashTablePutBinary(HashTable * hashTable,
+void * key, size_t keyLength, void * value, size_t valueLength, size_t padding,
+bool overwrite
 )
 {
-
 	if ( !hashTable ) false;
 
 	if ( !key ) {
 		hashTable->lastError = HT_OP_ERROR_NO_KEY;
 		return false;
 	}
-
-	size_t keyLength = strlen(key);
 
 	if ( !keyLength ) {
 		hashTable->lastError = HT_OP_ERROR_NO_KEY_LENGTH;
@@ -162,8 +159,6 @@ char * key, void * value, size_t valueLength, size_t padding, bool overwrite
 		hashTable->lastError = HT_OP_ERROR_NO_VALUE;
 		return false;
 	}
-
-	if (!valueLength) valueLength = strlen(value);
 
 	size_t index = HashTableIndexOf ( hashTable, key, keyLength );
 
@@ -207,7 +202,7 @@ char * key, void * value, size_t valueLength, size_t padding, bool overwrite
 	data = malloc ( valueLength + padding );
 
 	if (data) {
-		thisItem->value = memcpy ( data, key, valueLength + padding );
+		thisItem->value = memcpy ( data, value, valueLength + padding );
 		if (padding) memset(data + valueLength, 0, padding);
 		thisItem->valueLength = valueLength;
 	} else {
@@ -226,29 +221,79 @@ char * key, void * value, size_t valueLength, size_t padding, bool overwrite
 }
 
 bool
+HashTablePut ( hashtable_t * hashTable,
+char * key, void * value, size_t valueLength, size_t padding, bool overwrite
+)
+{
+	if ( !hashTable ) false;
+	if ( !key ) {
+		hashTable->lastError = HT_OP_ERROR_NO_KEY;
+		return false;
+	}
+	if ( !value ) {
+		hashTable->lastError = HT_OP_ERROR_NO_VALUE;
+		return false;
+	}
+	return HashTablePutBinary(
+		hashTable, key, strlen(key), value, valueLength, padding, overwrite
+	);
+}
+
+bool
 HashTablePutUTF8(hashtable_t * hashTable, char * key, char * value, bool overwrite) {
-	return HashTablePut ( hashTable, key, value, 0, 1, overwrite);
+	if ( !hashTable ) false;
+	if ( !key ) {
+		hashTable->lastError = HT_OP_ERROR_NO_KEY;
+		return false;
+	}
+	if ( !value ) {
+		hashTable->lastError = HT_OP_ERROR_NO_VALUE;
+		return false;
+	}
+	return HashTablePutBinary(hashTable,
+		key, strlen(key), value, strlen(value), 1, overwrite
+	);
 }
 
 bool
 HashTablePutInt(
 	hashtable_t * hashTable, char * key, int value, bool overwrite
 ) {
-	return HashTablePut(hashTable, key, &value, sizeof(int), 0, overwrite);
+	if ( !hashTable ) false;
+	if ( !key ) {
+		hashTable->lastError = HT_OP_ERROR_NO_KEY;
+		return false;
+	}
+	return HashTablePutBinary(
+		hashTable, key, strlen(key), &value, sizeof(int), 0, overwrite
+	);
 }
 
 bool
 HashTablePutPointer(
 	hashtable_t * hashTable, char * key, void * value, bool overwrite
 ) {
-	return HashTablePut(hashTable, key, &value, sizeof(void *), 0, overwrite);
+	if ( !hashTable ) false;
+	if ( !key ) {
+		hashTable->lastError = HT_OP_ERROR_NO_KEY;
+		return false;
+	}
+	return HashTablePutBinary(
+		hashTable, key, strlen(key), &value, sizeof(void *), 0, overwrite);
 }
 
 bool
 HashTablePutDouble(
 	hashtable_t * hashTable, char * key, double value, bool overwrite
 ) {
-	return HashTablePut(hashTable, key, &value, sizeof(double), 0, overwrite);
+	if ( !hashTable ) false;
+	if ( !key ) {
+		hashTable->lastError = HT_OP_ERROR_NO_KEY;
+		return false;
+	}
+	return HashTablePutBinary(
+		hashTable, key, strlen(key), &value, sizeof(double), 0, overwrite
+	);
 }
 
 const void *

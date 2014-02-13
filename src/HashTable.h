@@ -277,6 +277,55 @@ HashTableGetPointer(HashTable * hashTable, char * key);
 HashTableLinkage double
 HashTableGetDouble(HashTable * hashTable, char * key);
 
+/* Function: HashTablePutBinary
+ *
+ * Description
+ *
+ *     Place a binary data identified entry into the hash table.
+ *
+ * Parameters
+ *
+ * hashTable:
+ *
+ *     Any HashTable reference returned from NewHashTable()
+ *
+ * key:
+ *
+ *     A pointer to any memory location.
+ *
+ * keyLength:
+ *
+ *     The size of the key in bytes.
+ *
+ * value:
+ *
+ *     A pointer to the binary data to associate with the key.
+ *
+ * valueLength:
+ *
+ *     The size in bytes of the value data.
+ *
+ * padding:
+ *
+ *     The number of zero terminated bytes to follow the supplied data.
+ *
+ * overwrite:
+ *
+ *     Boolean value. True if the operation should destroy existing data with
+ *     the same key.
+ *
+ * Return Value
+ *
+ *     Boolean status: true: success, false: failed
+ *
+ */
+HashTableLinkage bool
+HashTablePutBinary ( HashTable * hashTable,
+	void * key, size_t keyLength, 
+	void * value, size_t valueLength,
+	size_t padding, bool overwrite
+);
+
 /* Function: HashTablePut
  *
  * Description
