@@ -32,10 +32,8 @@ int main ( int argc, char **argv )
 	}
 
 	if (HashTableDelete(hashTable, "not-a-key")) {
-			fprintf(stderr, "%s: Deleted a non-existant key!\n",
-				argv[0]
-			);
-			return 1;
+		fprintf(stderr, "%s: Deleted a non-existant key!\n", argv[0]);
+		return 1;
 	} else HashTableGetLastError(hashTable); // belay that order...
 
 	if (HashTableDelete(hashTable, key)) {
