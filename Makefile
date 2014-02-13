@@ -38,7 +38,12 @@ $(ARCHIVE): $(BUILD_BIN)/HashTable.o $(HEADER)
 	@echo
 
 $(SHARED): $(BUILD_BIN)/HashTable.o
+	@echo -e Building $(BUILD_NAME) \
+		$(BUILD_MAJOR).$(BUILD_MINOR).$(THIS_BUILD_REVISION) library...'\n' >&2;
 	$(LINK.c) -shared $(BUILD_FLAGS) -o $@ $^
+	@$(push-stats)
+	@echo
+
 
 $(BUILD_BIN)/demo.o: $(BUILD_SRC)/demo.c
 	@echo -e Building $(BUILD_NAME) \
