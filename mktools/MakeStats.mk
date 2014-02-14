@@ -84,14 +84,16 @@ endif
 #
 # =================================================================================
 
-BUILD_STATS = project.ver
+BUILD_STATS ?= project.ver
+
+ifndef BUILD_VERSION_SOURCES
+    void != $(error You must define your BUILD_VERSION_SOURCES)
+endif
 
 MAKESTATS != if ! test -e $(BUILD_STATS); then \
 	printf "%s\n\n" "Creating build statistics database ..." >&2; \
 	echo 0 0 0 0 `date +%s` $(USER) `basename $(shell pwd)` > $(BUILD_STATS); \
-ifdef $(BUILD_VERSION_SOURCES)
 	touch -mc $(BUILD_VERSION_SOURCES); \
-endif
 fi;
 
 MAKESTATS != cat $(BUILD_STATS) 2>&- || true
@@ -129,6 +131,8 @@ push-minor:
 build-name:
 	@sh -c 'echo $${@:1:6} `read -ep "Enter product or code name: " NAME; echo $$NAME` > $(BUILD_STATS);' -- `cat $(BUILD_STATS)`
 
+push-version: $(BUILD_STATS)
+
 # Update build number; possibly revision, date, and user
 push-build: push-version
 	@sh -c 'echo $${@:1:3} $(BUILD_NUMBER) $${@:5} > $(BUILD_STATS);' -- `cat $(BUILD_STATS)`
@@ -136,8 +140,6 @@ push-build: push-version
 # Update revision, date, and user if sources are newer than stats
 $(BUILD_STATS): $(BUILD_VERSION_SOURCES)
 	@sh -c 'echo $$1 $$2 $(BUILD_REVISION) $$4 $(BUILD_DATE) $(USER) $${@:7} > $(BUILD_STATS);' -- `cat $(BUILD_STATS)`
-
-push-version: $(BUILD_STATS)
 
 # These targets will build regardless of existing files
 .PHONY: stats build-name push-major push-minor push-version push-build
