@@ -67,6 +67,7 @@ $(SHARED).$(BUILD_TRIPLET): $(BUILD_BIN)/HashTable.o $(BUILD_STATS)
 	@echo
 
 shared: $(SHARED).$(BUILD_TRIPLET)
+demo: $(BUILD_BIN)/demo.o
 
 $(BUILD_BIN)/demo.o: $(BUILD_SRC)/demo.c
 	@echo -e Building $(BUILD_NAME) \
