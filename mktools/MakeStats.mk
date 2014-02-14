@@ -63,7 +63,7 @@ endif
 #
 # Likewise to increment the major build version, from the command line:
 #
-# make push-major
+# make push-major;
 #
 # To change the product, project, or code name:
 #
@@ -89,7 +89,9 @@ BUILD_STATS = project.ver
 MAKESTATS != if ! test -e $(BUILD_STATS); then \
 	printf "%s\n\n" "Creating build statistics database ..." >&2; \
 	echo 0 0 0 0 `date +%s` $(USER) `basename $(shell pwd)` > $(BUILD_STATS); \
-	touch $(BUILD_VERSION_SOURCES); \
+ifdef $(BUILD_VERSION_SOURCES)
+	touch -mc $(BUILD_VERSION_SOURCES); \
+endif
 fi;
 
 MAKESTATS != cat $(BUILD_STATS) 2>&- || true
