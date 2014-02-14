@@ -48,9 +48,12 @@ endif
 # Populate this variable with all sources that will cause version to change
 # when modified.
 #
-# To trigger updating of stats, use $(BUILD_STATS) as a final prerequisite:
+# To trigger updating of stats, use push-build as a final prerequisite:
 #
-# my_program: some.c some.h $(BUILD_STATS)
+# my_program: some.c some.h push-build
+#
+# DO NOTE: Each pre-requisite for push-build WILL increment build number!
+# so only call for it once in the project build process.
 #
 # Which will automatically increment your build revision number.
 #
@@ -96,6 +99,7 @@ BUILD_USER  = $(word 6, $(MAKESTATS))
 BUILD_NAME = $(wordlist 7, $(words $(MAKESTATS)), $(MAKESTATS))
 BUILD_TRIPLET = $(BUILD_MAJOR).$(BUILD_MINOR).$(BUILD_REVISION)
 
+
 stats: BUILD_REVISION != expr $(BUILD_REVISION) - 1
 stats: BUILD_NUMBER != expr $(BUILD_NUMBER) - 1
 stats:
@@ -126,7 +130,9 @@ build-name:
 	)
 
 $(BUILD_STATS): BUILD_REVISION != expr $(BUILD_REVISION) + 1
-$(BUILD_STATS): BUILD_NUMBER != expr $(BUILD_NUMBER) + 1
 $(BUILD_STATS): BUILD_DATE != date +%s
 $(BUILD_STATS): $(BUILD_VERSION_SOURCES)
 	@$(BUILD_DUMP_STATS)
+
+push-build: $(BUILD_STATS)
+	@(set -- `cat $(BUILD_STATS)`; echo $${@:1:3} `expr $$4 + 1` $${@:5} > $(BUILD_STATS));

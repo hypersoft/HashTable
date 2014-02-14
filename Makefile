@@ -47,7 +47,7 @@ include mktools/MakeStats.mk
 
 $(BUILD_BIN)/HashTable.o: CFLAGS += -fPIC
 $(BUILD_BIN)/HashTable.o: \
-		$(BUILD_SRC)/HashTable.c $(BUILD_SRC)/HashTable.h $(BUILD_STATS)
+		$(BUILD_SRC)/HashTable.c $(BUILD_SRC)/HashTable.h push-build
 	$(COMPILE.c) $(BUILD_OFLAGS) $(BUILD_FLAGS) -o $@ $<
 	@echo
 
@@ -60,19 +60,17 @@ $(ARCHIVE): $(BUILD_BIN)/HashTable.o $(HEADER)
 	$(AR) -vr $@ $<
 	@echo
 
-$(SHARED).$(BUILD_TRIPLET): $(BUILD_BIN)/HashTable.o $(BUILD_STATS)
-	@echo -e Building $(BUILD_NAME) \
-		$(BUILD_MAJOR).$(BUILD_MINOR).$(BUILD_REVISION) library...'\n' >&2;
+$(SHARED).$(BUILD_TRIPLET): $(BUILD_BIN)/HashTable.o
+	@echo -e Building $(BUILD_NAME) $(BUILD_TRIPLET) library...'\n' >&2;
 	ld $(BUILD_SOFLAGS) -o $@ $<
 	@echo
 
 shared: $(SHARED).$(BUILD_TRIPLET)
-demo: $(BUILD_BIN)/demo.o
+demo: $(BUILD_BIN)/demo
 
 $(BUILD_BIN)/demo.o: $(BUILD_SRC)/demo.c
-	@echo -e Building $(BUILD_NAME) \
-		$(BUILD_MAJOR).$(BUILD_MINOR).$(BUILD_REVISION) demo...'\n' >&2;
-	$(COMPILE.c) -o $@ $^
+	@echo -e Building $(BUILD_NAME) $(BUILD_TRIPLET) demo...'\n' >&2;
+	$(COMPILE.c) -o $@ $<
 	@echo
 
 $(BUILD_BIN)/demo: $(BUILD_BIN)/demo.o  $(BUILD_BIN)/HashTable.o

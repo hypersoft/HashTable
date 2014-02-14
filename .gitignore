@@ -2,4 +2,4 @@ bin
 nbproject
 HashTable.a
 HashTable.h
-libhashtable.so
+libhashtable.so*
