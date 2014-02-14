@@ -16,7 +16,7 @@ BUILD_VENDOR = Hypersoft Systems
 # http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html
 
 # disable MakeStats notice
-NOTICE=FALSE
+BUILD_STATS_NOTICE=FALSE
 
 BUILD_FLAGS += \
 -DHT_VERSION_VENDOR='"$(BUILD_VENDOR)"' \
@@ -35,32 +35,37 @@ void != test -d $(BUILD_OUTPUT) || mkdir $(BUILD_OUTPUT);
 
 ARCHIVE = $(BUILD_OUTPUT)/HashTable.a
 SHARED = $(BUILD_OUTPUT)/libhashtable.so
+
 HEADER = $(BUILD_OUTPUT)/HashTable.h
+BUILD_MAIN = $(BUILD_BIN)/HashTable.o
 
 CFLAGS = -O3
 BUILD_SOFLAGS = -export-dynamic -shared -soname $(SHARED).$(BUILD_MAJOR)
 
-all: $(ARCHIVE)
+all: $(ARCHIVE) $(SHARED)
 
+# This MakeStats variable updates build revision if these files are modified
+# We will also use this list as a prerequisite list for our main object.
 BUILD_VERSION_SOURCES = $(BUILD_SRC)/HashTable.c $(BUILD_SRC)/HashTable.h
+
 include mktools/MakeStats.mk
 
-$(BUILD_BIN)/HashTable.o: CFLAGS += -fPIC
-$(BUILD_BIN)/HashTable.o: \
-		$(BUILD_SRC)/HashTable.c $(BUILD_SRC)/HashTable.h push-build
-	$(COMPILE.c) $(BUILD_OFLAGS) $(BUILD_FLAGS) -o $@ $<
+$(BUILD_MAIN): CFLAGS += -fPIC
+
+# Notice push-build below, it triggers ALL MakeStats updates
+$(BUILD_MAIN): $(BUILD_VERSION_SOURCES) push-build
+	$(COMPILE.c) $(BUILD_MAIN_FLAGS) $(BUILD_FLAGS) -o $@ $<
 	@echo
 
-$(HEADER):
-	@cp $(BUILD_SRC)/HashTable.h $(BUILD_OUTPUT)
+$(HEADER): $(BUILD_OUTPUT)
+	@cp $@ $^
 
-$(ARCHIVE): $(BUILD_BIN)/HashTable.o $(HEADER)
-	@echo -e Building $(BUILD_NAME) \
-		$(BUILD_MAJOR).$(BUILD_MINOR).$(BUILD_REVISION) archive...'\n' >&2;
+$(ARCHIVE): $(BUILD_MAIN) $(HEADER)
+	@echo -e Building $(BUILD_NAME) $(BUILD_TRIPLET) archive...'\n' >&2;
 	$(AR) -vr $@ $<
 	@echo
 
-$(SHARED).$(BUILD_TRIPLET): $(BUILD_BIN)/HashTable.o
+$(SHARED).$(BUILD_TRIPLET): $(BUILD_MAIN)
 	@echo -e Building $(BUILD_NAME) $(BUILD_TRIPLET) library...'\n' >&2;
 	ld $(BUILD_SOFLAGS) -o $@ $<
 	@echo
@@ -73,11 +78,11 @@ $(BUILD_BIN)/demo.o: $(BUILD_SRC)/demo.c
 	$(COMPILE.c) -o $@ $<
 	@echo
 
-$(BUILD_BIN)/demo: $(BUILD_BIN)/demo.o  $(BUILD_BIN)/HashTable.o
+$(BUILD_BIN)/demo: $(BUILD_BIN)/demo.o  $(BUILD_MAIN)
 	$(LINK.c) -o $@ $^
 	@echo
 
 clean:
-	@$(RM) -v $(BUILD_BIN)/HashTable.o $(ARCHIVE) $(HEADER) $(SHARED)* \
+	@$(RM) -v $(BUILD_MAIN) $(ARCHIVE) $(HEADER) $(SHARED)* \
 		$(BUILD_BIN)/demo $(BUILD_BIN)/demo.o
 	@echo

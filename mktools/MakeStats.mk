@@ -10,8 +10,8 @@
 #  2) DO NOT REMOVE OR MODIFY THE FOLLOWING NOTICE.
 #
 
-ifneq (FALSE, $(NOTICE))
-NOTICE := $(shell { \
+ifneq (FALSE, $(BUILD_STATS_NOTICE))
+BUILD_STATS_NOTICE := $(shell { \
 	printf 'Makestats: \n\n'; \
 	printf '\t%s\n' \
 		'(C) 2014 Hypersoft Systems All Rights Reserved.' \
@@ -48,14 +48,12 @@ endif
 # Populate this variable with all sources that will cause version to change
 # when modified.
 #
-# To trigger updating of stats, use push-build as a final prerequisite:
+# To trigger update of stats, use push-build as a final prerequisite:
 #
-# my_program: some.c some.h push-build
+# my_program.o: some.c some.h push-build
 #
-# DO NOTE: Each pre-requisite for push-build WILL increment build number!
-# so only call for it once in the project build process.
-#
-# Which will automatically increment your build revision number.
+# Which will automatically increment your build number, and if ANY
+# BUILD_VERSION_SOURCES are new, will also update build revision, user and date.
 #
 # To increment the minor build version, from the command line you shall issue:
 #
@@ -76,63 +74,68 @@ endif
 # make stats;
 #
 # =================================================================================
+#
+# Finally, DO NOT MIX TARGETS with: push-major, push-minor or build-name
+# While you can do this, it will not produce the obvious result, due to the
+# way GNU Make and alike expand variables at make file initialization.
+#
+# There is no way to exit a makefile early without an error which would be a
+# false positive, so.. That's the rest of the story...
+#
+# =================================================================================
 
 BUILD_STATS = project.ver
 
 MAKESTATS != if ! test -e $(BUILD_STATS); then \
 	printf "%s\n\n" "Creating build statistics database ..." >&2; \
-	echo 0 0 1 1 `date +%s` $(USER) `basename $(shell pwd)` > $(BUILD_STATS); \
+	echo 0 0 0 0 `date +%s` $(USER) `basename $(shell pwd)` > $(BUILD_STATS); \
 	touch $(BUILD_VERSION_SOURCES); \
 fi;
-
-BUILD_DUMP_STATS = echo $(BUILD_MAJOR) $(BUILD_MINOR) $(BUILD_REVISION) \
-    $(BUILD_NUMBER) $(BUILD_DATE) $(USER) $(BUILD_NAME) > $(BUILD_STATS)
 
 MAKESTATS != cat $(BUILD_STATS) 2>&- || true
 
 BUILD_MAJOR = $(word 1, $(MAKESTATS))
 BUILD_MINOR = $(word 2, $(MAKESTATS))
-BUILD_REVISION = $(word 3, $(MAKESTATS))
-BUILD_NUMBER = $(word 4, $(MAKESTATS))
-BUILD_DATE = $(word 5, $(MAKESTATS))
-BUILD_USER  = $(word 6, $(MAKESTATS))
+BUILD_REVISION != expr $(word 3, $(MAKESTATS)) + 1
+BUILD_NUMBER != expr $(word 4, $(MAKESTATS)) + 1
+BUILD_DATE != date +%s
+BUILD_USER  = $(USER)
 BUILD_NAME = $(wordlist 7, $(words $(MAKESTATS)), $(MAKESTATS))
 BUILD_TRIPLET = $(BUILD_MAJOR).$(BUILD_MINOR).$(BUILD_REVISION)
 
-
-stats: BUILD_REVISION != expr $(BUILD_REVISION) - 1
-stats: BUILD_NUMBER != expr $(BUILD_NUMBER) - 1
 stats:
-	@echo Build Developer: $(BUILD_USER)
-	@echo '  'Build Version: $(BUILD_MAJOR).$(BUILD_MINOR).$(BUILD_REVISION)
-	@echo '   'Build Number: $(BUILD_NUMBER)
-	@echo '     'Build Date: `date --date=@$(BUILD_DATE)`
-	@echo '     'Build Name: $(BUILD_NAME)
+	@(  \
+	    set -- `cat $(BUILD_STATS)`; \
+	    printf "%s\n" \
+	    "Build Developer: $$6" \
+	    "  Build Version: $$1.$$2.$$3" \
+	    "   Build Number: $$4" \
+	    "     Build Date: `date --date=@$$5`" \
+	    "     Build Name: $${@:7}" \
+	);
 	@echo
 
-push-major: BUILD_MAJOR != expr $(BUILD_MAJOR) + 1
-push-major: BUILD_MINOR = 0
-push-major: BUILD_REVISON = 0
+# Update build major, clearing build minor and build revision
 push-major:
-	@$(BUILD_DUMP_STATS);
-	@echo
-	
-push-minor: BUILD_MINOR != expr $(BUILD_MINOR) + 1
-push-minor: BUILD_REVISON = 0
+	@sh -c 'echo `expr $$1 + 1` 0 0 $${@:4} > $(BUILD_STATS);' -- `cat $(BUILD_STATS)`
+
+# Update build minor, clearing build revision
 push-minor:
-	@$(BUILD_DUMP_STATS);
-	@echo
+	@sh -c 'echo $$1 `expr $$2 + 1` 0 $${@:4} > $(BUILD_STATS);' -- `cat $(BUILD_STATS)`
 
+# Update build name
 build-name:
-	@$(shell read -ep "Enter product or code name: " NAME; echo -n \
-		$(BUILD_MAJOR) $(BUILD_MINOR) $(BUILD_REVISION) $(BUILD_NUMBER)  \
-		$(BUILD_DATE) $(USER) $$NAME > $(BUILD_STATS); \
-	)
+	@sh -c 'echo $${@:1:6} `read -ep "Enter product or code name: " NAME; echo $$NAME` > $(BUILD_STATS);' -- `cat $(BUILD_STATS)`
 
-$(BUILD_STATS): BUILD_REVISION != expr $(BUILD_REVISION) + 1
-$(BUILD_STATS): BUILD_DATE != date +%s
+# Update build number; possibly revision, date, and user
+push-build: push-version
+	@sh -c 'echo $${@:1:3} $(BUILD_NUMBER) $${@:5} > $(BUILD_STATS);' -- `cat $(BUILD_STATS)`
+
+# Update revision, date, and user if sources are newer than stats
 $(BUILD_STATS): $(BUILD_VERSION_SOURCES)
-	@$(BUILD_DUMP_STATS)
+	@sh -c 'echo $$1 $$2 $(BUILD_REVISION) $$4 $(BUILD_DATE) $(USER) $${@:7} > $(BUILD_STATS);' -- `cat $(BUILD_STATS)`
 
-push-build: $(BUILD_STATS)
-	@(set -- `cat $(BUILD_STATS)`; echo $${@:1:3} `expr $$4 + 1` $${@:5} > $(BUILD_STATS));
+push-version: $(BUILD_STATS)
+
+# These targets will build regardless of existing files
+.PHONY: stats build-name push-major push-minor push-version push-build
