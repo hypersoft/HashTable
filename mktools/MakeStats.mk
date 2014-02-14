@@ -86,15 +86,27 @@ endif
 
 BUILD_STATS ?= project.ver
 
+ifeq (, $(BUILD_STATS))
+    void != $(error MakeStats Database name is zero-length)
+endif
+
+ifeq (TRUE, $(shell test -d $(BUILD_STATS) && echo TRUE))
+    void != $(error MakeStats Database name is a directory)
+endif
+
 ifndef BUILD_VERSION_SOURCES
     void != $(error You must define your BUILD_VERSION_SOURCES)
 endif
 
-MAKESTATS != if ! test -e $(BUILD_STATS); then \
+void != if ! test -e $(BUILD_STATS); then \
 	printf "%s\n\n" "Creating build statistics database ..." >&2; \
 	echo 0 0 0 0 `date +%s` $(USER) `basename $(shell pwd)` > $(BUILD_STATS); \
 	touch -mc $(BUILD_VERSION_SOURCES); \
 fi;
+
+ifeq (1, $(shell expr `wc -w $(BUILD_STATS) | cut -d ' ' -f1` "<" 7))
+    void != $(error Unrecognized MakeStats Database format: $(BUILD_STATS))
+endif
 
 MAKESTATS != cat $(BUILD_STATS)
 
