@@ -84,6 +84,12 @@ endif
 #
 # =================================================================================
 
+# DB FMT: MAJOR MINOR REVISION BUILD DATE USER PRODUCT...\n
+# MAJOR MINOR REVISION and BUILD must be INTEGERS
+# DATE must be an EPOCH interval
+# USER may not contain spaces
+
+# You can set this variable in YOUR makefile/command-line if need be.
 BUILD_STATS ?= project.ver
 
 ifeq (, $(BUILD_STATS))
@@ -96,6 +102,16 @@ endif
 
 ifndef BUILD_VERSION_SOURCES
     void != $(error You must define your BUILD_VERSION_SOURCES)
+endif
+
+ifeq (, $(BUILD_VERSION_SOURCES))
+    void != $(error BUILD_VERSION_SOURCES are zero-length)
+endif
+
+BUILD_VERSION_SOURCE_CHECK := $(foreach file,$(BUILD_SOURCES),$(shell test -e $(file) || echo $(file)))
+
+ifneq (, $(BUILD_VERSION_SOURCE_CHECK))
+    void != $(error Could not find file $(word 1, $(BUILD_VERSION_SOURCE_CHECK)) specified by BUILD_VERSION_SOURCES)
 endif
 
 void != if ! test -e $(BUILD_STATS); then \
@@ -151,7 +167,7 @@ push-build: push-version
 
 # Update revision, date, and user if sources are newer than stats
 $(BUILD_STATS): $(BUILD_VERSION_SOURCES)
-	@sh -c 'echo $$1 $$2 $(BUILD_REVISION) $$4 $(BUILD_DATE) $(BUILD_USER) $${@:7} > $(BUILD_STATS);' -- `cat $(BUILD_STATS)`
+	@sh -c 'echo $$1 $$2 $(BUILD_REVISION) $$4 $(BUILD_DATE) "$(BUILD_USER)" $${@:7} > $(BUILD_STATS);' -- `cat $(BUILD_STATS)`
 
 # These targets will build regardless of existing files
 .PHONY: stats build-name push-major push-minor push-version push-build
