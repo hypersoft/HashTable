@@ -34,7 +34,7 @@
  * This value will be used to determine how many slots to allocate.
  */
 #ifndef HT_DEFAULT_RESERVE_SLOTS
-#define HT_DEFAULT_RESERVE_SLOTS 32L
+#define HT_DEFAULT_RESERVE_SLOTS sizeof(size_t)
 #endif
 
 // Compile Makefile Definitions
