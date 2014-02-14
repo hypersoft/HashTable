@@ -43,11 +43,14 @@ endif
 # To use this file properly, you must include the file at the end
 # of your make script, or at least after the default rule.
 #
-# After you have succesfully built your rule, you shall issue a statement of the form:
+# Variable: BUILD_VERSION_SOURCES
 #
-# rule:
-#	...
-#	@$(push-stats)
+# Populate this variable with all sources that will cause version to change
+# when modified.
+#
+# To trigger updating of stats, use $(BUILD_STATS) as a final prerequisite:
+#
+# my_program: some.c some.h $(BUILD_STATS)
 #
 # Which will automatically increment your build revision number.
 #
@@ -65,18 +68,25 @@ endif
 #
 # make build-name;
 #
-# To review your project make stats:
+# To review your project version stats:
 #
 # make stats;
 #
 # =================================================================================
 
-MAKESTATS != if ! test -e make.sts; then \
-	echo Creating build statistics database ... >&2; \
-	echo 0 0 0 0 `date +%s` $(USER) `basename $(shell pwd)` > make.sts; \
+BUILD_STATS = project.ver
+
+MAKESTATS != if ! test -e $(BUILD_STATS); then \
+	printf "%s\n\n" "Creating build statistics database ..." >&2; \
+	echo 0 0 1 1 `date +%s` $(USER) `basename $(shell pwd)` > $(BUILD_STATS); \
+	touch $(BUILD_VERSION_SOURCES); \
 fi;
 
-MAKESTATS != cat make.sts 2>&- || true
+BUILD_DUMP_STATS = echo $(BUILD_MAJOR) $(BUILD_MINOR) $(BUILD_REVISION) \
+    $(BUILD_NUMBER) $(BUILD_DATE) $(USER) $(BUILD_NAME) > $(BUILD_STATS)
+
+MAKESTATS != cat $(BUILD_STATS) 2>&- || true
+
 BUILD_MAJOR = $(word 1, $(MAKESTATS))
 BUILD_MINOR = $(word 2, $(MAKESTATS))
 BUILD_REVISION = $(word 3, $(MAKESTATS))
@@ -84,34 +94,10 @@ BUILD_NUMBER = $(word 4, $(MAKESTATS))
 BUILD_DATE = $(word 5, $(MAKESTATS))
 BUILD_USER  = $(word 6, $(MAKESTATS))
 BUILD_NAME = $(wordlist 7, $(words $(MAKESTATS)), $(MAKESTATS))
+BUILD_TRIPLET = $(BUILD_MAJOR).$(BUILD_MINOR).$(BUILD_REVISION)
 
-THIS_BUILD_REVISION != expr $(BUILD_REVISION) + 1
-THIS_BUILD_NUMBER != expr $(BUILD_NUMBER) + 1
-THIS_BUILD_DATE != date +%s
-THIS_BUILD_TRIPLET = $(BUILD_MAJOR).$(BUILD_MINOR).$(THIS_BUILD_REVISION)
-
-push-stats = echo -n \
-$(BUILD_MAJOR) $(BUILD_MINOR) $(THIS_BUILD_REVISION) $(THIS_BUILD_NUMBER)  \
-$(THIS_BUILD_DATE) $(USER) $(BUILD_NAME) > make.sts;
-
-push-major:
-	@echo -n \
-	$(shell expr $(BUILD_MINOR) + 1) 0 0 $(BUILD_NUMBER)  \
-	$(THIS_BUILD_DATE) $(USER) $(BUILD_NAME) > make.sts;
-	@echo
-
-push-minor:
-	@echo -n \
-	$(BUILD_MAJOR) $(shell expr $(BUILD_MINOR) + 1) 0 $(BUILD_NUMBER)  \
-	$(THIS_BUILD_DATE) $(USER) $(BUILD_NAME) > make.sts;
-	@echo
-
-build-name:
-	@$(shell read -ep "Enter product or code name: " NAME; echo -n \
-		$(BUILD_MAJOR) $(BUILD_MINOR) $(BUILD_REVISION) $(BUILD_NUMBER)  \
-		$(BUILD_DATE) $(USER) $$NAME > make.sts; \
-	)
-
+stats: BUILD_REVISION != expr $(BUILD_REVISION) - 1
+stats: BUILD_NUMBER != expr $(BUILD_NUMBER) - 1
 stats:
 	@echo Build Developer: $(BUILD_USER)
 	@echo '  'Build Version: $(BUILD_MAJOR).$(BUILD_MINOR).$(BUILD_REVISION)
@@ -120,3 +106,27 @@ stats:
 	@echo '     'Build Name: $(BUILD_NAME)
 	@echo
 
+push-major: BUILD_MAJOR != expr $(BUILD_MAJOR) + 1
+push-major: BUILD_MINOR = 0
+push-major: BUILD_REVISON = 0
+push-major:
+	@$(BUILD_DUMP_STATS);
+	@echo
+	
+push-minor: BUILD_MINOR != expr $(BUILD_MINOR) + 1
+push-minor: BUILD_REVISON = 0
+push-minor:
+	@$(BUILD_DUMP_STATS);
+	@echo
+
+build-name:
+	@$(shell read -ep "Enter product or code name: " NAME; echo -n \
+		$(BUILD_MAJOR) $(BUILD_MINOR) $(BUILD_REVISION) $(BUILD_NUMBER)  \
+		$(BUILD_DATE) $(USER) $$NAME > $(BUILD_STATS); \
+	)
+
+$(BUILD_STATS): BUILD_REVISION != expr $(BUILD_REVISION) + 1
+$(BUILD_STATS): BUILD_NUMBER != expr $(BUILD_NUMBER) + 1
+$(BUILD_STATS): BUILD_DATE != date +%s
+$(BUILD_STATS): $(BUILD_VERSION_SOURCES)
+	@$(BUILD_DUMP_STATS)

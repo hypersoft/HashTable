@@ -15,11 +15,14 @@ BUILD_VENDOR = Hypersoft Systems
 #
 # http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html
 
+# disable MakeStats notice
+NOTICE=FALSE
+
 BUILD_FLAGS += \
 -DHT_VERSION_VENDOR='"$(BUILD_VENDOR)"' \
--DHT_VERSION_TRIPLET='"$(THIS_BUILD_TRIPLET)"' \
--DHT_VERSION_DESCRIPTION='"$(BUILD_VENDOR) $(BUILD_NAME) $(THIS_BUILD_TRIPLET)"' \
--DHT_VERSION_BUILDNO=$(THIS_BUILD_NUMBER)
+-DHT_VERSION_TRIPLET='"$(BUILD_TRIPLET)"' \
+-DHT_VERSION_DESCRIPTION='"$(BUILD_VENDOR) $(BUILD_NAME) $(BUILD_TRIPLET)"' \
+-DHT_VERSION_BUILDNO=$(BUILD_NUMBER)
 
 BUILD_OUTPUT ?= .
 BUILD_SRC ?= src
@@ -35,21 +38,16 @@ SHARED = $(BUILD_OUTPUT)/libhashtable.so
 HEADER = $(BUILD_OUTPUT)/HashTable.h
 
 CFLAGS = -O3
-BUILD_OFLAGS = -fPIC
 BUILD_SOFLAGS = -export-dynamic -shared -soname $(SHARED).$(BUILD_MAJOR)
 
 all: $(ARCHIVE)
 
-NOTICE=FALSE
+BUILD_VERSION_SOURCES = $(BUILD_SRC)/HashTable.c $(BUILD_SRC)/HashTable.h
 include mktools/MakeStats.mk
 
-make.sts: $(BUILD_SRC)/HashTable.c $(BUILD_SRC)/HashTable.h
-ifndef BUILD_TEST
-	@$(push-stats)
-endif
-
+$(BUILD_BIN)/HashTable.o: CFLAGS += -fPIC
 $(BUILD_BIN)/HashTable.o: \
-		$(BUILD_SRC)/HashTable.c $(BUILD_SRC)/HashTable.h make.sts
+		$(BUILD_SRC)/HashTable.c $(BUILD_SRC)/HashTable.h $(BUILD_STATS)
 	$(COMPILE.c) $(BUILD_OFLAGS) $(BUILD_FLAGS) -o $@ $<
 	@echo
 
@@ -58,21 +56,21 @@ $(HEADER):
 
 $(ARCHIVE): $(BUILD_BIN)/HashTable.o $(HEADER)
 	@echo -e Building $(BUILD_NAME) \
-		$(BUILD_MAJOR).$(BUILD_MINOR).$(THIS_BUILD_REVISION) archive...'\n' >&2;
+		$(BUILD_MAJOR).$(BUILD_MINOR).$(BUILD_REVISION) archive...'\n' >&2;
 	$(AR) -vr $@ $<
 	@echo
 
-$(SHARED).$(THIS_BUILD_TRIPLET): $(BUILD_BIN)/HashTable.o make.sts
+$(SHARED).$(BUILD_TRIPLET): $(BUILD_BIN)/HashTable.o $(BUILD_STATS)
 	@echo -e Building $(BUILD_NAME) \
-		$(BUILD_MAJOR).$(BUILD_MINOR).$(THIS_BUILD_REVISION) library...'\n' >&2;
+		$(BUILD_MAJOR).$(BUILD_MINOR).$(BUILD_REVISION) library...'\n' >&2;
 	ld $(BUILD_SOFLAGS) -o $@ $<
 	@echo
 
-shared: $(SHARED).$(THIS_BUILD_TRIPLET)
+shared: $(SHARED).$(BUILD_TRIPLET)
 
 $(BUILD_BIN)/demo.o: $(BUILD_SRC)/demo.c
 	@echo -e Building $(BUILD_NAME) \
-		$(BUILD_MAJOR).$(BUILD_MINOR).$(THIS_BUILD_REVISION) demo...'\n' >&2;
+		$(BUILD_MAJOR).$(BUILD_MINOR).$(BUILD_REVISION) demo...'\n' >&2;
 	$(COMPILE.c) -o $@ $^
 	@echo
 
