@@ -49,7 +49,10 @@ BUILD_SHARED = $(BUILD_OUTPUT)/libhashtable
 BUILD_VERSION_SOURCES = $(BUILD_SRC)/HashTable.c $(BUILD_SRC)/HashTable.h
 
 # build these targets even if files exist
-.PHONY: archive library demo
+.PHONY: all archive library demo
+
+# This project doesn't use old implicit rules
+.SUFFIXES:
 
 # define our targets (these are based on variables from the MakeStats include)
 all: archive library demo

@@ -200,3 +200,5 @@ build-major:
 build-minor:
 	@sh -c 'echo $$1 `expr $$2 + 1` 0 "$${@:4}" > $(BUILD_STATS);' -- \
 	    `cat $(BUILD_STATS)`
+
+.PHONY: build-stats build-name build-major build-minor
