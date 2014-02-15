@@ -81,18 +81,18 @@ $(BUILD_HEADER): $(BUILD_SRC)/HashTable.h
 
 $(BUILD_ARCHIVE): $(BUILD_MAIN) $(BUILD_HEADER)
 	@$(make-build-number)
-	@echo -e Building $(BUILD_NAME) $(BUILD_TRIPLET) archive...'\n' >&2;
+	@echo -e 'Building $(BUILD_NAME) $(BUILD_TRIPLET) archive...\n'
 	$(AR) -vr $@ $<
 	@echo
 
 $(BUILD_LIBRARY): $(BUILD_MAIN)
 	@$(make-build-number)
-	@echo -e Building $(BUILD_NAME) $(BUILD_TRIPLET) library...'\n' >&2;
+	@echo -e 'Building $(BUILD_NAME) $(BUILD_TRIPLET) library...\n'
 	ld $(BUILD_SOFLAGS) -o $@ $<
 	@echo
 
 $(BUILD_BIN)/demo.o: $(BUILD_SRC)/demo.c
-	@echo -e Building $(BUILD_NAME) $(BUILD_TRIPLET) demo...'\n' >&2;
+	@echo -e 'Building $(BUILD_NAME) $(BUILD_TRIPLET) demo...\n'
 	$(COMPILE.c) -o $@ $<
 	@echo
 
@@ -101,7 +101,7 @@ $(BUILD_BIN)/demo: $(BUILD_BIN)/demo.o  $(BUILD_MAIN)
 	@echo
 
 install: $(BUILD_SHARED) $(BUILD_HEADER)
-	@echo Installing shared library...
+	@echo 'Installing shared library...'
 	@cp -v $(BUILD_SHARED) $(SYSTEM_LIBDIR)
 	@cp -v $(BUILD_HEADER) $(SYSTEM_INCDIR)
 	ldconfig -n $(SYSTEM_LIBDIR)
