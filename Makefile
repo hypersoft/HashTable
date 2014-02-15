@@ -28,50 +28,65 @@ BUILD_OUTPUT ?= .
 BUILD_SRC ?= src
 BUILD_BIN ?= bin
 
+# System Install Paths for lib & header
+SYSTEM_LIBDIR := /usr/local/lib
+SYSTEM_INCDIR := /usr/local/include
+
 void != echo >&2;
 
 void != test -d $(BUILD_BIN) || mkdir $(BUILD_BIN);
 void != test -d $(BUILD_OUTPUT) || mkdir $(BUILD_OUTPUT);
 
-ARCHIVE = $(BUILD_OUTPUT)/HashTable.a
-SHARED = $(BUILD_OUTPUT)/libhashtable.so
-
-HEADER = $(BUILD_OUTPUT)/HashTable.h
-BUILD_MAIN = $(BUILD_BIN)/HashTable.o
-
 CFLAGS = -O3
-BUILD_SOFLAGS = -export-dynamic -shared -soname $(SHARED).$(BUILD_MAJOR)
 
-all: $(ARCHIVE) $(SHARED)
+BUILD_ARCHIVE = $(BUILD_OUTPUT)/HashTable.a
+BUILD_HEADER = $(BUILD_OUTPUT)/HashTable.h
+BUILD_MAIN = $(BUILD_BIN)/HashTable.o
+BUILD_SHARED = $(BUILD_OUTPUT)/libhashtable
 
 # This MakeStats variable updates build revision if these files are modified
 # We will also use this list as a prerequisite list for our main object.
 BUILD_VERSION_SOURCES = $(BUILD_SRC)/HashTable.c $(BUILD_SRC)/HashTable.h
 
-include mktools/MakeStats.mk
+# build these targets even if files exist
+.PHONY: archive library demo
+
+# define our targets (these are based on variables from the MakeStats include)
+all: archive library demo
+
+# include MakeStats
+include $(BUILD_SRC)/../mktools/MakeStats.mk
+
+# create the shared object "meta-datas"
+BUILD_SOFLAGS = -export-dynamic -shared -soname $(BUILD_SHARED).so.$(BUILD_MAJOR)
+BUILD_LIBRARY:= $(BUILD_SHARED).so.$(BUILD_TRIPLET)
+
+# Shortcuts: these allow us make build targets based on included variables
+archive: $(BUILD_ARCHIVE)
+library: $(BUILD_LIBRARY)
+demo: $(BUILD_BIN)/demo
 
 $(BUILD_MAIN): CFLAGS += -fPIC
-
-# Notice push-build below, it triggers ALL MakeStats updates
-$(BUILD_MAIN): $(BUILD_VERSION_SOURCES) push-build
+$(BUILD_MAIN): $(BUILD_VERSION_SOURCES)
+	@$(make-build-number)
 	$(COMPILE.c) $(BUILD_MAIN_FLAGS) $(BUILD_FLAGS) -o $@ $<
+	@$(make-build-revision)
 	@echo
 
-$(HEADER): $(BUILD_OUTPUT)
-	@cp $@ $^
+$(BUILD_HEADER): $(BUILD_SRC)/HashTable.h
+	@cp $< $@
 
-$(ARCHIVE): $(BUILD_MAIN) $(HEADER)
+$(BUILD_ARCHIVE): $(BUILD_MAIN) $(BUILD_HEADER)
+	@$(make-build-number)
 	@echo -e Building $(BUILD_NAME) $(BUILD_TRIPLET) archive...'\n' >&2;
 	$(AR) -vr $@ $<
 	@echo
 
-$(SHARED).$(BUILD_TRIPLET): $(BUILD_MAIN)
+$(BUILD_LIBRARY): $(BUILD_MAIN)
+	@$(make-build-number)
 	@echo -e Building $(BUILD_NAME) $(BUILD_TRIPLET) library...'\n' >&2;
 	ld $(BUILD_SOFLAGS) -o $@ $<
 	@echo
-
-shared: $(SHARED).$(BUILD_TRIPLET)
-demo: $(BUILD_BIN)/demo
 
 $(BUILD_BIN)/demo.o: $(BUILD_SRC)/demo.c
 	@echo -e Building $(BUILD_NAME) $(BUILD_TRIPLET) demo...'\n' >&2;
@@ -82,7 +97,14 @@ $(BUILD_BIN)/demo: $(BUILD_BIN)/demo.o  $(BUILD_MAIN)
 	$(LINK.c) -o $@ $^
 	@echo
 
+install: $(BUILD_SHARED) $(BUILD_HEADER)
+	@echo Installing shared library...
+	@cp -v $(BUILD_SHARED) $(SYSTEM_LIBDIR)
+	@cp -v $(BUILD_HEADER) $(SYSTEM_INCDIR)
+	ldconfig -n $(SYSTEM_LIBDIR)
+	@echo
+
 clean:
-	@$(RM) -v $(BUILD_MAIN) $(ARCHIVE) $(HEADER) $(SHARED)* \
+	@$(RM) -v $(BUILD_MAIN) $(BUILD_ARCHIVE) $(BUILD_HEADER) $(BUILD_SHARED)* \
 		$(BUILD_BIN)/demo $(BUILD_BIN)/demo.o
 	@echo
