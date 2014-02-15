@@ -161,7 +161,7 @@ sh -c ' \
     fi; echo -n;' -- \
 `cat $(BUILD_STATS)`
 
-build-stats: $(BUILD_GOAL)
+build-stats:
 	@(  \
 	    set -- `cat $(BUILD_STATS)`; \
 	    printf "%s\n" \
