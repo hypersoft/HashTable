@@ -38,7 +38,7 @@ endif
 #    Please indicate "MakeStats" as your purpose and provide ANY contact address.
 # ==================================================================================
 
-# Usage
+# Usage ========================================================================
 #
 # To use this file properly, you must include the file at the end
 # of your make script, or at least after the default rule.
@@ -48,12 +48,19 @@ endif
 # Populate this variable with all sources that will cause version to change
 # when modified.
 #
-# To trigger update of stats, use build-build as a final prerequisite:
-#
-# my_program.o: some.c some.h build-build
-#
-# Which will automatically increment your build number, and if ANY
-# BUILD_VERSION_SOURCES are new, will also update build revision, user and date.
+# ==============================================================================
+# Do this BEFORE compiling, archiving, and linking your "main object".
+# ...
+# @$(make-build-number)
+# ...
+# To increment the build number. 
+# ==============================================================================
+# Do this AFTER SUCCESSFUL compile of your "main object".
+# ...
+# @$(make-build-revision)
+# ...
+# To increment the build revision. 
+# ==============================================================================
 #
 # To increment the minor build version, from the command line you shall issue:
 #
