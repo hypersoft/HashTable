@@ -60,7 +60,7 @@ all: archive library demo
 # include MakeStats
 include $(BUILD_SRC)/../mktools/MakeStats.mk
 
-# create the shared object "meta-datas"
+# create the shared object "meta-datum"
 BUILD_SOFLAGS = -export-dynamic -shared -soname $(BUILD_SHARED).so.$(BUILD_MAJOR)
 BUILD_LIBRARY:= $(BUILD_SHARED).so.$(BUILD_TRIPLET)
 
@@ -69,10 +69,10 @@ archive: $(BUILD_ARCHIVE)
 library: $(BUILD_LIBRARY)
 demo: $(BUILD_BIN)/demo
 
-$(BUILD_MAIN): CFLAGS += -fPIC
+$(BUILD_MAIN): CFLAGS += -fPIC $(BUILD_FLAGS)
 $(BUILD_MAIN): $(BUILD_VERSION_SOURCES)
 	@$(make-build-number)
-	$(COMPILE.c) $(BUILD_MAIN_FLAGS) $(BUILD_FLAGS) -o $@ $<
+	$(COMPILE.c) -o $@ $<
 	@$(make-build-revision)
 	@echo
 
