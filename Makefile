@@ -18,6 +18,9 @@ BUILD_VENDOR = Hypersoft Systems
 # disable MakeStats notice
 BUILD_STATS_NOTICE=FALSE
 
+# enable MakeStats auto commit; Warning noisy commit history!
+BUILD_STATS_AUTO_COMMIT = TRUE
+
 BUILD_FLAGS += \
 -DHT_VERSION_VENDOR='"$(BUILD_VENDOR)"' \
 -DHT_VERSION_TRIPLET='"$(BUILD_TRIPLET)"' \
