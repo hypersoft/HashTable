@@ -15,7 +15,7 @@ which the correct value can be found.
 
 This library written in 100% C is an implementation of hash table featuring
 separate chaining with linked lists. It supports binary keys, and binary data.
-Convenience procedures are provided to facilitate common key profiles such as:
+Convenience procedures are provided to facilitate common value profiles such as:
 
 *  UTF-8 String (ANSI C String)
 *  Integer
