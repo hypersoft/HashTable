@@ -68,6 +68,24 @@ typedef struct hashtable_s hashtable_t;
 	#include "HashTable.h"
 #undef HashTable_c
 
+/* INTERNAL: Get the load factor of a hash table */
+#define hashTableGetLoadFactor(ht) \
+	((double) (((double) ht->entries) / ((double) ht->size)))
+
+double
+HashTableGetLoadFactor(HashTable * hashTable)
+{
+	if (!hashTable) return 0.0;
+	return hashTableGetLoadFactor(hashTable);
+}
+
+size_t
+HashTableGetSize(HashTable * hashTable)
+{
+	if (!hashTable) return 0;
+	return hashTable->size;
+}
+
 hashtable_t *
 NewHashTable ( size_t size, void * userData )
 {

@@ -564,6 +564,12 @@ DestroyHashTable (HashTable * hashTable);
 HashTableLinkage bool
 HashTableHasEntry ( HashTable * hashTable, char * key );
 
+HashTableLinkage double
+HashTableGetLoadFactor(HashTable * hashTable);
+
+HashTableLinkage size_t
+HashTableGetSize(HashTable * hashTable);
+
 #undef HashTableLinkage
 
 #endif /* HashTable_h */
