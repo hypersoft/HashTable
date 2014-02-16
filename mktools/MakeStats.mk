@@ -126,7 +126,7 @@ ifeq (TRUE, $(BUILD_STATS_AUTO_COMMIT))
 
     # Nobody told me how to execute this directive...
     ifeq (,$(BUILD_STATS_AUTO_COMMIT))
-	error := $(info No command to commit MakeStats changes found)
+	void := $(info No command to commit MakeStats changes found)
     endif
 
 endif
