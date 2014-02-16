@@ -28,7 +28,6 @@ Convenience procedures are provided to facilitate common value profiles such as:
 *  Integer
 *  Double
 *  Pointer
-***
 
 ## Discussion
 
