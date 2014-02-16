@@ -72,7 +72,7 @@ hashtable_t *
 NewHashTable ( size_t size, void * userData )
 {
 	/* Allocate the table itself. */
-	hashtable_t * hashTable = malloc ( sizeof ( hashtable_t ) );
+	hashtable_t * hashTable = calloc ( 1, sizeof ( hashtable_t ) );
 
 	if ( !hashTable ) return NULL;
 
@@ -80,7 +80,7 @@ NewHashTable ( size_t size, void * userData )
 	hashTable->userData = userData;
 
 	/* Allocate pointers to the head nodes. */
-	if ( ( hashTable->entry = calloc ( size, sizeof (void* ) )
+	if ( ( hashTable->entry = calloc ( hashTable->size, sizeof (void* ) )
 	) == NULL ) {
 		free ( hashTable );
 		return NULL;
