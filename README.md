@@ -28,8 +28,4 @@ requests. Not only will the hash table store these properties, it will also
 track the size of the data supplied. Knowing the length of the key, is an
 essential component of lookup performance, wherefore the API, will check the
 key's length before performing a memory comparison.
-
-Due to the fact that the value stored may be of any arbitrary length, the API
-provides an optional output parameter for the size of the returned request. All
-requests for an entry return a constant pointer to the value's allocated data.
 ***
