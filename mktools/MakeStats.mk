@@ -198,7 +198,6 @@ make-build-number = \
 sh -c ' \
     if [ "$(BUILD_NUMBER)" != "$$4" ]; then \
 	echo $${@:1:3} $(BUILD_NUMBER) "$${@:5}" > $(BUILD_STATS); \
-	$(BUILD_STATS_AUTO_COMMIT) \
     fi; echo -n;' -- \
 `cat $(BUILD_STATS)`
 
