@@ -127,8 +127,11 @@ ifeq (TRUE, $(BUILD_STATS_AUTO_COMMIT))
     # Nobody told me how to execute this directive...
     ifeq (,$(BUILD_STATS_AUTO_COMMIT))
 	void := $(info No command to commit MakeStats changes found)
+	BUILD_STATS_AUTO_COMMIT = true;
     endif
 
+else
+    BUILD_STATS_AUTO_COMMIT = true;
 endif
 
 ifeq (, $(BUILD_STATS))
@@ -211,6 +214,7 @@ build-stats:
 	    "     Build Date: `date --date=@$$5`" \
 	    "     Build Name: $${@:7}" \
 	);
+	@$(BUILD_STATS_AUTO_COMMIT)
 	@echo
 
 # Update build name
