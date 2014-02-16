@@ -20,6 +20,7 @@ Convenience procedures are provided to facilitate common value profiles such as:
 *  UTF-8 String (ANSI C String)
 *  Integer
 *  Double
+*  Pointer
 
 Upon putting an entry into a hash table, both key and value are copied into
 the hash table to ensure the integrity and availability of the data for future
