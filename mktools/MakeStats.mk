@@ -105,7 +105,9 @@ endif
 # You can set this variable in YOUR makefile/command-line if need be.
 BUILD_STATS ?= project.ver
 
-ifdef BUILD_STATS_AUTO_COMMIT
+ifeq (TRUE, $(BUILD_STATS_AUTO_COMMIT))
+
+    BUILD_STATS_AUTO_COMMIT=
 
     BUILD_STATS_COMMIT_MESSAGE = \
     "$(BUILD_NAME) Version $(BUILD_TRIPLET); Build Number $(BUILD_NUMBER)"
