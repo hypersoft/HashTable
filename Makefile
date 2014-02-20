@@ -40,6 +40,8 @@ BUILD_BIN ?= bin
 
 BUILD_PATHS = $(BUILD_BIN) $(BUILD_OUTPUT)
 
+void != mkdir -p $(BUILD_PATHS); # make is sofaking stupid...
+
 # System Install Paths for lib & header
 SYSTEM_LIBDIR := /usr/local/lib
 SYSTEM_INCDIR := /usr/local/include
