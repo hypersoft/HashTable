@@ -100,19 +100,23 @@ typedef struct sHashTable {
 #define htReturnIfKeyNotFound(i) \
 	if ( ! i ) { errno = HT_ERROR_KEY_NOT_FOUND; return 0; }
 
-#define htReturnIfNotWritableItem(i) if (vartype(i->key) & HTR_NON_WRITABLE) { \
+#define htReturnIfNotWritableItem(i) if (vartype(i->value) & HTR_NON_WRITABLE) { \
 	errno = HT_ERROR_NOT_WRITABLE_ITEM; return 0; \
 }
 
 #define htReturnIfNotConfigurableItem(i) \
-if (vartype(i->key) & HTR_NON_CONFIGURABLE) { \
+if (vartype(i->value) & HTR_NON_CONFIGURABLE) { \
 	errno = HT_ERROR_NOT_CONFIGURABLE_ITEM; return 0; \
 }
+
+#define htReturnIfItemNotFound(i) \
+	if ( ! i ) { errno = HT_ERROR_INVALID_REFERENCE; return 0; }
 
 #define htItemAccess(ht, r, label, expr) \
 	htReturnIfTableUninitialized(ht); \
 	htReturnIfInvalidReference(ht, r); \
 	HashTableRecord label = ht->item[r]; \
+	htReturnIfItemNotFound(label);	\
 	if (label) return expr; \
 	else errno = HT_ERROR_INVALID_REFERENCE; \
 	return 0
@@ -216,6 +220,7 @@ void OptimizeHashTable
 ) {
 	htVoidIfTableUninitialized(ht);
 	/* doesn't do anything yet */
+	slots+1;
 	htVoidUnsupportedFunction();
 }
 
@@ -369,7 +374,7 @@ HashTableItem HashTablePut
 		htReturnIfNotWritableItem(current);
 		htReturnIfAllocationFailure(
 			(varValue = varcreate(valueLength, value, valueHint)), {}
-		);
+		) else varprvti(varValue) = index;
 		ht->impact += varimpact(current->value),
 		ht->impact += varimpact(varValue);
 		varfree(current->value);
@@ -388,7 +393,7 @@ HashTableItem HashTablePut
 	htReturnIfAllocationFailure(
 		(varValue = varcreate(valueLength, value, valueHint)),
 		free(this), varfree(varKey)
-	)   else this->value = varValue;
+	)   else this->value = varValue, varprvti(varValue) = index;
 
 	ht->impact += htRecordImpact(this), ht->itemsTotal++;
 
@@ -431,13 +436,14 @@ bool HashTableDeleteItem
 	htReturnIfInvalidReference(ht, reference);
 	HashTableRecord parent = NULL;
 	HashTableRecord item = ht->item[reference];
+	htReturnIfItemNotFound(item);
 	htReturnIfNotConfigurableItem(item);
 
 	item = htFindKeyWithParent(ht, varlen(item->key), item->key, item, &parent);
 
 	if (parent) parent->successor = item->successor;
 	else {
-		ht->slot[htKeyHash(ht, varlen(item->key), item->key)] = item->successor;
+		ht->slot[varprvti(item->value)] = item->successor;
 	}
 
 	ht->item[reference] = NULL, ht->itemsTotal--,
@@ -445,4 +451,32 @@ bool HashTableDeleteItem
 	varfree(item->key); varfree(item->value); free(item);
 	return true;
 
+}
+
+HashTableRecordFlags HashTableItemGetFlags
+(
+	HashTable ht,
+	HashTableItem reference
+) {
+	htItemAccess(ht, reference, item, vartype(item->value));
+}
+
+bool HashTableItemPutFlags
+(
+	HashTable ht,
+	HashTableItem reference,
+	HashTableRecordFlags settings
+) {
+	htReturnIfTableUninitialized(ht);
+	htReturnIfInvalidReference(ht, reference);
+	HashTableRecord item = ht->item[reference];
+	htReturnIfItemNotFound(item);
+	htReturnIfNotConfigurableItem(item);
+	/*
+	 we don't particularly use these flags, but to avoid future collision
+	 ignore setting them, or flag an error and return early...
+	 */
+	settings |= ~(HTR_INT | HTR_DOUBLE | HTR_POINTER | HTR_UTF8 | HTR_BLOCK);
+	vartype(item->value) |= settings;
+	return true;
 }

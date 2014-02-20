@@ -72,11 +72,7 @@ typedef enum eHashTableRecordFlags {
 	HTR_NON_ENUMERABLE   = HashTableBitFlag(6),
 	HTR_NON_WRITABLE     = HashTableBitFlag(7),
 	HTR_NON_CONFIGURABLE = HashTableBitFlag(8),
-	HTR_USER_MIN         = HashTableBitFlag(9),
-	HTR_USER_MAX         = HashTableBitFlag(31)
 } HashTableRecordFlags;
-
-#undef HashTableBitFlag
 
 /* cast integer things to double */
 #define htIntVal(i) ((double)(uint)(i))
@@ -227,6 +223,12 @@ HashTableItem HashTableGet
 );
 
 bool HashTableDeleteItem
+(
+	HashTable ht,
+	HashTableItem reference
+);
+
+HashTableRecordFlags HashTableItemGetFlags
 (
 	HashTable ht,
 	HashTableItem reference
