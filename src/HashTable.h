@@ -33,10 +33,22 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <errno.h>
 
 #define HashTableItem size_t
 
 #define HashTableBitFlag(n) (1 << (n))
+
+typedef enum HashTableError {
+	HT_ERROR_TABLE_UNINITIALIZED = EOWNERDEAD,
+	HT_ERROR_ALLOCATION_FAILURE = ENOMEM,
+	HT_ERROR_UNSUPPORTED_FUNCTION = ENOTSUP,
+	HT_ERROR_ZERO_LENGTH_KEY = EDESTADDRREQ,
+	HT_ERROR_KEY_NOT_FOUND = EADDRNOTAVAIL,
+	HT_ERROR_INVALID_REFERENCE = EFAULT,
+	HT_ERROR_NOT_CONFIGURABLE_ITEM = EACCES,
+	HT_ERROR_NOT_WRITABLE_ITEM = EROFS
+} HashTableError;
 
 typedef enum eHashTableEvent {
 	HT_EVENT_CONSTRUCTED     = HashTableBitFlag( 1),
@@ -52,16 +64,16 @@ typedef enum eHashTableEvent {
 } HashTableEvent;
 
 typedef enum eHashTableRecordFlags {
-	HTR_INT = HashTableBitFlag(1),
-	HTR_DOUBLE = HashTableBitFlag(2),
-	HTR_POINTER = HashTableBitFlag(3),
-	HTR_UTF8 = HashTableBitFlag(4),
-	HTR_BLOCK = HashTableBitFlag(5),
-	HTR_HIDDEN = HashTableBitFlag(6),
-	HTR_CONSTANT = HashTableBitFlag(7),
-	HTR_LOCKED = HashTableBitFlag(8),
-	HTR_USER_MIN = HashTableBitFlag(9),
-	HTR_USER_MAX = HashTableBitFlag(31)
+	HTR_INT              = HashTableBitFlag(1),
+	HTR_DOUBLE           = HashTableBitFlag(2),
+	HTR_POINTER          = HashTableBitFlag(3),
+	HTR_UTF8             = HashTableBitFlag(4),
+	HTR_BLOCK            = HashTableBitFlag(5),
+	HTR_NON_ENUMERABLE   = HashTableBitFlag(6),
+	HTR_NON_WRITABLE     = HashTableBitFlag(7),
+	HTR_NON_CONFIGURABLE = HashTableBitFlag(8),
+	HTR_USER_MIN         = HashTableBitFlag(9),
+	HTR_USER_MAX         = HashTableBitFlag(31)
 } HashTableRecordFlags;
 
 #undef HashTableBitFlag
@@ -84,7 +96,8 @@ typedef HashTableItem (*HashTableEventHandler)
 	void * hashTable,
 	HashTableEvent event,
 	HashTableItem primary,
-	HashTableItem secondary
+	HashTableItem secondary,
+	void * private
 );
 
 #else
@@ -106,7 +119,8 @@ typedef void * HashTable;
 // =============================================================================
 
 extern HashTable NewHashTable
-(size_t size,
+(
+	size_t size,
 	HashTableEvent withEvents,
 	HashTableEventHandler eventHandler,
 	void * userData
@@ -114,12 +128,20 @@ extern HashTable NewHashTable
 
 extern void OptimizeHashTable
 (
-	HashTable hashTable
+	HashTable hashTable,
+	size_t slots
 );
 
 extern HashTable DestroyHashTable
 (
 	HashTable hashTable
+);
+
+void HashTableRegisterEvents
+(
+	HashTable hashTable,
+	HashTableEvent withEvents,
+	HashTableEventHandler eventHandler
 );
 
 /* Statistics */
@@ -153,6 +175,25 @@ extern size_t HashTableDistribution
 	HashTableRecordFlags hint
 );
 
+size_t HashTableItemHits
+(
+	HashTable hashTable,
+	HashTableItem reference
+);
+
+size_t HashTableItemLength
+(
+	HashTable hashTable,
+	HashTableItem reference
+);
+
+size_t HashTableItemImpact
+(
+	HashTable hashTable,
+	HashTableItem reference
+);
+
+
 /* Data Management */
 // =============================================================================
 extern bool HashTablePutPrivate
@@ -175,6 +216,20 @@ HashTableItem HashTablePut
 	size_t valueLength,
 	double value,
 	HashTableRecordFlags valueHint
+);
+
+HashTableItem HashTableGet
+(
+	HashTable hashTable,
+	size_t keyLength,
+	double key,
+	HashTableRecordFlags hint
+);
+
+bool HashTableDeleteItem
+(
+	HashTable ht,
+	HashTableItem reference
 );
 
 #endif

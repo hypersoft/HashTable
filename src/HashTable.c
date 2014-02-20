@@ -36,7 +36,11 @@
  * This value will be used to determine how many slots to allocate.
  */
 #ifndef HT_RESERVE_SLOTS
-#define HT_RESERVE_SLOTS (sizeof(size_t) << 3)
+#define HT_RESERVE_SLOTS (sizeof(size_t) << 3L)
+#endif
+
+#ifndef HT_RESERVE_ITEMS
+#define HT_RESERVE_ITEMS 8L
 #endif
 
 // Compile Makefile Definitions
@@ -73,11 +77,50 @@ typedef struct sHashTable {
 #define HashTableSize sizeof(sHashTable)
 #define HashTable sHashTable *
 
+#define htReturnIfTableUninitialized(t) \
+	if ( ! ht ) { errno = HT_ERROR_TABLE_UNINITIALIZED; return 0; }
+
+#define htVoidIfTableUninitialized(t) \
+	if ( ! ht ) { errno = HT_ERROR_TABLE_UNINITIALIZED; return; }
+
+#define htVoidUnsupportedFunction() \
+	errno = HT_ERROR_UNSUPPORTED_FUNCTION; return
+
+#define htReturnIfZeroLengthKey(l) \
+	if ( ! l ) { errno = HT_ERROR_ZERO_LENGTH_KEY; return 0; }
+
+#define htReturnIfAllocationFailure(p, ...) \
+	if ( ! p ) { errno = HT_ERROR_ALLOCATION_FAILURE; __VA_ARGS__; return 0; }
+
+#define htReturnIfInvalidReference(ht, r) \
+	if ( ! r || ht->itemsMax < r) { \
+		errno = HT_ERROR_INVALID_REFERENCE; return 0; \
+}
+
+#define htReturnIfKeyNotFound(i) \
+	if ( ! i ) { errno = HT_ERROR_KEY_NOT_FOUND; return 0; }
+
+#define htReturnIfNotWritableItem(i) if (vartype(i->key) & HTR_NON_WRITABLE) { \
+	errno = HT_ERROR_NOT_WRITABLE_ITEM; return 0; \
+}
+
+#define htReturnIfNotConfigurableItem(i) \
+if (vartype(i->key) & HTR_NON_CONFIGURABLE) { \
+	errno = HT_ERROR_NOT_CONFIGURABLE_ITEM; return 0; \
+}
+
+#define htItemAccess(ht, r, label, expr) \
+	htReturnIfTableUninitialized(ht); \
+	htReturnIfInvalidReference(ht, r); \
+	HashTableRecord label = ht->item[r]; \
+	if (label) return expr; \
+	else errno = HT_ERROR_INVALID_REFERENCE; \
+	return 0
+
 /* for these inlines: d should be volatile; re: optimization issues */
 #define htDblIsNaN(d) (d != d)
 #define htDblInfinity(d) \
 	(((d == d) && ((d - d) != 0.0)) ? (d < 0.0 ? -1 : 1) : 0)
-
 
 #define htKeyHash(table, keyLength, realKey) \
 	( htCreateHash ( keyLength, realKey ) % (table->slotCount) )
@@ -85,14 +128,13 @@ typedef struct sHashTable {
 /* scan UTF strings for length if not supplied, and return FAIL if empty */
 #define __htKeyLength(l, v, h) if ( ! l ) { \
 	if (h & HTR_UTF8) l = strlen(ptrVar(v)); \
-	if ( ! l ) return 0; \
 }
 
 #define htRealKey(l, v, h) (h & HTR_DOUBLE)?&v:ptrVar(v); __htKeyLength(l, v, h)
 
 #define htCreateRecord() calloc(1, HashTableRecordSize)
 
-#define htRecordReference(e) ((e) ? e->hitCount++, varprvti(e->key) : 0)
+#define htRecordReference(e) ((e) ? e->hitCount++,  : 0)
 
 #define htCompareRecordToRealKey(e, l, k) \
 	(varlen(e->key) == l) && (memcmp(e->key, k, l) == 0)
@@ -142,9 +184,9 @@ HashTable NewHashTable
 	HashTableEventHandler eventHandler,
 	void * private
 ) {
-	HashTable ht = calloc(1, HashTableSize);
 
-	if (!ht) return NULL;
+	HashTable ht = calloc(1, HashTableSize);
+	htReturnIfAllocationFailure(ht, {});
 
 	if (!size) size = HT_RESERVE_SLOTS;
 
@@ -152,14 +194,13 @@ HashTable NewHashTable
 	ht->eventHandler = eventHandler,
 	ht->private = private,
 	ht->slot = calloc(size, sizeof(void*));
+	htReturnIfAllocationFailure(ht->slot, free(ht));
 
-	if ( !ht->slot ) { free(ht); return NULL; }
+	ht->item = calloc(HT_RESERVE_ITEMS, sizeof(void*));
+	htReturnIfAllocationFailure(ht->item, free(ht), free(ht->slot));
 
-	ht->item = calloc(8, sizeof(void*));
-	if ( !ht->item ) { free(ht), free(ht->slot); return NULL; }
-
-	ht->itemsMax = 8,
-	ht->impact = HashTableSize + (sizeof(void*) * (size + 8));
+	ht->itemsMax = HT_RESERVE_ITEMS,
+	ht->impact = HashTableSize + (sizeof(void*) * (size + HT_RESERVE_ITEMS));
 
 	if (withEvents & HT_EVENT_CONSTRUCTED && eventHandler)
 		eventHandler(ht, HT_EVENT_CONSTRUCTED, 0, 0, private);
@@ -170,16 +211,19 @@ HashTable NewHashTable
 
 void OptimizeHashTable
 (
-	HashTable ht
+	HashTable ht,
+	size_t slots
 ) {
+	htVoidIfTableUninitialized(ht);
 	/* doesn't do anything yet */
+	htVoidUnsupportedFunction();
 }
 
 HashTable DestroyHashTable
 (
 	HashTable ht
 ) {
-	if (!ht) return NULL;
+	htReturnIfTableUninitialized(ht);
 	size_t item, length = ht->itemsMax; HashTableRecord target = NULL;
 	for (item = 0; item < length; item++) {
 		if ((target = ht->item[item])) {
@@ -190,11 +234,22 @@ HashTable DestroyHashTable
 	return NULL;
 }
 
+void HashTableRegisterEvents
+(
+	HashTable ht,
+	HashTableEvent withEvents,
+	HashTableEventHandler eventHandler
+) {
+	htVoidIfTableUninitialized(ht);
+	ht->events = withEvents;
+	if ( eventHandler ) ht->eventHandler = eventHandler;
+}
+
 size_t HashTableSlotCount
 (
 	HashTable ht
 ) {
-	if (!ht) return 0;
+	htReturnIfTableUninitialized(ht);
 	return ht->slotCount;
 }
 
@@ -202,7 +257,7 @@ size_t HashTableSlotsUsed
 (
 	HashTable ht
 ) {
-	if (!ht) return 0;
+	htReturnIfTableUninitialized(ht);
 	size_t used = 0, index, max = ht->slotCount;
 	for (index = 0; index < max; index++) if (ht->slot[index]) used++;
 	return used;
@@ -212,7 +267,7 @@ double HashTableLoadFactor
 (
 	HashTable ht
 ) {
-	if (!ht) return (double) 0.0;
+	htReturnIfTableUninitialized(ht);
 	volatile double factor = (((double)ht->itemsTotal)/((double)ht->slotCount));
 	return htDblInfinity(factor) ? 0 : factor;
 }
@@ -221,7 +276,7 @@ size_t HashTableImpact
 (
 	HashTable ht
 ) {
-	if (!ht) return 0;
+	htReturnIfTableUninitialized(ht);
 	return ht->impact;
 }
 
@@ -232,7 +287,7 @@ size_t HashTableDistribution
 	double key,
 	HashTableRecordFlags hint
 ) {
-	if (!ht) return 0;
+	htReturnIfTableUninitialized(ht);
 	void * realKey = htRealKey(keyLength, key, hint);
 	register HashTableRecord child;
 	register size_t distribution = 0;
@@ -241,18 +296,28 @@ size_t HashTableDistribution
 	return distribution;
 }
 
-size_t HashTableRecordHits
+size_t HashTableItemHits
 (
 	HashTable ht,
 	HashTableItem reference
 ) {
-	if (!ht) return 0;
-	if (ht->itemsMax > --reference) {
-		HashTableRecord item = ht->item[reference];
-		if (item) return item->hitCount;
-		return 0;
-	}
-	return 0;
+	htItemAccess(ht, reference, item, item->hitCount);
+}
+
+size_t HashTableItemLength
+(
+	HashTable ht,
+	HashTableItem reference
+) {
+	htItemAccess(ht, reference, item, varlen(item->value));
+}
+
+size_t HashTableItemImpact
+(
+	HashTable ht,
+	HashTableItem reference
+) {
+	htItemAccess(ht, reference, item, htRecordImpact(item));
 }
 
 bool HashTablePutPrivate
@@ -260,7 +325,7 @@ bool HashTablePutPrivate
 	HashTable ht,
 	void * private
 ) {
-	if (!ht) return false;
+	htReturnIfTableUninitialized(ht);
 	ht->private = private; return true;
 }
 
@@ -268,7 +333,7 @@ void * HashTableGetPrivate
 (
 	HashTable ht
 ) {
-	if (!ht) return NULL;
+	htReturnIfTableUninitialized(ht);
 	return ht->private;
 }
 
@@ -283,11 +348,10 @@ HashTableItem HashTablePut
 	HashTableRecordFlags valueHint
 ) {
 
-	if (!ht) return 0;
-
-	HyperVariant varKey, varValue;
+	htReturnIfTableUninitialized(ht);
 
 	char * realKey = htRealKey(keyLength, key, keyHint);
+	htReturnIfZeroLengthKey(keyLength);
 
 	if (!valueLength) {
 		if (valueHint & HTR_UTF8) valueLength = strlen(ptrVar(value));
@@ -299,8 +363,13 @@ HashTableItem HashTablePut
 		ht, keyLength, realKey, (root = ht->slot[index]), &parent
 	);
 
+	HyperVariant varKey, varValue;
+
 	if ( current ) { /* There is already a pair for this key; Update Value */
-		if (!(varValue = varcreate(valueLength, value, valueHint))) return 0;
+		htReturnIfNotWritableItem(current);
+		htReturnIfAllocationFailure(
+			(varValue = varcreate(valueLength, value, valueHint)), {}
+		);
 		ht->impact += varimpact(current->value),
 		ht->impact += varimpact(varValue);
 		varfree(current->value);
@@ -309,13 +378,17 @@ HashTableItem HashTablePut
 	}
 
 	HashTableRecord this = htCreateRecord();
-	if ( ! (varKey = varcreate(keyLength, key, keyHint))) {
-		free(this); return 0;
-	} else 	this->key = varKey;
+	htReturnIfAllocationFailure(this, {});
 
-	if ( ! (varValue = varcreate(valueLength, value, valueHint))) {
-		free(this), varfree(varKey); return 0;
-	} else this->value = varValue;
+	htReturnIfAllocationFailure(
+		(varKey = varcreate(keyLength, key, keyHint)),
+		free(this)
+	)   else this->key = varKey;
+
+	htReturnIfAllocationFailure(
+		(varValue = varcreate(valueLength, value, valueHint)),
+		free(this), varfree(varKey)
+	)   else this->value = varValue;
 
 	ht->impact += htRecordImpact(this), ht->itemsTotal++;
 
@@ -340,7 +413,36 @@ HashTableItem HashTableGet
 	double key,
 	HashTableRecordFlags hint
 ) {
+	htReturnIfTableUninitialized(ht);
 	char * realKey = htRealKey(keyLength, key, hint);
+	htReturnIfZeroLengthKey(keyLength);
 	HashTableRecord item = htFindKey(ht, keyLength, realKey);
-	return htRecordReference(item);
+	htReturnIfKeyNotFound(item);
+	return varprvti(item->key);
+}
+
+bool HashTableDeleteItem
+(
+	HashTable ht,
+	HashTableItem reference
+) {
+
+	htReturnIfTableUninitialized(ht);
+	htReturnIfInvalidReference(ht, reference);
+	HashTableRecord parent = NULL;
+	HashTableRecord item = ht->item[reference];
+	htReturnIfNotConfigurableItem(item);
+
+	item = htFindKeyWithParent(ht, varlen(item->key), item->key, item, &parent);
+
+	if (parent) parent->successor = item->successor;
+	else {
+		ht->slot[htKeyHash(ht, varlen(item->key), item->key)] = item->successor;
+	}
+
+	ht->item[reference] = NULL, ht->itemsTotal--,
+	ht->impact -= htRecordImpact(item);
+	varfree(item->key); varfree(item->value); free(item);
+	return true;
+
 }
