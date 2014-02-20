@@ -484,3 +484,11 @@ bool HashTableItemPutFlags
 	vartype(item->value) |= settings;
 	return true;
 }
+
+HashTableItemFlags HashTableItemGetValue
+(
+	HashTable ht,
+	HashTableItem reference
+) {
+	htItemAccess(ht, reference, item, item->value);
+}

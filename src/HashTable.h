@@ -241,6 +241,12 @@ bool HashTableItemPutFlags
 	HashTableItemFlags settings
 );
 
+const void * HashTableItemGetValue
+(
+	HashTable hashTable,
+	HashTableItem reference
+);
+
 #endif
 
 #endif /* HashTable_h */
