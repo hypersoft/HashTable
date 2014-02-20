@@ -224,19 +224,19 @@ HashTableItem HashTableGet
 
 bool HashTableDeleteItem
 (
-	HashTable ht,
+	HashTable hashTable,
 	HashTableItem reference
 );
 
 HashTableItemFlags HashTableItemGetFlags
 (
-	HashTable ht,
+	HashTable hashTable,
 	HashTableItem reference
 );
 
 bool HashTableItemPutFlags
 (
-	HashTable ht,
+	HashTable hashTable,
 	HashTableItem reference,
 	HashTableItemFlags settings
 );
