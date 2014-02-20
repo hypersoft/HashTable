@@ -26,480 +26,321 @@
 
  */
 
-/* Special Thanks to: https://gist.github.com/tonious/1377667 */
+#define HashTable_c
+#include "HashTable.h"
+#undef HashTable_c
 
-#include <string.h>
+#include "HyperVariant.h"
 
 /*
  * This value will be used to determine how many slots to allocate.
  */
-#ifndef HT_DEFAULT_RESERVE_SLOTS
-#define HT_DEFAULT_RESERVE_SLOTS (sizeof(size_t) << 3)
+#ifndef HT_RESERVE_SLOTS
+#define HT_RESERVE_SLOTS (sizeof(size_t) << 3)
 #endif
 
 // Compile Makefile Definitions
-const char * HashTableVendor = HT_VERSION_VENDOR;
-const char * HashTableVersion = HT_VERSION_TRIPLET;
-const char * HashTableDescription = HT_VERSION_DESCRIPTION;
-const long HashTableBuildNumber = HT_VERSION_BUILDNO;
+const char * HashTableVendor = BUILD_VERSION_VENDOR;
+const char * HashTableVersion = BUILD_VERSION_TRIPLET;
+const char * HashTableDescription = BUILD_VERSION_DESCRIPTION;
+const long HashTableBuildNumber = BUILD_VERSION_NUMBER;
 
-struct entry_s {
+typedef struct sHashTableRecord {
 	size_t hitCount;
-	void * key;
-	size_t keyLength;
-	void * value;
-	size_t valueLength;
-	struct entry_s * successor;
-};
+	HyperVariant key;
+	HyperVariant value;
+	struct sHashTableRecord * successor;
+} sHashTableRecord;
 
-typedef struct entry_s hashtable_entry_t;
+#define HashTableRecordSize sizeof(sHashTableRecord)
+#define HashTableRecord sHashTableRecord *
+#define HashTableRecordList sHashTableRecord **
+#define HashTableRecordItems sHashTableRecord **
 
-struct hashtable_s {
-	size_t size;
-	size_t entries;
-	struct entry_s ** entry;
-	int lastError;
-	void * userData;
-};
+typedef struct sHashTable {
+	HashTableRecordItems item;
+	size_t itemsUsed;
+	size_t itemsTotal;
+	size_t itemsMax;
+	HashTableRecordList slot;
+	size_t slotCount;
+	HashTableEventHandler eventHandler;
+	HashTableEvent events;
+	size_t impact;
+	void * private;
+} sHashTable;
 
-typedef struct hashtable_s hashtable_t;
+#define HashTableSize sizeof(sHashTable)
+#define HashTable sHashTable *
 
-#define HashTable_c
-	#include "HashTable.h"
-#undef HashTable_c
+/* for these inlines: d should be volatile; re: optimization issues */
+#define htDblIsNaN(d) (d != d)
+#define htDblInfinity(d) \
+	(((d == d) && ((d - d) != 0.0)) ? (d < 0.0 ? -1 : 1) : 0)
 
-/* INTERNAL: Get the load factor of a hash table */
-#define hashTableGetLoadFactor(ht) \
-	((double) (((double) ht->entries) / ((double) ht->size)))
 
-double
-HashTableGetLoadFactor(HashTable * hashTable)
-{
-	if (!hashTable) return 0.0;
-	return hashTableGetLoadFactor(hashTable);
+#define htKeyHash(table, keyLength, realKey) \
+	( htCreateHash ( keyLength, realKey ) % (table->slotCount) )
+
+/* scan UTF strings for length if not supplied, and return FAIL if empty */
+#define __htKeyLength(l, v, h) if ( ! l ) { \
+	if (h & HTR_UTF8) l = strlen(ptrVar(v)); \
+	if ( ! l ) return 0; \
 }
 
-size_t
-HashTableGetSize(HashTable * hashTable)
-{
-	if (!hashTable) return 0;
-	return hashTable->size;
-}
+#define htRealKey(l, v, h) (h & HTR_DOUBLE)?&v:ptrVar(v); __htKeyLength(l, v, h)
 
-hashtable_t *
-NewHashTable ( size_t size, void * userData )
-{
-	/* Allocate the table itself. */
-	hashtable_t * hashTable = calloc ( 1, sizeof ( hashtable_t ) );
+#define htCreateRecord() calloc(1, HashTableRecordSize)
 
-	if ( !hashTable ) return NULL;
+#define htRecordReference(e) ((e) ? e->hitCount++, varprvti(e->key) : 0)
 
-	hashTable->size = ( size ) ? size : HT_DEFAULT_RESERVE_SLOTS,
-	hashTable->userData = userData;
+#define htCompareRecordToRealKey(e, l, k) \
+	(varlen(e->key) == l) && (memcmp(e->key, k, l) == 0)
 
-	/* Allocate pointers to the head nodes. */
-	if ( ( hashTable->entry = calloc ( hashTable->size, sizeof (void* ) )
-	) == NULL ) {
-		free ( hashTable );
-		return NULL;
-	}
+/* I wouldn't call this on an incomplete record if I were you... */
+#define htRecordImpact(r) ( \
+	(varimpact(r->key)) + (varimpact(r->value)) + (HashTableRecordSize) \
+)
 
-	/* Return Dataset */
-	return hashTable;
-
-}
-
-bool
-DestroyHashTable (hashtable_t * hashTable) {
-	if (!hashTable) return false; // can't destroy something that does not exist
-	size_t slot, limit = hashTable->size;
-	for (slot = 0; (slot < limit) && hashTable->entries; slot++) {
-		hashtable_entry_t * parent = hashTable->entry[slot], * child;
-		while (parent) {
-			child = parent->successor;
-			/* free up the resources */
-			free ( parent->value ), free ( parent->key ),
-			free ( parent );
-			hashTable->entries--;
-			parent = child;
-		}
-	}
-	free(hashTable->entry),	free(hashTable);
-	return true;
-}
-
-/* INTERNAL: Hash a binary input */
-static
-size_t
-hashBinaryInput ( char * input, size_t length )
+/* Jenkins' "One At a Time Hash" === Perl "Like" Hashing */
+inline static size_t htCreateHash (size_t length, char * realKey)
 {
 	size_t hash, i;
-	/* Use: Jenkins' "One At a Time Hash" === Perl "Like" Hashing */
-	for ( hash = i = 0; i < length; ++i ) {
-		hash += input[i], hash += ( hash << 10 ), hash ^= ( hash >> 6 );
-	}
+	for ( hash = i = 0; i < length; ++i ) hash += realKey[i],
+		hash += ( hash << 10 ), hash ^= ( hash >> 6 );
 	hash += ( hash << 3 ), hash ^= ( hash >> 11 ), hash += ( hash << 15 );
-
 	return hash;
 }
 
-/* INTERNAL: distribute a hash over the number of available slots */
-#define HashTableIndexOf(table, key, length) \
-( hashBinaryInput ( key, length ) % (table->size) )
-
-/* INTERNAL: Create a key-value pair. */
-static
-hashtable_entry_t *
-hashTableCreateEntry ( )
-{
-	hashtable_entry_t *thisItem = calloc ( 1, sizeof ( hashtable_entry_t ) );
-	return thisItem;
+inline static HashTableRecord htFindKeyWithParent (
+	HashTable ht, size_t keyLength, void * realKey,
+	HashTableRecord primary, HashTableRecord * parent
+) {
+	while ( primary ) {
+		if (htCompareRecordToRealKey(primary, keyLength, realKey))
+			return primary;
+		*parent = primary; primary = primary->successor;
+	}
+	return NULL;
 }
 
-bool HashTablePutBinary(HashTable * hashTable,
-void * key, size_t keyLength, void * value, size_t valueLength, size_t padding,
-bool overwrite
-)
-{
-	if ( !hashTable ) false;
-
-	if ( !key ) {
-		hashTable->lastError = HT_OP_ERROR_NO_KEY;
-		return false;
+inline static HashTableRecord htFindKey (
+	HashTable ht, size_t keyLength, void * realKey
+) {
+	HashTableRecord primary = ht->slot[htKeyHash(ht, keyLength, realKey)];
+	while ( primary ) {
+		if (htCompareRecordToRealKey(primary, keyLength, realKey))
+			return primary;
+		primary = primary->successor;
 	}
+	return NULL;
+}
 
-	if ( !keyLength ) {
-		hashTable->lastError = HT_OP_ERROR_NO_KEY_LENGTH;
-		return 0;
-	}
+HashTable NewHashTable
+(size_t size,
+	HashTableEvent withEvents,
+	HashTableEventHandler eventHandler,
+	void * private
+) {
+	HashTable ht = calloc(1, HashTableSize);
 
-	if ( !value ) {
-		hashTable->lastError = HT_OP_ERROR_NO_VALUE;
-		return false;
-	}
+	if (!ht) return NULL;
 
-	size_t index = HashTableIndexOf ( hashTable, key, keyLength );
+	if (!size) size = HT_RESERVE_SLOTS;
 
-	hashtable_entry_t * primaryItem, * currentItem, * thisItem,
-	*previousItem = NULL;
+	ht->slotCount = size, ht->events = withEvents,
+	ht->eventHandler = eventHandler,
+	ht->private = private,
+	ht->slot = calloc(size, sizeof(void*));
 
-	currentItem = primaryItem = hashTable->entry[index];
+	if ( !ht->slot ) { free(ht); return NULL; }
 
-	while ( currentItem ) {
-		if ( currentItem->keyLength == keyLength ) {
-			if ( !memcmp ( key, currentItem->key, keyLength ) ) {
-				if ( !overwrite ) {
-					hashTable->lastError = HT_OP_ERROR_KEY_EXISTS;
-					return false;
-				}
-				/* There is already a pair for this key; Update Value */
-				free ( currentItem->value );
-				currentItem->hitCount++;
-				currentItem->value = memcpy (
-				malloc ( valueLength ), value, valueLength
-				);
-				currentItem->valueLength = valueLength;
-				return true;
-			}
+	ht->item = calloc(8, sizeof(void*));
+	if ( !ht->item ) { free(ht), free(ht->slot); return NULL; }
+
+	ht->itemsMax = 8,
+	ht->impact = HashTableSize + (sizeof(void*) * (size + 8));
+
+	if (withEvents & HT_EVENT_CONSTRUCTED && eventHandler)
+		eventHandler(ht, HT_EVENT_CONSTRUCTED, 0, 0, private);
+
+	return ht;
+
+}
+
+void OptimizeHashTable
+(
+	HashTable ht
+) {
+	/* doesn't do anything yet */
+}
+
+HashTable DestroyHashTable
+(
+	HashTable ht
+) {
+	if (!ht) return NULL;
+	size_t item, length = ht->itemsMax; HashTableRecord target = NULL;
+	for (item = 0; item < length; item++) {
+		if ((target = ht->item[item])) {
+			varfree(target->key); varfree(target->value); free(target);
 		}
-		previousItem = currentItem, currentItem = currentItem->successor;
 	}
-
-	thisItem = hashTableCreateEntry ( );
-	void * data = malloc ( keyLength );
-
-	if (data) {
-		thisItem->key = memcpy ( data, key, keyLength );
-		thisItem->keyLength = keyLength;
-	} else {
-		free(thisItem);
-		hashTable->lastError = HT_OP_ERROR_ALLOCATION_FAILURE;
-		return false;
-	}
-
-	data = malloc ( valueLength + padding );
-
-	if (data) {
-		thisItem->value = memcpy ( data, value, valueLength + padding );
-		if (padding) memset(data + valueLength, 0, padding);
-		thisItem->valueLength = valueLength;
-	} else {
-		free(thisItem->key), free(thisItem);
-		hashTable->lastError = HT_OP_ERROR_ALLOCATION_FAILURE;
-		return false;
-	}
-
-	if ( !primaryItem ) {
-		hashTable->entry[index] = thisItem;
-	} else if ( primaryItem == currentItem ) primaryItem->successor = thisItem;
-	else previousItem->successor = thisItem;
-
-	return (hashTable->entries += 1);
-
+	free(ht->item), free(ht->slot), free(ht);
+	return NULL;
 }
 
-bool
-HashTablePut ( hashtable_t * hashTable,
-char * key, void * value, size_t valueLength, size_t padding, bool overwrite
-)
-{
-	if ( !hashTable ) false;
-	if ( !key ) {
-		hashTable->lastError = HT_OP_ERROR_NO_KEY;
-		return false;
-	}
-	if ( !value ) {
-		hashTable->lastError = HT_OP_ERROR_NO_VALUE;
-		return false;
-	}
-	return HashTablePutBinary(
-		hashTable, key, strlen(key), value, valueLength, padding, overwrite
-	);
-}
-
-bool
-HashTablePutUTF8(hashtable_t * hashTable, char * key, char * value, bool overwrite) {
-	if ( !hashTable ) false;
-	if ( !key ) {
-		hashTable->lastError = HT_OP_ERROR_NO_KEY;
-		return false;
-	}
-	if ( !value ) {
-		hashTable->lastError = HT_OP_ERROR_NO_VALUE;
-		return false;
-	}
-	return HashTablePutBinary(hashTable,
-		key, strlen(key), value, strlen(value), 1, overwrite
-	);
-}
-
-bool
-HashTablePutInt(
-	hashtable_t * hashTable, char * key, int value, bool overwrite
+size_t HashTableSlotCount
+(
+	HashTable ht
 ) {
-	if ( !hashTable ) false;
-	if ( !key ) {
-		hashTable->lastError = HT_OP_ERROR_NO_KEY;
-		return false;
-	}
-	return HashTablePutBinary(
-		hashTable, key, strlen(key), &value, sizeof(int), 0, overwrite
-	);
+	if (!ht) return 0;
+	return ht->slotCount;
 }
 
-bool
-HashTablePutPointer(
-	hashtable_t * hashTable, char * key, void * value, bool overwrite
+size_t HashTableSlotsUsed
+(
+	HashTable ht
 ) {
-	if ( !hashTable ) false;
-	if ( !key ) {
-		hashTable->lastError = HT_OP_ERROR_NO_KEY;
-		return false;
-	}
-	return HashTablePutBinary(
-		hashTable, key, strlen(key), &value, sizeof(void *), 0, overwrite);
+	if (!ht) return 0;
+	size_t used = 0, index, max = ht->slotCount;
+	for (index = 0; index < max; index++) if (ht->slot[index]) used++;
+	return used;
 }
 
-bool
-HashTablePutDouble(
-	hashtable_t * hashTable, char * key, double value, bool overwrite
+double HashTableLoadFactor
+(
+	HashTable ht
 ) {
-	if ( !hashTable ) false;
-	if ( !key ) {
-		hashTable->lastError = HT_OP_ERROR_NO_KEY;
-		return false;
-	}
-	return HashTablePutBinary(
-		hashTable, key, strlen(key), &value, sizeof(double), 0, overwrite
-	);
+	if (!ht) return (double) 0.0;
+	volatile double factor = (((double)ht->itemsTotal)/((double)ht->slotCount));
+	return htDblInfinity(factor) ? 0 : factor;
 }
 
-const void *
-HashTableGet (
-hashtable_t * hashTable, char * key, size_t * valueLength
-)
-{
-	if ( !hashTable ) return NULL;
+size_t HashTableImpact
+(
+	HashTable ht
+) {
+	if (!ht) return 0;
+	return ht->impact;
+}
 
-	if ( !key ) {
-		hashTable->lastError = HT_OP_ERROR_NO_KEY;
-		return NULL;
-	}
+size_t HashTableDistribution
+(
+	HashTable ht,
+	size_t keyLength,
+	double key,
+	HashTableRecordFlags hint
+) {
+	if (!ht) return 0;
+	void * realKey = htRealKey(keyLength, key, hint);
+	register HashTableRecord child;
+	register size_t distribution = 0;
+	child = ht->slot[htKeyHash(ht, keyLength, realKey)];
+	while (child) distribution++, child = child->successor;
+	return distribution;
+}
 
-	size_t keyLength = strlen(key);
-
-	if ( !keyLength ) {
-		hashTable->lastError = HT_OP_ERROR_NO_KEY_LENGTH;
-		return NULL;
-	}
-
-	/* Retrieve Query Index */
-	size_t list = HashTableIndexOf ( hashTable, key, keyLength );
-
-	/* Think Outside The Box */
-	hashtable_entry_t * thisItem = hashTable->entry [list];
-
-	/* Locate Target */
-	while ( thisItem ) {
-		if ( thisItem->keyLength == keyLength &&
-		!memcmp ( key, thisItem->key, keyLength )
-		) /* Target Located */ break;
-		else thisItem = thisItem->successor;
-	}
-
-	if ( !thisItem ) {
-		hashTable->lastError = HT_OP_ERROR_NO_VALUE;
+size_t HashTableRecordHits
+(
+	HashTable ht,
+	HashTableItem reference
+) {
+	if (!ht) return 0;
+	if (ht->itemsMax > --reference) {
+		HashTableRecord item = ht->item[reference];
+		if (item) return item->hitCount;
 		return 0;
 	}
-
-	thisItem->hitCount++;
-
-	/* Return Query Result */
-	if (valueLength) *valueLength = thisItem->valueLength;
-	return thisItem->value;
-
-}
-
-int
-HashTableGetInt(hashtable_t * hashTable, char * key) {
-	const int *value = HashTableGet(hashTable, key, NULL);
-	if (value) return *value;
 	return 0;
 }
 
-void *
-HashTableGetPointer(hashtable_t * hashTable, char * key) {
-	void * const * value = HashTableGet(hashTable, key, NULL);
-	if (value) return *value;
-	return 0;
+bool HashTablePutPrivate
+(
+	HashTable ht,
+	void * private
+) {
+	if (!ht) return false;
+	ht->private = private; return true;
 }
 
-double
-HashTableGetDouble(hashtable_t * hashTable, char * key) {
-	const double *value = HashTableGet(hashTable, key, NULL);
-	if (value) return *value;
-	return 0;
+void * HashTableGetPrivate
+(
+	HashTable ht
+) {
+	if (!ht) return NULL;
+	return ht->private;
 }
 
-bool
-HashTableDelete ( hashtable_t * hashTable, char * key )
-{
-	if ( !hashTable ) return false;
+HashTableItem HashTablePut
+(
+	HashTable ht,
+	size_t keyLength,
+	double key,
+	HashTableRecordFlags keyHint,
+	size_t valueLength,
+	double value,
+	HashTableRecordFlags valueHint
+) {
 
-	if ( !key ) {
-		hashTable->lastError = HT_OP_ERROR_NO_KEY;
-		return false;
+	if (!ht) return 0;
+
+	HyperVariant varKey, varValue;
+
+	char * realKey = htRealKey(keyLength, key, keyHint);
+
+	if (!valueLength) {
+		if (valueHint & HTR_UTF8) valueLength = strlen(ptrVar(value));
 	}
 
-	size_t keyLength = strlen(key);
+	size_t index = htKeyHash(ht, keyLength, realKey);
 
-	if ( !keyLength ) {
-		hashTable->lastError = HT_OP_ERROR_NO_KEY_LENGTH;
-		return false;
+	HashTableRecord root, * parent = NULL, * current = htFindKeyWithParent(
+		ht, keyLength, realKey, (root = ht->slot[index]), &parent
+	);
+
+	if ( current ) { /* There is already a pair for this key; Update Value */
+		if (!(varValue = varcreate(valueLength, value, valueHint))) return 0;
+		ht->impact += varimpact(current->value),
+		ht->impact += varimpact(varValue);
+		varfree(current->value);
+		current->value = varValue, current->hitCount++;
+		return varprvti (current->key);
 	}
 
-	/* Retrieve Query Index */
-	size_t list = HashTableIndexOf ( hashTable, key, keyLength );
+	HashTableRecord this = htCreateRecord();
+	if ( ! (varKey = varcreate(keyLength, key, keyHint))) {
+		free(this); return 0;
+	} else 	this->key = varKey;
 
-	/* Think Outside The Box */
-	hashtable_entry_t * previousItem, * currentItem = hashTable->entry[list];
+	if ( ! (varValue = varcreate(valueLength, value, valueHint))) {
+		free(this), varfree(varKey); return 0;
+	} else this->value = varValue;
 
-	previousItem = currentItem;
+	ht->impact += htRecordImpact(this), ht->itemsTotal++;
 
-	/* Locate Target */
-	while ( currentItem ) {
-		if ( currentItem->keyLength == keyLength &&
-		!memcmp ( key, currentItem->key, keyLength )
-		) /* Target Located */ break;
-		else previousItem = currentItem, currentItem = currentItem->successor;
-	}
+	ht->item[ht->itemsUsed++] = this;
+	varprvti(varKey) = ht->itemsUsed;
 
-	if ( !currentItem ) {
-		hashTable->lastError = HT_OP_ERROR_NO_VALUE;
-		return false;
-	}
+	/* TODO: HT_EVENT_PUT !*/
 
-	if ( previousItem == currentItem ) { /* delete the list head */
-		hashTable->entry[ list ] = NULL;
-	} else { /* remove entry from the list */
-		previousItem->successor = currentItem->successor;
-	}
+	if ( ! root ) ht->slot[index] = this;
+	else if ( root == current ) root->successor = this;
+	else parent->successor = this;
 
-	/* free up the resources */
-	free ( currentItem->value ), free ( currentItem->key ),
-	free ( currentItem );
-
-	hashTable->entries--;
-
-	return true;
+	return ht->itemsUsed;
 
 }
+#include <stdio.h>
 
-size_t
-HashTableGetEntryCount ( hashtable_t * hashTable )
-{
-	if ( hashTable ) return hashTable->entries;
-	return 0;
-}
-
-enum HashTableErrorCode
-HashTableGetLastError ( hashtable_t * hashTable )
-{
-	if ( !hashTable ) return HT_OP_ERROR_NO_HASH_TABLE;
-	enum HashTableErrorCode result = hashTable->lastError;
-	if ( result ) hashTable->lastError = HT_OP_ERROR_NONE;
-	return result;
-}
-
-void *
-HashTableGetPrivate ( hashtable_t * hashTable )
-{
-	if ( !hashTable ) return NULL;
-	return hashTable->userData;
-}
-
-bool
-HashTablePutPrivate ( hashtable_t * hashTable, void * userData )
-{
-	if ( !hashTable ) return false;
-	hashTable->userData = userData;
-	return true;
-}
-
-bool
-HashTableHasEntry ( hashtable_t * hashTable, char * key )
-{
-	if ( !hashTable ) return false;
-
-	if ( !key ) {
-		hashTable->lastError = HT_OP_ERROR_NO_KEY;
-		return false;
-	}
-
-	size_t keyLength = strlen(key);
-
-	if ( !keyLength ) {
-		hashTable->lastError = HT_OP_ERROR_NO_KEY_LENGTH;
-		return false;
-	}
-
-	/* Think Outside The Box */
-	hashtable_entry_t * search = hashTable->entry[
-		HashTableIndexOf ( hashTable, key, keyLength )
-	];
-
-	/* Locate Target */
-	while ( search ) {
-		if ( search->keyLength == keyLength &&
-		!memcmp ( key, search->key, keyLength )
-		) /* Target Located */ break;
-		else search = search->successor;
-	}
-
-	if ( !search ) {
-		return false;
-	}
-
-	return true;
-
+HashTableItem HashTableGet
+(
+	HashTable ht,
+	size_t keyLength,
+	double key,
+	HashTableRecordFlags hint
+) {
+	char * realKey = htRealKey(keyLength, key, hint);
+	HashTableRecord item = htFindKey(ht, keyLength, realKey);
+	return htRecordReference(item);
 }

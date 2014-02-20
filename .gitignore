@@ -1,5 +1,7 @@
-bin
-nbproject
-HashTable.a
-HashTable.h
-libhashtable.so*
+/bin
+/nbproject
+/HashTable.a
+/HashTable.h
+/libhashtable.so*
+/HashTable.vym
+/pkg/HyperVariant
