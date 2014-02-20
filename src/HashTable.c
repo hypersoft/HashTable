@@ -485,7 +485,7 @@ bool HashTableItemPutFlags
 	return true;
 }
 
-HashTableItemFlags HashTableItemGetValue
+const void * HashTableItemGetValue
 (
 	HashTable ht,
 	HashTableItem reference
