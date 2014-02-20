@@ -72,7 +72,7 @@ typedef enum eHashTableRecordFlags {
 	HTR_NON_ENUMERABLE   = HashTableBitFlag(6),
 	HTR_NON_WRITABLE     = HashTableBitFlag(7),
 	HTR_NON_CONFIGURABLE = HashTableBitFlag(8),
-} HashTableRecordFlags;
+} HashTableItemFlags;
 
 /* cast integer things to double */
 #define htIntVal(i) ((double)(uint)(i))
@@ -168,7 +168,7 @@ extern size_t HashTableDistribution
 	HashTable hashTable,
 	size_t keyLength,
 	double key,
-	HashTableRecordFlags hint
+	HashTableItemFlags hint
 );
 
 size_t HashTableItemHits
@@ -208,10 +208,10 @@ HashTableItem HashTablePut
 	HashTable hashTable,
 	size_t keyLength,
 	double key,
-	HashTableRecordFlags keyHint,
+	HashTableItemFlags keyHint,
 	size_t valueLength,
 	double value,
-	HashTableRecordFlags valueHint
+	HashTableItemFlags valueHint
 );
 
 HashTableItem HashTableGet
@@ -219,7 +219,7 @@ HashTableItem HashTableGet
 	HashTable hashTable,
 	size_t keyLength,
 	double key,
-	HashTableRecordFlags hint
+	HashTableItemFlags hint
 );
 
 bool HashTableDeleteItem
@@ -228,10 +228,17 @@ bool HashTableDeleteItem
 	HashTableItem reference
 );
 
-HashTableRecordFlags HashTableItemGetFlags
+HashTableItemFlags HashTableItemGetFlags
 (
 	HashTable ht,
 	HashTableItem reference
+);
+
+bool HashTableItemPutFlags
+(
+	HashTable ht,
+	HashTableItem reference,
+	HashTableItemFlags settings
 );
 
 #endif

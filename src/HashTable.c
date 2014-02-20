@@ -290,7 +290,7 @@ size_t HashTableDistribution
 	HashTable ht,
 	size_t keyLength,
 	double key,
-	HashTableRecordFlags hint
+	HashTableItemFlags hint
 ) {
 	htReturnIfTableUninitialized(ht);
 	void * realKey = htRealKey(keyLength, key, hint);
@@ -347,10 +347,10 @@ HashTableItem HashTablePut
 	HashTable ht,
 	size_t keyLength,
 	double key,
-	HashTableRecordFlags keyHint,
+	HashTableItemFlags keyHint,
 	size_t valueLength,
 	double value,
-	HashTableRecordFlags valueHint
+	HashTableItemFlags valueHint
 ) {
 
 	htReturnIfTableUninitialized(ht);
@@ -416,7 +416,7 @@ HashTableItem HashTableGet
 	HashTable ht,
 	size_t keyLength,
 	double key,
-	HashTableRecordFlags hint
+	HashTableItemFlags hint
 ) {
 	htReturnIfTableUninitialized(ht);
 	char * realKey = htRealKey(keyLength, key, hint);
@@ -439,7 +439,11 @@ bool HashTableDeleteItem
 	htReturnIfItemNotFound(item);
 	htReturnIfNotConfigurableItem(item);
 
-	item = htFindKeyWithParent(ht, varlen(item->key), item->key, item, &parent);
+	item = htFindKeyWithParent(
+		ht, varlen(item->key), item->key,
+		ht->slot[varprvti(item->value)],
+		&parent
+	);
 
 	if (parent) parent->successor = item->successor;
 	else {
@@ -453,7 +457,7 @@ bool HashTableDeleteItem
 
 }
 
-HashTableRecordFlags HashTableItemGetFlags
+HashTableItemFlags HashTableItemGetFlags
 (
 	HashTable ht,
 	HashTableItem reference
@@ -465,7 +469,7 @@ bool HashTableItemPutFlags
 (
 	HashTable ht,
 	HashTableItem reference,
-	HashTableRecordFlags settings
+	HashTableItemFlags settings
 ) {
 	htReturnIfTableUninitialized(ht);
 	htReturnIfInvalidReference(ht, reference);
@@ -474,7 +478,7 @@ bool HashTableItemPutFlags
 	htReturnIfNotConfigurableItem(item);
 	/*
 	 we don't particularly use these flags, but to avoid future collision
-	 ignore setting them, or flag an error and return early...
+	 ignore setting them...
 	 */
 	settings |= ~(HTR_INT | HTR_DOUBLE | HTR_POINTER | HTR_UTF8 | HTR_BLOCK);
 	vartype(item->value) |= settings;
