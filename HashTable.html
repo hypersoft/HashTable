@@ -1,0 +1,539 @@
+<html><meta http-equiv="content-type" content="text/html; charset=UTF-8"> <meta name="generator=" content=" vym - view your mind - http://www.insilmaril.de/vym"><meta name="author" content=""> <meta name="description" content=""> <title>HashTable</title><body> <link rel='stylesheet' id='css.stylesheet' href='vym.css' />
+<span class='vym-branch0'  id='mc:0'>HashTable</span><ul>
+<li><span class='vym-branch1'  id='mc:0,bo:0'>Public</span><ul>
+<li><span class='vym-branch2'  id='mc:0,bo:0,bo:0'>HashTableItem</span>
+<table class="vym-note"><tr><td>
+typedef size_t HashTableItem<br/><br/>A temporary reference to an item within a hash table. This item is guaranteed valid, so long as no items have been deleted from the corresponding hash table, and that same hash table has not been optimized since obtaining this reference.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:0,bo:1'>enum HashTableItemFlags</span><ul>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:1,bo:0'>HTI_INT</span>
+<table class="vym-note"><tr><td>
+size_t HTI_INT<br/><br/>The data supplied is a platform sized integer value.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:1,bo:1'>HTI_DOUBLE</span>
+<table class="vym-note"><tr><td>
+size_t HTI_DOUBLE<br/><br/>The data supplied is an IEEE 754 double precision floating point value.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:1,bo:2'>HTI_POINTER</span>
+<table class="vym-note"><tr><td>
+size_t HTI_POINTER<br/><br/>The data supplied is a platform pointer value.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:1,bo:3'>HTI_UTF8</span>
+<table class="vym-note"><tr><td>
+size_T HTI_UTF8<br/><br/>The data supplied is an ANSI C or UTF-8 encoded string.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:1,bo:4'>HTI_BLOCK</span>
+<table class="vym-note"><tr><td>
+size_T HTI_BLOCK<br/><br/>Generic block data of the specified length.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:1,bo:5'>HTI_NON_ENUMERABLE</span>
+<table class="vym-note"><tr><td>
+size_t HTI_NON_ENUMERABLE<br/><br/>Do not list in enumeration.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:1,bo:6'>HTI_NON_WRITABLE</span>
+<table class="vym-note"><tr><td>
+size_t HTI_NON_WRITABLE<br/><br/>Do not overwrite.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:1,bo:7'>HTI_NON_CONFIGURABLE</span>
+<table class="vym-note"><tr><td>
+size_t HTI_NON_CONFIGURABLE<br/><br/>Do not delete, do not modify enumerable or configurable.<br/>
+</td></tr></table>
+</li>
+</ul>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:0,bo:2'>ht Macros</span>
+<table class="vym-note"><tr><td>
+Use these macros to perform variant data requests between your application and the HashTable API.<br/>
+</td></tr></table>
+<ul>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:2,bo:0'>htInt</span>
+<table class="vym-note"><tr><td>
+parameter list htInt(size_t i)<br/><br/>Returns parameter list for API functions to diagnose and transpose an integer as a record key or value.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:2,bo:1'>htPtr</span>
+<table class="vym-note"><tr><td>
+parameter list htInt(void * p)<br/><br/>Returns parameter list for API functions to diagnose and transpose a pointer as a record key or value.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:2,bo:2'>htDbl</span>
+<table class="vym-note"><tr><td>
+parameter list htInt(dobule d)<br/><br/>Returns parameter list for API functions to diagnose and transpose a double as a record key or value.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:2,bo:3'>htStr</span>
+<table class="vym-note"><tr><td>
+parameter list htInt(char * s)<br/><br/>Returns parameter list for API functions to diagnose and transpose an ANSI or UTF-8 string as a record key or value.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:2,bo:4'>htBlk</span>
+<table class="vym-note"><tr><td>
+parameter list htInt(void * b, size_t s)<br/><br/>Returns parameter list for API functions to diagnose and transpose an arbitrary block of data with specified length as a record key or value.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:2,bo:5'>htStrN</span>
+<table class="vym-note"><tr><td>
+parameter list htInt(char * b, size_t s)<br/><br/>Returns parameter list for API functions to diagnose and transpose an arbitrary length ANSI or UTF-8 string pointer as a record key or value.<br/>
+</td></tr></table>
+</li>
+</ul>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:0,bo:3'>HashTableError</span>
+<table class="vym-note"><tr><td>
+enum HashTableError<br/><br/>Error codes that are set in errno in the event of an API call error.<br/>
+</td></tr></table>
+<ul>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:3,bo:0'>HT_ERROR_TABLE_UNINITIALIZED</span>
+<table class="vym-note"><tr><td>
+size_t HT_ERROR_TABLE_UNINITIALIZED<br/><br/>The hash table parameter was invalid.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:3,bo:1'>HT_ERROR_ALLOCATION_FAILURE</span>
+<table class="vym-note"><tr><td>
+size_t HT_ERROR_ALLOCATION_FAILURE<br/><br/>A data allocation request failed.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:3,bo:2'>HT_ERROR_UNSUPPORTED_FUNCTION</span>
+<table class="vym-note"><tr><td>
+size_t HT_ERROR_UNSUPPORTED_FUNCTION<br/><br/>The library does not support the function called.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:3,bo:3'>HT_ERROR_ZERO_LENGTH_KEY</span>
+<table class="vym-note"><tr><td>
+size_t HT_ERROR_ZERO_LENGTH_KEY<br/><br/>A key specifying zero length was supplied, or a UTF-8 key is empty. If you would like to specify a null key, specify the length as 1.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:3,bo:4'>HT_ERROR_KEY_NOT_FOUND</span>
+<table class="vym-note"><tr><td>
+size_t HT_ERROR_KEY_NOT_FOUND<br/><br/>The specified key could not be located within the hash table.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:3,bo:5'>HT_ERROR_INVALID_REFERENCE</span>
+<table class="vym-note"><tr><td>
+size_t HT_ERROR_INVALID_REFERENCE<br/><br/>The specified HashTableItem was invalid.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:3,bo:6'>HT_ERROR_NOT_WRITABLE_ITEM</span>
+<table class="vym-note"><tr><td>
+size_t HT_ERROR_NOT_WRITABLE_ITEM<br/><br/>The request could not be completed because the item is configured read only.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:3,bo:7'>HT_ERROR_NOT_CONFIGURABLE_ITEM</span>
+<table class="vym-note"><tr><td>
+size_t HT_ERROR_NOT_CONFIGURABLE_ITEM<br/><br/>The request could not be completed because the item is non-configurable.<br/>
+</td></tr></table>
+</li>
+</ul>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:0,bo:4'>enum HashTableEvent</span><ul>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:4,bo:0'>HT_EVENT_CONSTRUCTED</span>
+<table class="vym-note"><tr><td>
+size_t HT_EVENT_CONSTRUCTED<br/><br/>A new hash table has been successfully constructed.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:4,bo:1'>HT_EVENT_PUT</span>
+<table class="vym-note"><tr><td>
+size_T HT_EVENT_PUT<br/><br/>The API has been instructed to put data into the hash table.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:4,bo:2'>HT_EVENT_GET</span>
+<table class="vym-note"><tr><td>
+size_t HT_EVENT_GET<br/><br/>The API has been queried for a record.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:4,bo:3'>HT_EVENT_DELETE</span>
+<table class="vym-note"><tr><td>
+size_t HT_EVENT_DELETE<br/><br/>The API has been instructed to delete a record.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:4,bo:4'>HT_EVENT_ENUMERATE</span>
+<table class="vym-note"><tr><td>
+size_t HT_EVENT_ENUMERATE<br/><br/>The hash table is being enumerated.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:4,bo:5'>HT_EVENT_SORT_ITEMS</span>
+<table class="vym-note"><tr><td>
+size_t HT_EVENT_SORT_ITEMS<br/><br/>The API would like the user to make a sort decision on table items.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:4,bo:6'>HT_EVENT_SORT_HASH</span>
+<table class="vym-note"><tr><td>
+size_t HT_EVENT_SORT_HASH<br/><br/>The API would like the user to make a sort decision on a hash table slot.<br/><br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:4,bo:7'>HT_EVENT_SORT_NUMERIC</span>
+<table class="vym-note"><tr><td>
+size_t HT_EVENT_SORT_NUMERIC<br/><br/>The API would like the user to make a sort decision based on numeric properties. If not specified, implementation defined sort is assumed.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:4,bo:8'>HT_EVENT_SORT_DESCENDING</span>
+<table class="vym-note"><tr><td>
+size_t HT_EVENT_SORT_DESCENDING<br/><br/>The API would like the user to make a descending sort decision. If not specified ascending sort order is implied.<br/><br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:4,bo:9'>HT_EVENT_DESTRUCTING</span>
+<table class="vym-note"><tr><td>
+size_t HT_EVENT_DESTRUCTING<br/><br/>A hash table is about to be destroyed.<br/>
+</td></tr></table>
+</li>
+</ul>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:0,bo:5'>(*HashTableEventHandler)</span>
+<table class="vym-note"><tr><td>
+HashTableItem HashTableEventHandler(HashTable ht, HashTableEvent event, HashTableItem primary, HashTableItem secondary, void * private)<br/><br/>The hash table event call back.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:0,bo:6'>Lifecycle</span>
+<table class="vym-note"><tr><td>
+Operations which manage the existence or "instancing" of hash tables.<br/>
+</td></tr></table>
+<ul>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:6,bo:0'>NewHashTable</span>
+<table class="vym-note"><tr><td>
+HashTable NewHashTable(size_t size, HashTableEvent withEvents, HashTableEventHandler eventHandler, void * private)<br/><br/>Create a new hash table from scratch. <br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:6,bo:1'>OptimizeHashTable</span>
+<table class="vym-note"><tr><td>
+void OptimizeHashTable(HashTable ht, size_t slots)<br/><br/>Instructs the API to perform a one-time shrinking and expanding of a hash table for optimal performance. Optionally, the number of desired slots may be specified.<br/><br/>Once the hash table has been optimized, if any items have previously been removed since any prior optimizations, no gurantees are made as to the validity of any prior HashTableItem references. More specifically, optimizing a hash table invalidates HashTableItem references.<br/><br/>This procedure is NOT currently functional.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:6,bo:2'>DestroyHashTable</span>
+<table class="vym-note"><tr><td>
+HashTable DestroyHashTable(HashTable ht)<br/><br/>Completely destroys a hash table and all of its records, releasing the total memory impact.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:6,bo:3'>HashTableRegisterEvents</span>
+<table class="vym-note"><tr><td>
+void HashTableRegisterEvents(HashTable ht, HashTableEvent withEvents, HashTableEventHandler eventHandler)<br/><br/>Modifies the event flags and callback (if supplied, non-zero) associated with a particular hash table.<br/>
+</td></tr></table>
+</li>
+</ul>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:0,bo:7'>Statistics</span><ul>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:7,bo:0'>HashTableSlotCount</span>
+<table class="vym-note"><tr><td>
+size_t HashTableSlotCount(HashTable ht)<br/><br/>Returns the total number of slots for a particular hash table.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:7,bo:1'>HashTableSlotsUsed</span>
+<table class="vym-note"><tr><td>
+size_t HashTableSlotsUsed(HashTable ht)<br/><br/>Returns the number of slots containing one or more records.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:7,bo:2'>HashTableLoadFactor</span>
+<table class="vym-note"><tr><td>
+double HashTableLoadFactor(HashTable ht)<br/><br/>Returns the total number of hash table records divided by the number of slots for a particular hash table.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:7,bo:3'>HashTableImpact</span>
+<table class="vym-note"><tr><td>
+size_t HashTableImpact(HashTable ht)<br/><br/>Get report on how many logical bytes this hash table occupies in memory.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:7,bo:4'>HashTableDistribution</span>
+<table class="vym-note"><tr><td>
+size_t HashTableDistribution(HashTable ht, size_t keyLength, double key, HashTableItemFlags hint);<br/><br/>Generate a report on how many entries are associated with a key's hash.
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:7,bo:5'>HashTableItemHits</span>
+<table class="vym-note"><tr><td>
+size_t HashTableItemHits(HashTable ht, HashTableItem reference)<br/><br/>Returns the number of times a hash table item has been set or requested. This operation does not alter any items in the hash table nor does it alter the hash table itself.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:7,bo:6'>HashTableItemLength</span>
+<table class="vym-note"><tr><td>
+size_t HashTableItemLength(HashTable ht, HashTableItem reference)<br/><br/>Returns the length of a hash table item value.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:7,bo:7'>HashTableItemImpact</span>
+<table class="vym-note"><tr><td>
+size_t HashTableItemImpact(HashTable ht, HashTableItem reference)<br/><br/>Generates a report on the total number of bytes used to store an item.<br/>
+</td></tr></table>
+</li>
+</ul>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:0,bo:8'>Data Management</span><ul>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:8,bo:0'>HashTableGetPrivate</span>
+<table class="vym-note"><tr><td>
+void * HashTableGetPrivate(HashTable ht)<br/><br/>Returns the private user data associated with a hash table.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:8,bo:1'>HashTablePutPrivate</span>
+<table class="vym-note"><tr><td>
+void HashTablePutPrivate(HashTable ht, void * private)<br/><br/>Stores the private data supplied as an user association of data for a hash table.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:8,bo:2'>HashTablePut</span>
+<table class="vym-note"><tr><td>
+HashTableItem HashTablePut(HashTable ht, size_t keyLength, double key, HashTableItemFlags keyHint, size_t valueLength, double value, HashTableItemFlags valueHint)<br/><br/>Places a key value pair into the hash table and returns the item's reference.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:8,bo:3'>HashTableGet</span>
+<table class="vym-note"><tr><td>
+HashTableItem HashTableGet(HashTable ht, size_t keyLength, double key, HashTableItemFlags hint)<br/><br/>Get's an item reference by its key.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:8,bo:4'>HashTableDeleteItem</span>
+<table class="vym-note"><tr><td>
+bool HashTableDeleteItem(HashTable ht, HashTableItem reference)<br/><br/>Removes an item from a hash table.
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:8,bo:5'>HashTableItemGetFlags</span>
+<table class="vym-note"><tr><td>
+HashTableItemFlags HashTableItemGetFlags(HashTable ht, HashTableItem reference)<br/><br/>Retrieves the flags associated with an item.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:8,bo:6'>HashTableItemPutFlags</span></li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:8,bo:7'>HashTableItemPutPrivate</span></li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:8,bo:8'>HashTableItemGetPrivate</span></li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:8,bo:9'>HashTableItemValue</span>
+<table class="vym-note"><tr><td>
+Returns a constant pointer to the item data.
+</td></tr></table>
+</li>
+</ul>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:0,bo:9'>Extended Operations</span><ul>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:9,bo:0'>HashTableEnumerate</span></li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:9,bo:1'>HashTableSortItems</span></li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:9,bo:2'>HashTableSortHash</span></li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:9,bo:3'>HashTableErrorMessage</span>
+<table class="vym-note"><tr><td>
+const char * HashTableErrorMessage(void)<br/><br/>Returns a string representing the contents of errno, if errno equates to a HashTableError.<br/>
+</td></tr></table>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class='vym-branch1'  id='mc:0,bo:1'>Private</span><ul>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:0'>struct sHashTableRecord</span><ul>
+<li><span class='vym-branch3'  id='mc:0,bo:1,bo:0,bo:0'>hitCount</span>
+<table class="vym-note"><tr><td>
+size_t hitCount<br/><br/>The number of times this record has been set or requested by the user. This number does not include initialization.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:1,bo:0,bo:1'>key</span>
+<table class="vym-note"><tr><td>
+HyperVariant key<br/><br/>As far as we are concerned, this is just a void * for allocated data.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:1,bo:0,bo:2'>value</span>
+<table class="vym-note"><tr><td>
+HyperVariant value<br/><br/>See sHashTableRecord.key for more information.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:1,bo:0,bo:3'>successor</span>
+<table class="vym-note"><tr><td>
+struct sHashTableRecord * successor<br/><br/>The next record to succeed this one in the hash table.<br/>
+</td></tr></table>
+</li>
+</ul>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:1'>HashTableRecordSize</span>
+<table class="vym-note"><tr><td>
+#define HashTableRecordSize sizeof(sHashTableRecord)<br/><br/>The size in bytes of a single sHashTableRecord.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:2'>HashTableRecord</span>
+<table class="vym-note"><tr><td>
+#define HashTableRecord sHashTableRecord *<br/><br/>An alias for sHashTableRecord *.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:3'>HashTableRecordItems</span>
+<table class="vym-note"><tr><td>
+#define HashTableRecordItems sHashTableRecord **<br/><br/>An alias for sHashTableRecord **.
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:4'>HashTableRecordList</span>
+<table class="vym-note"><tr><td>
+#define HashTableRecordList sHashTableRecord **<br/><br/>An alias for sHashTableRecord **.
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:5'>struct sHashTable</span><ul>
+<li><span class='vym-branch3'  id='mc:0,bo:1,bo:5,bo:0'>item</span>
+<table class="vym-note"><tr><td>
+HashTableRecordItems item<br/><br/>Pointer array containing the logical order of all hash table entries.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:1,bo:5,bo:1'>itemsUsed</span>
+<table class="vym-note"><tr><td>
+size_t itemsUsed<br/><br/>The number of items written to in the linear pointer array.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:1,bo:5,bo:2'>itemsTotal</span>
+<table class="vym-note"><tr><td>
+size_t itemsTotal<br/><br/>The number of data records actually held by this hash table.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:1,bo:5,bo:3'>itemsMax</span>
+<table class="vym-note"><tr><td>
+size_t itemsMax<br/><br/>The number of records that can be written to the linear pointer array.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:1,bo:5,bo:4'>slot</span>
+<table class="vym-note"><tr><td>
+sHashTable ** slot<br/><br/>This pointer array, stores the entries that are also stored in linear, except it stores them in true Hash Table fashion as a linked list of finite buckets or "slots".<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:1,bo:5,bo:5'>slotCount</span>
+<table class="vym-note"><tr><td>
+size_t slotCount<br/><br/>The number of slots this table has allocated for record list storage.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:1,bo:5,bo:6'>eventHandler</span>
+<table class="vym-note"><tr><td>
+HashTableEventHandler eventHandler<br/><br/>The call back procedure which is called when hash table events are "raised".<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:1,bo:5,bo:7'>events</span>
+<table class="vym-note"><tr><td>
+size_t eventFlags<br/><br/>The HashTableEvent flags this table's event handler handles.
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:1,bo:5,bo:8'>impact</span>
+<table class="vym-note"><tr><td>
+size_t impact<br/><br/>The number of bytes consumed in memory by this hash table and all of its records.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:1,bo:5,bo:9'>private</span>
+<table class="vym-note"><tr><td>
+void * private<br/><br/>The private data the user associates with this hash table.<br/>
+</td></tr></table>
+</li>
+</ul>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:6'>HashTableSize</span>
+<table class="vym-note"><tr><td>
+#define HashTableSize sizeof(sHashTable)<br/><br/>The size in bytes of a single sHashTable.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:7'>HashTable</span>
+<table class="vym-note"><tr><td>
+#define HashTable sHashTable *<br/><br/>An alias for sHashTable *.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:8'>htReturnIfTableUninitialized</span>
+<table class="vym-note"><tr><td>
+void htReturnIfTableUninitialized(HashTable ht)<br/><br/>Return 0 if ht is null.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:9'>htVoidIfTableUninitialized</span>
+<table class="vym-note"><tr><td>
+void htVoidIfTableUninitialized(HashTable ht)<br/><br/>Return undefined if table is Null (uninitialized).<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:10'>htVoidUnsupportedFunction</span>
+<table class="vym-note"><tr><td>
+void htVoidUnsupportedFunction(void)<br/><br/>Set errno to HT_ERROR_UNSUPPORTED_FUNCTION and Return.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:11'>htReturnIfZeroLengthKey</span>
+<table class="vym-note"><tr><td>
+void htReturnIfZeroLengthKey(size_t length)<br/><br/>Set errno to HT_ERROR_ZERO_LENGTH_KEY and return 0.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:12'>htReturnIfAllocationFailure</span>
+<table class="vym-note"><tr><td>
+void htReturnIfAllocationFailure(void * ptr, ...)<br/><br/>If ptr is null, set errno HT_ERROR_ALLOCATION_FAILURE and execute statements (expectedly free(), ...) and return 0.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:13'>htReturnIfInvalidReference</span>
+<table class="vym-note"><tr><td>
+void htReturnIfInvalidReference(HashTable ht, HashTableItem reference)<br/><br/>If reference is an invalid item reference, set errno to HT_ERROR_INVALID_REFERENCE and return 0.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:14'>htReturnIfKeyNotFound</span>
+<table class="vym-note"><tr><td>
+void htReturnIfKeyNotFound(HashTableRecord item)<br/><br/>If item is null, set errno to HT_ERROR_KEY_NOT_FOUND and return 0.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:15'>htReturnIfNotWritableItem</span>
+<table class="vym-note"><tr><td>
+void htReturnIfNotWritableItem(HashTableRecord item)<br/><br/>If item has flags HTI_CONSTANT, set errno to HT_ERROR_NOT_WRITABLE_ITEM and return 0.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:16'>htReturnIfNotConfigurableItem</span>
+<table class="vym-note"><tr><td>
+void htReturnIfNotConfigurableItem(HashTableItem reference)<br/><br/>If the item cannot be configured set errno HT_ERROR_NOT_CONFIGURABLE_ITEM and return 0.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:17'>htItemAccess</span>
+<table class="vym-note"><tr><td>
+void htItemAccess(HashTable ht, HashTableItem reference, identifier label, expression)<br/><br/>Return error if table uninitialized, return error if invalid reference, assign hash table item reference to label, if label is non-null, return label expression otherwise, return invalid reference error.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:18'>htDblIsNaN</span>
+<table class="vym-note"><tr><td>
+boolean htDblIsNaN(double value)<br/><br/>Returns true or false if the value specified is representative of the IEEE 754 floating point value NaN.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:19'>htDblInfinity</span>
+<table class="vym-note"><tr><td>
+(signed int) trilean htDblInfinity(double value)<br/><br/>Returns -1 if the double value specified is an IEEE 754 negative infinity, 1 if the value specified is an IEEE 754 positive infinity, and zero otherwise. Trilean meaning three state value.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:20'>htKeyHash</span>
+<table class="vym-note"><tr><td>
+size_t htKeyHash(HashTable ht, size_t keyLength, void * realKey)<br/><br/>Hashes a key and distributes (selects a slot for) the key in the table.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:21'>void * htRealKey()</span>
+<table class="vym-note"><tr><td>
+void * htRealKey(HashTableRecordFlag hint, double value)<br/><br/>Automatically selects pointer to double, or pointer in double based on the contents of flag.<br/><br/>Value must be an lvalue.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:22'>htRecordImpact</span>
+<table class="vym-note"><tr><td>
+size_t htRecordImpact(HashTableRecord record)<br/><br/>Returns the size in bytes occupied by a hash table record.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:23'>htCreateRecord</span>
+<table class="vym-note"><tr><td>
+HashTableRecord htCreateRecord(void)<br/><br/>Creates a new hash table record.<br/><br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:24'>htCompareRecordToRealKey</span>
+<table class="vym-note"><tr><td>
+boolean htCompareRecordToRealKey(HashTable ht, HashTableRecord record, size_t keyLength, void * realKey)<br/><br/>Compares a hash table record to a real key.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:25'>htCreateHash</span>
+<table class="vym-note"><tr><td>
+size_t htCreateHash(size_t keyLength, void * realKey)<br/><br/>Creates a hash of any data supplied, using the hash table library's hashing algorithm.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:26'>htFindKeyWithParent</span>
+<table class="vym-note"><tr><td>
+HashTableRecord htFindKeyWithParent(HashTable table, size_t keyLength, void * realKey, HashTableRecord primary, HashTableRecord * parent)<br/><br/>Locate a key within the table beginning the search at primary, returning the results found, as well as the predecessor of the key found (or not found).<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:27'>htFindKey</span>
+<table class="vym-note"><tr><td>
+HashTableRecord htFindKey(HashTable table, size_t keyLength, void * realKey)<br/><br/>Locate a key within a table's records and return its 1 based index within the linear list or zero if not found.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:28'>htReturnIfItemNotFound</span></li>
+</ul>
+</li>
+</ul>
+<map name='imagemap'>
+</map>
+<hr/>
+<table class="vym-footer">   
+      <tr> 
+        <td class="vym-footerL">HashTable.vym</td> 
+        <td class="vym-footerC">2014-02-20</td> 
+        <td class="vym-footerR"> <a href='http://www.insilmaril.de/vym'>vym 2.2.4</a></td> 
+      </tr> 
+     </table>
+</body></html>
