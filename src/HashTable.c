@@ -56,6 +56,9 @@ typedef struct sHashTableRecord {
 	struct sHashTableRecord * successor;
 } sHashTableRecord;
 
+#define htRecordHash(r) varprvti (r->value)
+#define htRecordItemReference(r) varprvti (r->key)
+
 #define HashTableRecordSize sizeof(sHashTableRecord)
 #define HashTableRecord sHashTableRecord *
 #define HashTableRecordList sHashTableRecord **
