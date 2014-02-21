@@ -56,8 +56,8 @@ typedef struct sHashTableRecord {
 	struct sHashTableRecord * successor;
 } sHashTableRecord;
 
+#define htRecordReference(r) varprvti (r->key)
 #define htRecordHash(r) varprvti (r->value)
-#define htRecordItemReference(r) varprvti (r->key)
 
 #define HashTableRecordSize sizeof(sHashTableRecord)
 #define HashTableRecord sHashTableRecord *
@@ -139,8 +139,6 @@ if (vartype(i->value) & HTR_NON_CONFIGURABLE) { \
 
 #define htRealKey(l, v, h) (h & HTR_DOUBLE)?&v:ptrVar(v); __htKeyLength(l, v, h)
 
-#define htRecordReference(e) ((e) ? e->hitCount++,  : 0)
-
 #define htCompareRecordToRealKey(e, l, k) \
 	(varlen(e->key) == l) && (memcmp(e->key, k, l) == 0)
 
@@ -220,7 +218,7 @@ static HashTableRecord htCreateRecord
 
 	ht->item[ht->itemsUsed++] = this;
 	ht->itemsTotal++, ht->impact += htRecordImpact(this);
-	htRecordItemReference(this) = ht->itemsUsed;
+	htRecordReference(this) = ht->itemsUsed;
 
 	return this;
 
@@ -422,7 +420,7 @@ HashTableItem HashTablePut
 		varfree(current->value);
 		current->value = varValue, current->hitCount++;
 		htRecordHash(current) = index;
-		return htRecordItemReference(current);
+		return htRecordReference(current);
 	}
 
 	HashTableRecord this = htCreateRecord(
@@ -437,7 +435,7 @@ HashTableItem HashTablePut
 		if ( ! root ) ht->slot[index] = this;
 		else if ( root == current ) root->successor = this;
 		else parent->successor = this;
-		return htRecordItemReference(this);
+		return htRecordReference(this);
 	}
 
 	return 0;
@@ -456,7 +454,7 @@ HashTableItem HashTableGet
 	htReturnIfZeroLengthKey(keyLength);
 	HashTableRecord item = htFindKey(ht, keyLength, realKey);
 	htReturnIfKeyNotFound(item);
-	return htRecordItemReference(item);
+	return htRecordReference(item);
 }
 
 bool HashTableDeleteItem
