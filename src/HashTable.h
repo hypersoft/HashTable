@@ -53,14 +53,15 @@ typedef enum HashTableError {
 typedef enum eHashTableEvent {
 	HT_EVENT_CONSTRUCTED     = HashTableBitFlag( 1),
 	HT_EVENT_PUT             = HashTableBitFlag( 2),
-	HT_EVENT_GET             = HashTableBitFlag( 3),
-	HT_EVENT_DELETE          = HashTableBitFlag( 4),
-	HT_EVENT_ENUMERATE       = HashTableBitFlag( 5),
-	HT_EVENT_SORT_TABLE      = HashTableBitFlag( 6),
-	HT_EVENT_SORT_HASH       = HashTableBitFlag( 7),
-	HT_EVENT_SORT_NUMERIC    = HashTableBitFlag( 8),
-	HT_EVENT_SORT_DESCENDING = HashTableBitFlag( 9),
-	HT_EVENT_DESTRUCTING     = HashTableBitFlag(10)
+	HT_EVENT_OVERWRITE       = HashTableBitFlag( 3),
+	HT_EVENT_GET             = HashTableBitFlag( 4),
+	HT_EVENT_DELETE          = HashTableBitFlag( 5),
+	HT_EVENT_ENUMERATE       = HashTableBitFlag( 6),
+	HT_EVENT_SORT_TABLE      = HashTableBitFlag( 7),
+	HT_EVENT_SORT_HASH       = HashTableBitFlag( 8),
+	HT_EVENT_SORT_NUMERIC    = HashTableBitFlag( 9),
+	HT_EVENT_SORT_DESCENDING = HashTableBitFlag(10),
+	HT_EVENT_DESTRUCTING     = HashTableBitFlag(11)
 } HashTableEvent;
 
 typedef enum eHashTableRecordFlags {
