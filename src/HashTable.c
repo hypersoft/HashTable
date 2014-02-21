@@ -499,7 +499,7 @@ bool HashTableItemPutFlags
 	htReturnIfNotConfigurableItem(item);
 	/*
 	 we don't particularly use these flags, but to avoid future collision
-	 ignore setting them...
+	 disallow setting them...
 	 */
 	settings |= ~(HTR_INT | HTR_DOUBLE | HTR_POINTER | HTR_UTF8 | HTR_BLOCK);
 	vartype(item->value) |= settings;
