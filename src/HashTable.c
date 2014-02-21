@@ -220,7 +220,7 @@ static HashTableRecord htCreateRecord
 
 	ht->item[ht->itemsUsed++] = this;
 	ht->itemsTotal++, ht->impact += htRecordImpact(this);
-	varprvti(this->key) = ht->itemsUsed;
+	htRecordItemReference(this) = ht->itemsUsed;
 
 	return this;
 
@@ -415,13 +415,14 @@ HashTableItem HashTablePut
 		htReturnIfNotWritableItem(current);
 		htReturnIfAllocationFailure(
 			(varValue = varcreate(valueLength, value, valueHint)), {}
-		) else varprvti(varValue) = index;
+		);
 		/* TODO: HT_EVENT_OVERWRITE !*/
 		ht->impact -= varimpact(current->value),
 		ht->impact += varimpact(varValue);
 		varfree(current->value);
 		current->value = varValue, current->hitCount++;
-		return varprvti (current->key);
+		htRecordHash(current) = index;
+		return htRecordItemReference(current);
 	}
 
 	HashTableRecord this = htCreateRecord(
@@ -431,12 +432,12 @@ HashTableItem HashTablePut
 	);
 
 	if (this) {
-		varprvti(this->value) = index;
+		htRecordHash(this) = index;
 		/* TODO: HT_EVENT_PUT !*/
 		if ( ! root ) ht->slot[index] = this;
 		else if ( root == current ) root->successor = this;
 		else parent->successor = this;
-		return varprvti(this->key);
+		return htRecordItemReference(this);
 	}
 
 	return 0;
@@ -455,7 +456,7 @@ HashTableItem HashTableGet
 	htReturnIfZeroLengthKey(keyLength);
 	HashTableRecord item = htFindKey(ht, keyLength, realKey);
 	htReturnIfKeyNotFound(item);
-	return varprvti(item->key);
+	return htRecordItemReference(item);
 }
 
 bool HashTableDeleteItem
@@ -473,13 +474,13 @@ bool HashTableDeleteItem
 
 	item = htFindKeyWithParent(
 		ht, varlen(item->key), item->key,
-		ht->slot[varprvti(item->value)],
+		ht->slot[htRecordHash(item)],
 		&parent
 	);
 
 	if (parent) parent->successor = item->successor;
 	else {
-		ht->slot[varprvti(item->value)] = item->successor;
+		ht->slot[htRecordHash(item)] = item->successor;
 	}
 
 	ht->item[reference] = NULL, ht->itemsTotal--,
