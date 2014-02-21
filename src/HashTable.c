@@ -182,6 +182,33 @@ inline static HashTableRecord htFindKey (
 	return NULL;
 }
 
+static inline HashTableItem htPutRecordItem
+(
+	HashTable ht, HashTableRecord this
+) {
+
+	if (ht->itemsMax == ht->itemsUsed) {
+		HashTableRecordItems list = calloc(
+			sizeof(void*),
+			ht->itemsUsed + HT_RESERVE_ITEMS
+		);
+		htReturnIfAllocationFailure(list, {});
+		if (ht->item) {
+			memcpy(list, ht->item, sizeof(void*) * ht->itemsUsed);
+			free(ht->item);
+		}
+		ht->impact += sizeof(void *) * HT_RESERVE_ITEMS;
+		ht->itemsMax += HT_RESERVE_ITEMS;
+		ht->item = list;
+	}
+
+	ht->item[ht->itemsUsed++] = this;
+	ht->itemsTotal++, ht->impact += htRecordImpact(this);
+	varprvti(this->key) = ht->itemsUsed;
+	return ht->itemsUsed;
+
+}
+
 HashTable NewHashTable
 (size_t size,
 	HashTableEvent withEvents,
@@ -337,33 +364,6 @@ void * HashTableGetPrivate
 ) {
 	htReturnIfTableUninitialized(ht);
 	return ht->private;
-}
-
-static inline HashTableItem htPutRecordItem
-(
-	HashTable ht, HashTableRecord this
-) {
-
-	if (ht->itemsMax == ht->itemsUsed) {
-		HashTableRecordItems list = calloc(
-			sizeof(void*),
-			ht->itemsUsed + HT_RESERVE_ITEMS
-		);
-		htReturnIfAllocationFailure(list, {});
-		if (ht->item) {
-			memcpy(list, ht->item, sizeof(void*) * ht->itemsUsed);
-			free(ht->item);
-		}
-		ht->impact += sizeof(void *) * HT_RESERVE_ITEMS;
-		ht->itemsMax += HT_RESERVE_ITEMS;
-		ht->item = list;
-	}
-
-	ht->item[ht->itemsUsed++] = this;
-	ht->itemsTotal++, ht->impact += htRecordImpact(this);
-	varprvti(this->key) = ht->itemsUsed;
-	return ht->itemsUsed;
-
 }
 
 HashTableItem HashTablePut
