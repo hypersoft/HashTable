@@ -200,11 +200,7 @@ HashTable NewHashTable
 	ht->slot = calloc(size, sizeof(void*));
 	htReturnIfAllocationFailure(ht->slot, free(ht));
 
-	ht->item = calloc(HT_RESERVE_ITEMS, sizeof(void*));
-	htReturnIfAllocationFailure(ht->item, free(ht), free(ht->slot));
-
-	ht->itemsMax = HT_RESERVE_ITEMS,
-	ht->impact = HashTableSize + (sizeof(void*) * (size + HT_RESERVE_ITEMS));
+	ht->impact = HashTableSize + (sizeof(void*) * (size));
 
 	if (withEvents & HT_EVENT_CONSTRUCTED && eventHandler)
 		eventHandler(ht, HT_EVENT_CONSTRUCTED, 0, 0, private);
@@ -229,9 +225,10 @@ HashTable DestroyHashTable
 	HashTable ht
 ) {
 	htReturnIfTableUninitialized(ht);
-	size_t item, length = ht->itemsMax; HashTableRecord target = NULL;
+	size_t item = 0, length = ht->itemsMax; HashTableRecord target = NULL;
 	for (item = 0; item < length; item++) {
-		if ((target = ht->item[item])) {
+		target = ht->item[item];
+		if (target) {
 			varfree(target->key); varfree(target->value); free(target);
 		}
 	}
@@ -342,6 +339,33 @@ void * HashTableGetPrivate
 	return ht->private;
 }
 
+static inline HashTableItem htPutRecordItem
+(
+	HashTable ht, HashTableRecord this
+) {
+
+	if (ht->itemsMax == ht->itemsUsed) {
+		HashTableRecordItems list = calloc(
+			sizeof(void*),
+			ht->itemsUsed + HT_RESERVE_ITEMS
+		);
+		htReturnIfAllocationFailure(list, {});
+		if (ht->item) {
+			memcpy(list, ht->item, sizeof(void*) * ht->itemsUsed);
+			free(ht->item);
+		}
+		ht->impact += sizeof(void *) * HT_RESERVE_ITEMS;
+		ht->itemsMax += HT_RESERVE_ITEMS;
+		ht->item = list;
+	}
+
+	ht->item[ht->itemsUsed++] = this;
+	ht->itemsTotal++, ht->impact += htRecordImpact(this);
+	varprvti(this->key) = ht->itemsUsed;
+	return ht->itemsUsed;
+
+}
+
 HashTableItem HashTablePut
 (
 	HashTable ht,
@@ -375,7 +399,8 @@ HashTableItem HashTablePut
 		htReturnIfAllocationFailure(
 			(varValue = varcreate(valueLength, value, valueHint)), {}
 		) else varprvti(varValue) = index;
-		ht->impact += varimpact(current->value),
+		/* TODO: HT_EVENT_OVERWRITE !*/
+		ht->impact -= varimpact(current->value),
 		ht->impact += varimpact(varValue);
 		varfree(current->value);
 		current->value = varValue, current->hitCount++;
@@ -395,21 +420,17 @@ HashTableItem HashTablePut
 		free(this), varfree(varKey)
 	)   else this->value = varValue, varprvti(varValue) = index;
 
-	ht->impact += htRecordImpact(this), ht->itemsTotal++;
+	if (htPutRecordItem(ht, this)) {
+		/* TODO: HT_EVENT_PUT !*/
+		if ( ! root ) ht->slot[index] = this;
+		else if ( root == current ) root->successor = this;
+		else parent->successor = this;
+		return ht->itemsUsed;
+	}
 
-	ht->item[ht->itemsUsed++] = this;
-	varprvti(varKey) = ht->itemsUsed;
-
-	/* TODO: HT_EVENT_PUT !*/
-
-	if ( ! root ) ht->slot[index] = this;
-	else if ( root == current ) root->successor = this;
-	else parent->successor = this;
-
-	return ht->itemsUsed;
+	return 0;
 
 }
-#include <stdio.h>
 
 HashTableItem HashTableGet
 (
