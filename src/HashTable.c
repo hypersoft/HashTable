@@ -78,27 +78,27 @@ typedef struct sHashTable {
 #define HashTable sHashTable *
 
 #define htReturnIfTableUninitialized(t) \
-	if ( ! ht ) { errno = HT_ERROR_TABLE_UNINITIALIZED; return 0; }
+	if ( ! (ht) ) { errno = HT_ERROR_TABLE_UNINITIALIZED; return 0; }
 
 #define htVoidIfTableUninitialized(t) \
-	if ( ! ht ) { errno = HT_ERROR_TABLE_UNINITIALIZED; return; }
+	if ( ! (ht) ) { errno = HT_ERROR_TABLE_UNINITIALIZED; return; }
 
 #define htVoidUnsupportedFunction() \
 	errno = HT_ERROR_UNSUPPORTED_FUNCTION; return
 
 #define htReturnIfZeroLengthKey(l) \
-	if ( ! l ) { errno = HT_ERROR_ZERO_LENGTH_KEY; return 0; }
+	if ( ! (l) ) { errno = HT_ERROR_ZERO_LENGTH_KEY; return 0; }
 
 #define htReturnIfAllocationFailure(p, ...) \
-	if ( ! p ) { errno = HT_ERROR_ALLOCATION_FAILURE; __VA_ARGS__; return 0; }
+	if ( ! (p) ) { errno = HT_ERROR_ALLOCATION_FAILURE; __VA_ARGS__; return 0; }
 
 #define htReturnIfInvalidReference(ht, r) \
-	if ( ! r || ht->itemsMax < r) { \
+	if ( ! (r) || ht->itemsMax < r) { \
 		errno = HT_ERROR_INVALID_REFERENCE; return 0; \
 }
 
 #define htReturnIfKeyNotFound(i) \
-	if ( ! i ) { errno = HT_ERROR_KEY_NOT_FOUND; return 0; }
+	if ( ! (i) ) { errno = HT_ERROR_KEY_NOT_FOUND; return 0; }
 
 #define htReturnIfNotWritableItem(i) if (vartype(i->value) & HTR_NON_WRITABLE) { \
 	errno = HT_ERROR_NOT_WRITABLE_ITEM; return 0; \
@@ -135,8 +135,6 @@ if (vartype(i->value) & HTR_NON_CONFIGURABLE) { \
 }
 
 #define htRealKey(l, v, h) (h & HTR_DOUBLE)?&v:ptrVar(v); __htKeyLength(l, v, h)
-
-#define htCreateRecord() calloc(1, HashTableRecordSize)
 
 #define htRecordReference(e) ((e) ? e->hitCount++,  : 0)
 
@@ -182,10 +180,25 @@ inline static HashTableRecord htFindKey (
 	return NULL;
 }
 
-static inline HashTableItem htPutRecordItem
+static HashTableRecord htCreateRecord
 (
-	HashTable ht, HashTableRecord this
+	HashTable ht,
+	size_t keyLength, double key, HashTableItemFlags keyHint,
+	size_t valueLength, double value, HashTableItemFlags valueHint
 ) {
+
+	HashTableRecord this = calloc(1, HashTableRecordSize);
+	htReturnIfAllocationFailure(this, {});
+
+	htReturnIfAllocationFailure(
+		this->key = varcreate(keyLength, key, keyHint),
+		free(this)
+	);
+
+	htReturnIfAllocationFailure(
+		this->value = varcreate(valueLength, value, valueHint),
+		free(this), varfree(this->key)
+	);
 
 	if (ht->itemsMax == ht->itemsUsed) {
 		HashTableRecordItems list = calloc(
@@ -205,7 +218,8 @@ static inline HashTableItem htPutRecordItem
 	ht->item[ht->itemsUsed++] = this;
 	ht->itemsTotal++, ht->impact += htRecordImpact(this);
 	varprvti(this->key) = ht->itemsUsed;
-	return ht->itemsUsed;
+
+	return this;
 
 }
 
@@ -407,25 +421,19 @@ HashTableItem HashTablePut
 		return varprvti (current->key);
 	}
 
-	HashTableRecord this = htCreateRecord();
-	htReturnIfAllocationFailure(this, {});
+	HashTableRecord this = htCreateRecord(
+		ht,
+		keyLength, key, keyHint,
+		valueLength, value, valueHint
+	);
 
-	htReturnIfAllocationFailure(
-		(varKey = varcreate(keyLength, key, keyHint)),
-		free(this)
-	)   else this->key = varKey;
-
-	htReturnIfAllocationFailure(
-		(varValue = varcreate(valueLength, value, valueHint)),
-		free(this), varfree(varKey)
-	)   else this->value = varValue, varprvti(varValue) = index;
-
-	if (htPutRecordItem(ht, this)) {
+	if (this) {
+		varprvti(this->value) = index;
 		/* TODO: HT_EVENT_PUT !*/
 		if ( ! root ) ht->slot[index] = this;
 		else if ( root == current ) root->successor = this;
 		else parent->successor = this;
-		return ht->itemsUsed;
+		return varprvti(this->key);
 	}
 
 	return 0;
