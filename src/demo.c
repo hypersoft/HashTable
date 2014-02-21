@@ -22,8 +22,9 @@ int main ( int argc, char **argv )
 	printf("Initial record index: %i\n", result);
 	result = HashTableGet(x, htStr(name));
 	printf("Retrieved record index: %i\n", result);
+	result = HashTableDistribution(x, htStr(name));
+	printf("Initial record distribution: %i\n", result);
 	htStats(x);
-	//HashTableDistribution(x, htStr("fuck me"));
 	DestroyHashTable(x);
 	return 0;
 }
