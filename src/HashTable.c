@@ -247,7 +247,7 @@ HashTable NewHashTable
 	ht->impact = HashTableSize + (sizeof(void*) * (size));
 
 	if (withEvents & HT_EVENT_CONSTRUCTED && eventHandler)
-		eventHandler(ht, HT_EVENT_CONSTRUCTED, 0, 0, private);
+		eventHandler(ht, HT_EVENT_CONSTRUCTED, 0, private);
 
 	return ht;
 
@@ -269,6 +269,10 @@ HashTable DestroyHashTable
 	HashTable ht
 ) {
 	htReturnIfTableUninitialized(ht);
+
+	if (ht->events & HT_EVENT_CONSTRUCTED && ht->eventHandler)
+		(void) ht->eventHandler(ht, HT_EVENT_DESTRUCTING, 0, ht->private);
+
 	size_t item = 0, length = ht->itemsMax; HashTableRecord target = NULL;
 	for (item = 0; item < length; item++) {
 		target = ht->item[item];
@@ -431,9 +435,26 @@ HashTableItem HashTablePut
 		valueLength, value, valueHint
 	);
 
+	bool put = true;
+
 	if (this) {
 		htRecordHash(this) = index;
-		/* TODO: HT_EVENT_PUT !*/
+		if (ht->events & HT_EVENT_PUT && ht->eventHandler) {
+			put = ht->eventHandler(
+				ht, HT_EVENT_PUT,
+				htRecordReference(this),
+				ht->private
+			);
+			if (! put ) {
+				ht->item[htRecordReference(this)] = NULL,
+				ht->itemsTotal--, ht->itemsUsed--,
+				ht->impact -= htRecordImpact(this);
+				varfree(this->key); varfree(this->value); free(this);
+			}
+		}
+	} else put = false;
+
+	if (put) {
 		if ( ! root ) ht->slot[index] = this;
 		else if ( root == current ) root->successor = this;
 		else parent->successor = this;
@@ -456,6 +477,14 @@ HashTableItem HashTableGet
 	htReturnIfZeroLengthKey(keyLength);
 	HashTableRecord item = htFindKey(ht, keyLength, realKey);
 	htReturnIfKeyNotFound(item);
+
+	if (ht->events & HT_EVENT_CONSTRUCTED && ht->eventHandler)
+		return ht->eventHandler(
+			ht, HT_EVENT_GET,
+			htRecordReference(item),
+			ht->private
+		);
+
 	return htRecordReference(item);
 }
 
@@ -471,6 +500,11 @@ bool HashTableDeleteItem
 	HashTableRecord item = ht->item[reference];
 	htReturnIfItemNotFound(item);
 	htReturnIfNotConfigurableItem(item);
+
+	if (ht->events & HT_EVENT_CONSTRUCTED && ht->eventHandler) {
+		if (! ht->eventHandler(ht, HT_EVENT_DELETE, reference, ht->private) )
+			return false;
+	}
 
 	item = htFindKeyWithParent(
 		ht, varlen(item->key), item->key,
@@ -531,4 +565,33 @@ void HashTableEnumerate
 			handler(ht, direction, index, private);
 		}
 	}
+}
+
+void HashTableSortItems
+(
+	HashTable ht,
+	HashTableSortType type,
+	HashTableSortDirection direction,
+	HashTableSortHandler sortHandler,
+	void * private
+) {
+	htVoidIfTableUninitialized(ht);
+	/* doesn't do anything yet */
+	htVoidUnsupportedFunction();
+}
+
+void HashTableSortHash
+(
+	HashTable ht,
+	size_t keyLength,
+	double key,
+	HashTableItemFlags keyHint,
+	HashTableSortType type,
+	HashTableSortDirection direction,
+	HashTableSortHandler sortHandler,
+	void * private
+) {
+	htVoidIfTableUninitialized(ht);
+	/* doesn't do anything yet */
+	htVoidUnsupportedFunction();
 }

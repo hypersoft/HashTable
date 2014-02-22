@@ -51,17 +51,21 @@ typedef enum eHashTableError {
 } HashTableError;
 
 typedef enum eHashTableEvent {
-	HT_EVENT_CONSTRUCTED     = HashTableBitFlag( 1),
-	HT_EVENT_PUT             = HashTableBitFlag( 2),
-	HT_EVENT_OVERWRITE       = HashTableBitFlag( 3),
-	HT_EVENT_GET             = HashTableBitFlag( 4),
-	HT_EVENT_DELETE          = HashTableBitFlag( 5),
-	HT_EVENT_SORT_TABLE      = HashTableBitFlag( 6),
-	HT_EVENT_SORT_HASH       = HashTableBitFlag( 7),
-	HT_EVENT_SORT_NUMERIC    = HashTableBitFlag( 8),
-	HT_EVENT_SORT_DESCENDING = HashTableBitFlag( 9),
-	HT_EVENT_DESTRUCTING     = HashTableBitFlag(10)
+	HT_EVENT_CONSTRUCTED     = HashTableBitFlag(1),
+	HT_EVENT_PUT             = HashTableBitFlag(2),
+	HT_EVENT_OVERWRITE       = HashTableBitFlag(3),
+	HT_EVENT_GET             = HashTableBitFlag(4),
+	HT_EVENT_DELETE          = HashTableBitFlag(5),
+	HT_EVENT_DESTRUCTING     = HashTableBitFlag(6)
 } HashTableEvent;
+
+typedef HashTableItem (*HashTableEventHandler)
+(
+	void * hashTable,
+	HashTableEvent event,
+	HashTableItem reference,
+	void * private
+);
 
 typedef enum eHashTableEnumerateDirection {
 	HT_ENUMERATE_FORWARD = 0,
@@ -73,6 +77,26 @@ typedef bool (*HashTableEnumerationHandler)
 	void * hashTable,
 	HashTableEnumerateDirection direction,
 	HashTableItem item,
+	void * private
+);
+
+typedef enum eHashTableSortType {
+	HT_SORT_NUMERIC = 0,
+	HT_SORT_ALPHA   = 1
+} HashTableSortType;
+
+typedef enum eHashTableSortDirection {
+	HT_SORT_ASCENDING  = 0,
+	HT_SORT_DESCENDING = 1
+} HashTableSortDirection;
+
+typedef HashTableItem (*HashTableSortHandler)
+(
+	void * hashTable,
+	HashTableSortType type,
+	HashTableSortDirection direction,
+	HashTableItem primary,
+	HashTableItem secondary,
 	void * private
 );
 
@@ -98,29 +122,7 @@ typedef enum eHashTableItemFlags {
 #define htBlk(p, s) s, htIntVal((void*)p), HTI_BLOCK
 #define htStrN(s, l) l, htIntVal(s), HTI_UTF8
 
-#ifdef HashTable_c
-
-typedef HashTableItem (*HashTableEventHandler)
-(
-	void * hashTable,
-	HashTableEvent event,
-	HashTableItem primary,
-	HashTableItem secondary,
-	void * private
-);
-
-#else
-
-typedef void * HashTable;
-
-typedef HashTableItem (*HashTableEventHandler)
-(
-	HashTable hashTable,
-	HashTableEvent event,
-	HashTableItem primary,
-	HashTableItem secondary,
-	void * private
-);
+#ifndef HashTable_c
 
 typedef void * HashTable;
 
@@ -253,9 +255,30 @@ HashTableItemFlags HashTableItemGetFlags
 
 void HashTableEnumerate
 (
-	HashTable ht,
+	HashTable hashTable,
 	HashTableEnumerateDirection direction,
 	HashTableEnumerationHandler handler,
+	void * private
+);
+
+void HashTableSortItems
+(
+	HashTable hashTable,
+	HashTableSortType type,
+	HashTableSortDirection direction,
+	HashTableSortHandler sortHandler,
+	void * private
+);
+
+void HashTableSortHash
+(
+	HashTable hashTable,
+	size_t keyLength,
+	double key,
+	HashTableItemFlags keyHint,
+	HashTableSortType type,
+	HashTableSortDirection direction,
+	HashTableSortHandler sortHandler,
 	void * private
 );
 

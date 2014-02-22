@@ -71,7 +71,7 @@ size_T HT_EVENT_PUT<br/><br/>The API has been instructed to put data into the ha
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:2,bo:2'>HT_EVENT_OVERWRITE</span>
 <table class="vym-note"><tr><td>
-size_t HT_EVENT_OVERWRITE<br/><br/>The API has been instructed to overwrite existing data.<br/>
+size_t HT_EVENT_OVERWRITE<br/><br/>This value is defined, but will not currently propagate.<br/><br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:2,bo:3'>HT_EVENT_GET</span>
@@ -84,27 +84,7 @@ size_t HT_EVENT_GET<br/><br/>The API has been queried for a record.<br/>
 size_t HT_EVENT_DELETE<br/><br/>The API has been instructed to delete a record.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:2,bo:5'>HT_EVENT_SORT_ITEMS</span>
-<table class="vym-note"><tr><td>
-size_t HT_EVENT_SORT_ITEMS<br/><br/>The API would like the user to make a sort decision on table items.<br/>
-</td></tr></table>
-</li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:2,bo:6'>HT_EVENT_SORT_HASH</span>
-<table class="vym-note"><tr><td>
-size_t HT_EVENT_SORT_HASH<br/><br/>The API would like the user to make a sort decision on a hash table slot.<br/><br/>
-</td></tr></table>
-</li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:2,bo:7'>HT_EVENT_SORT_NUMERIC</span>
-<table class="vym-note"><tr><td>
-size_t HT_EVENT_SORT_NUMERIC<br/><br/>The API would like the user to make a sort decision based on numeric properties. If not specified, implementation defined sort is assumed.<br/>
-</td></tr></table>
-</li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:2,bo:8'>HT_EVENT_SORT_DESCENDING</span>
-<table class="vym-note"><tr><td>
-size_t HT_EVENT_SORT_DESCENDING<br/><br/>The API would like the user to make a descending sort decision. If not specified ascending sort order is implied.<br/><br/>
-</td></tr></table>
-</li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:2,bo:9'>HT_EVENT_DESTRUCTING</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:2,bo:5'>HT_EVENT_DESTRUCTING</span>
 <table class="vym-note"><tr><td>
 size_t HT_EVENT_DESTRUCTING<br/><br/>A hash table is about to be destroyed.<br/>
 </td></tr></table>
@@ -113,7 +93,7 @@ size_t HT_EVENT_DESTRUCTING<br/><br/>A hash table is about to be destroyed.<br/>
 </li>
 <li><span class='vym-branch2'  id='mc:0,bo:0,bo:3'>HashTableEventHandler</span>
 <table class="vym-note"><tr><td>
-typedef HashTableItem (*HashTableEventHandler) (HashTable ht, HashTableEvent event, HashTableItem primary, HashTableItem secondary, void * private)<br/><br/>The hash table event call back.<br/>
+typedef HashTableItem (*HashTableEventHandler) (HashTable ht, HashTableEvent event, HashTableItem primary, void * private)<br/><br/>The hash table event call back.<br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch2'  id='mc:0,bo:0,bo:4'>HashTableEnumerateDirection</span>
@@ -138,198 +118,241 @@ size_t HT_ENUMERATE_REVERSE<br/><br/>Enumerate the entries from last to first.<b
 typedef bool (*HashTableEnumerationHandler) (void * hashTable, HashTableEnumerateDirection direction, HashTableItem item, void * private)<br/><br/>The hash table enumeration call back.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch2'  id='mc:0,bo:0,bo:6'>enum HashTableItemFlags</span><ul>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:6,bo:0'>HTI_INT</span>
+<li><span class='vym-branch2'  id='mc:0,bo:0,bo:6'>HashTableSortDirection</span>
+<table class="vym-note"><tr><td>
+enum HashTableSortDirection<br/>
+</td></tr></table>
+<ul>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:6,bo:0'>HT_SORT_DESCENDING</span></li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:6,bo:1'>HT_SORT_ASCENDING</span></li>
+</ul>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:0,bo:7'>HashTableSortType</span>
+<table class="vym-note"><tr><td>
+enum HashTableSortType<br/>
+</td></tr></table>
+<ul>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:7,bo:0'>HT_SORT_NUMERIC</span></li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:7,bo:1'>HT_SORT_ALPHA</span></li>
+</ul>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:0,bo:8'>HashTableSortHandler</span>
+<table class="vym-note"><tr><td>
+typedef HashTableItem(*HashTableSortHandler) (	void * hashTable, HashTableSortType type, HashTableSortDirection direction, HashTableItem primary, HashTableItem secondary, void * private)<br/><br/>The hash table sort call back.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:0,bo:9'>HashTableItemFlags</span>
+<table class="vym-note"><tr><td>
+enum HashTableItemFlags<br/>
+</td></tr></table>
+<ul>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:9,bo:0'>HTI_INT</span>
 <table class="vym-note"><tr><td>
 size_t HTI_INT<br/><br/>The data supplied is a platform sized integer value.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:6,bo:1'>HTI_DOUBLE</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:9,bo:1'>HTI_DOUBLE</span>
 <table class="vym-note"><tr><td>
 size_t HTI_DOUBLE<br/><br/>The data supplied is an IEEE 754 double precision floating point value.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:6,bo:2'>HTI_POINTER</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:9,bo:2'>HTI_POINTER</span>
 <table class="vym-note"><tr><td>
 size_t HTI_POINTER<br/><br/>The data supplied is a platform pointer value.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:6,bo:3'>HTI_UTF8</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:9,bo:3'>HTI_UTF8</span>
 <table class="vym-note"><tr><td>
 size_T HTI_UTF8<br/><br/>The data supplied is an ANSI C or UTF-8 encoded string.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:6,bo:4'>HTI_BLOCK</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:9,bo:4'>HTI_BLOCK</span>
 <table class="vym-note"><tr><td>
 size_T HTI_BLOCK<br/><br/>Generic block data of the specified length.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:6,bo:5'>HTI_NON_ENUMERABLE</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:9,bo:5'>HTI_NON_ENUMERABLE</span>
 <table class="vym-note"><tr><td>
 size_t HTI_NON_ENUMERABLE<br/><br/>Do not list in enumeration.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:6,bo:6'>HTI_NON_WRITABLE</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:9,bo:6'>HTI_NON_WRITABLE</span>
 <table class="vym-note"><tr><td>
 size_t HTI_NON_WRITABLE<br/><br/>Do not overwrite.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:6,bo:7'>HTI_NON_CONFIGURABLE</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:9,bo:7'>HTI_NON_CONFIGURABLE</span>
 <table class="vym-note"><tr><td>
 size_t HTI_NON_CONFIGURABLE<br/><br/>Do not delete, do not modify enumerable or configurable.<br/>
 </td></tr></table>
 </li>
 </ul>
 </li>
-<li><span class='vym-branch2'  id='mc:0,bo:0,bo:7'>ht Macros</span>
+<li><span class='vym-branch2'  id='mc:0,bo:0,bo:10'>ht Macros</span>
 <table class="vym-note"><tr><td>
 Use these macros to perform variant data requests between your application and the HashTable API.<br/>
 </td></tr></table>
 <ul>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:7,bo:0'>htInt</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:10,bo:0'>htInt</span>
 <table class="vym-note"><tr><td>
 parameter list htInt(size_t i)<br/><br/>Returns parameter list for API functions to diagnose and transpose an integer as a record key or value.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:7,bo:1'>htPtr</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:10,bo:1'>htPtr</span>
 <table class="vym-note"><tr><td>
 parameter list htInt(void * p)<br/><br/>Returns parameter list for API functions to diagnose and transpose a pointer as a record key or value.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:7,bo:2'>htDbl</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:10,bo:2'>htDbl</span>
 <table class="vym-note"><tr><td>
 parameter list htInt(dobule d)<br/><br/>Returns parameter list for API functions to diagnose and transpose a double as a record key or value.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:7,bo:3'>htStr</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:10,bo:3'>htStr</span>
 <table class="vym-note"><tr><td>
 parameter list htInt(char * s)<br/><br/>Returns parameter list for API functions to diagnose and transpose an ANSI or UTF-8 string as a record key or value.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:7,bo:4'>htBlk</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:10,bo:4'>htBlk</span>
 <table class="vym-note"><tr><td>
 parameter list htInt(void * b, size_t s)<br/><br/>Returns parameter list for API functions to diagnose and transpose an arbitrary block of data with specified length as a record key or value.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:7,bo:5'>htStrN</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:10,bo:5'>htStrN</span>
 <table class="vym-note"><tr><td>
 parameter list htInt(char * b, size_t s)<br/><br/>Returns parameter list for API functions to diagnose and transpose an arbitrary length ANSI or UTF-8 string pointer as a record key or value.<br/>
 </td></tr></table>
 </li>
 </ul>
 </li>
-<li><span class='vym-branch2'  id='mc:0,bo:0,bo:8'>Lifecycle</span>
+<li><span class='vym-branch2'  id='mc:0,bo:0,bo:11'>Lifecycle</span>
 <table class="vym-note"><tr><td>
 Operations which manage the existence or "instancing" of hash tables.<br/>
 </td></tr></table>
 <ul>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:8,bo:0'>NewHashTable</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:11,bo:0'>NewHashTable</span>
 <table class="vym-note"><tr><td>
 HashTable NewHashTable(size_t size, HashTableEvent withEvents, HashTableEventHandler eventHandler, void * private)<br/><br/>Create a new hash table from scratch. <br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:8,bo:1'>OptimizeHashTable</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:11,bo:1'>OptimizeHashTable</span>
 <table class="vym-note"><tr><td>
-void OptimizeHashTable(HashTable ht, size_t slots)<br/><br/>Instructs the API to perform a one-time shrinking and expanding of a hash table for optimal performance. Optionally, the number of desired slots may be specified.<br/><br/>Once the hash table has been optimized, if any items have previously been removed since any prior optimizations, no gurantees are made as to the validity of any prior HashTableItem references. More specifically, optimizing a hash table invalidates HashTableItem references.<br/><br/>This procedure is NOT currently functional.<br/>
+void OptimizeHashTable(HashTable ht, size_t slots)<br/><br/>This function is defined but is not yet supported.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:8,bo:2'>DestroyHashTable</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:11,bo:2'>DestroyHashTable</span>
 <table class="vym-note"><tr><td>
 HashTable DestroyHashTable(HashTable ht)<br/><br/>Completely destroys a hash table and all of its records, releasing the total memory impact.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:8,bo:3'>HashTableRegisterEvents</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:11,bo:3'>HashTableRegisterEvents</span>
 <table class="vym-note"><tr><td>
 void HashTableRegisterEvents(HashTable ht, HashTableEvent withEvents, HashTableEventHandler eventHandler)<br/><br/>Modifies the event flags and callback (if supplied, non-zero) associated with a particular hash table.<br/>
 </td></tr></table>
 </li>
 </ul>
 </li>
-<li><span class='vym-branch2'  id='mc:0,bo:0,bo:9'>Statistics</span><ul>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:9,bo:0'>HashTableSlotCount</span>
+<li><span class='vym-branch2'  id='mc:0,bo:0,bo:12'>Statistics</span><ul>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:12,bo:0'>HashTableSlotCount</span>
 <table class="vym-note"><tr><td>
 size_t HashTableSlotCount(HashTable ht)<br/><br/>Returns the total number of slots for a particular hash table.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:9,bo:1'>HashTableSlotsUsed</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:12,bo:1'>HashTableSlotsUsed</span>
 <table class="vym-note"><tr><td>
 size_t HashTableSlotsUsed(HashTable ht)<br/><br/>Returns the number of slots containing one or more records.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:9,bo:2'>HashTableLoadFactor</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:12,bo:2'>HashTableLoadFactor</span>
 <table class="vym-note"><tr><td>
 double HashTableLoadFactor(HashTable ht)<br/><br/>Returns the total number of hash table records divided by the number of slots for a particular hash table.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:9,bo:3'>HashTableImpact</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:12,bo:3'>HashTableImpact</span>
 <table class="vym-note"><tr><td>
 size_t HashTableImpact(HashTable ht)<br/><br/>Get report on how many logical bytes this hash table occupies in memory.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:9,bo:4'>HashTableDistribution</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:12,bo:4'>HashTableDistribution</span>
 <table class="vym-note"><tr><td>
 size_t HashTableDistribution(HashTable ht, size_t keyLength, double key, HashTableItemFlags hint);<br/><br/>Generate a report on how many entries are associated with a key's hash.
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:9,bo:5'>HashTableItemHits</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:12,bo:5'>HashTableItemHits</span>
 <table class="vym-note"><tr><td>
 size_t HashTableItemHits(HashTable ht, HashTableItem reference)<br/><br/>Returns the number of times a hash table item has been set or requested. This operation does not alter any items in the hash table nor does it alter the hash table itself.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:9,bo:6'>HashTableItemLength</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:12,bo:6'>HashTableItemLength</span>
 <table class="vym-note"><tr><td>
 size_t HashTableItemLength(HashTable ht, HashTableItem reference)<br/><br/>Returns the length of a hash table item value.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:9,bo:7'>HashTableItemImpact</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:12,bo:7'>HashTableItemImpact</span>
 <table class="vym-note"><tr><td>
 size_t HashTableItemImpact(HashTable ht, HashTableItem reference)<br/><br/>Generates a report on the total number of bytes used to store an item.<br/>
 </td></tr></table>
 </li>
 </ul>
 </li>
-<li><span class='vym-branch2'  id='mc:0,bo:0,bo:10'>Data Management</span><ul>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:10,bo:0'>HashTableGetPrivate</span>
+<li><span class='vym-branch2'  id='mc:0,bo:0,bo:13'>Data Management</span><ul>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:0'>HashTableGetPrivate</span>
 <table class="vym-note"><tr><td>
 void * HashTableGetPrivate(HashTable ht)<br/><br/>Returns the private user data associated with a hash table.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:10,bo:1'>HashTablePutPrivate</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:1'>HashTablePutPrivate</span>
 <table class="vym-note"><tr><td>
 void HashTablePutPrivate(HashTable ht, void * private)<br/><br/>Stores the private data supplied as an user association of data for a hash table.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:10,bo:2'>HashTablePut</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:2'>HashTablePut</span>
 <table class="vym-note"><tr><td>
 HashTableItem HashTablePut(HashTable ht, size_t keyLength, double key, HashTableItemFlags keyHint, size_t valueLength, double value, HashTableItemFlags valueHint)<br/><br/>Places a key value pair into the hash table and returns the item's reference.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:10,bo:3'>HashTableGet</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:3'>HashTableGet</span>
 <table class="vym-note"><tr><td>
 HashTableItem HashTableGet(HashTable ht, size_t keyLength, double key, HashTableItemFlags hint)<br/><br/>Get's an item reference by its key.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:10,bo:4'>HashTableDeleteItem</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:4'>HashTableDeleteItem</span>
 <table class="vym-note"><tr><td>
 bool HashTableDeleteItem(HashTable ht, HashTableItem reference)<br/><br/>Removes an item from a hash table.
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:10,bo:5'>HashTableItemValue</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:5'>HashTableItemKey</span></li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:6'>HashTableItemKeyLength</span></li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:7'>HashTableItemKeyType</span></li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:8'>HashTableItemValue</span>
 <table class="vym-note"><tr><td>
 const void * HashTableItemGetValue(HashTable hashTable, HashTableItem reference)<br/><br/>Returns a constant pointer to the item data.<br/>
 </td></tr></table>
 </li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:9'>HashTableItemValueLength</span></li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:10'>HashTableItemValueType</span></li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:11'>HashTableItemIsEnumerable</span></li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:12'>HashTableItemIsWriteable</span></li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:13'>HashTableItemIsConfigurable</span></li>
 </ul>
 </li>
-<li><span class='vym-branch2'  id='mc:0,bo:0,bo:11'>Extended Operations</span><ul>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:11,bo:0'>HashTableEnumerate</span>
+<li><span class='vym-branch2'  id='mc:0,bo:0,bo:14'>Extended Operations</span><ul>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:14,bo:0'>HashTableEnumerate</span>
 <table class="vym-note"><tr><td>
 void HashTableEnumerate(HashTable hashTable, 	HashTableEnumerateDirection direction, 	HashTableEnumerationHandler handler, void * private)<br/><br/>Enumerate a hash table's items in the specified direction.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:11,bo:1'>HashTableSortItems</span></li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:11,bo:2'>HashTableSortHash</span></li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:11,bo:3'>HashTableErrorMessage</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:14,bo:1'>HashTableSortItems</span>
+<table class="vym-note"><tr><td>
+void HashTableSortItems<br/>(<br/>	HashTable hashTable,<br/>	HashTableSortType type,<br/>	HashTableSortDirection direction,<br/>	HashTableSortHandler sortHandler,<br/>	void * private<br/>)<br/><br/>This function is defined but is not yet supported.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:14,bo:2'>HashTableSortHash</span>
+<table class="vym-note"><tr><td>
+void HashTableSortHash<br/>(<br/>	HashTable hashTable,<br/>	size_t keyLength,<br/>	double key,<br/>	HashTableItemFlags keyHint,<br/>	HashTableSortType type,<br/>	HashTableSortDirection direction,<br/>	HashTableSortHandler sortHandler,<br/>	void * private<br/>)<br/><br/>This function is defined but is not yet supported.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:14,bo:3'>HashTableErrorMessage</span>
 <table class="vym-note"><tr><td>
 const char * HashTableErrorMessage(void)<br/><br/>Returns a string representing the contents of errno, if errno equates to a HashTableError.<br/><br/>This procedure is not yet implemented.<br/>
 </td></tr></table>
@@ -569,123 +592,134 @@ HashTableRecord htFindKey(HashTable table, size_t keyLength, void * realKey)<br/
 </li>
 </ul>
 <map name='imagemap'>
-  <area shape='rect' coords='404.38,948.107,490.38,979.107' href='#mc:0'>
-  <area shape='rect' coords='501.529,946.5,549.529,975.5' href='#mc:0,bo:0'>
-  <area shape='rect' coords='633.529,30,725.529,56' href='#mc:0,bo:0,bo:0'>
-  <area shape='rect' coords='633.529,179,729.529,205' href='#mc:0,bo:0,bo:1'>
-  <area shape='rect' coords='793.529,96,971.529,120' href='#mc:0,bo:0,bo:1,bo:0'>
-  <area shape='rect' coords='793.529,120,971.529,144' href='#mc:0,bo:0,bo:1,bo:1'>
-  <area shape='rect' coords='793.529,144,997.529,168' href='#mc:0,bo:0,bo:1,bo:2'>
-  <area shape='rect' coords='793.529,168,962.529,192' href='#mc:0,bo:0,bo:1,bo:3'>
-  <area shape='rect' coords='793.529,192,953.529,216' href='#mc:0,bo:0,bo:1,bo:4'>
-  <area shape='rect' coords='793.529,216,967.529,240' href='#mc:0,bo:0,bo:1,bo:5'>
-  <area shape='rect' coords='793.529,240,971.529,264' href='#mc:0,bo:0,bo:1,bo:6'>
-  <area shape='rect' coords='793.529,264,998.529,288' href='#mc:0,bo:0,bo:1,bo:7'>
-  <area shape='rect' coords='633.529,435,731.529,461' href='#mc:0,bo:0,bo:2'>
-  <area shape='rect' coords='817.529,328,960.529,352' href='#mc:0,bo:0,bo:2,bo:0'>
-  <area shape='rect' coords='817.529,352,903.529,376' href='#mc:0,bo:0,bo:2,bo:1'>
-  <area shape='rect' coords='817.529,376,942.529,400' href='#mc:0,bo:0,bo:2,bo:2'>
-  <area shape='rect' coords='817.529,400,903.529,424' href='#mc:0,bo:0,bo:2,bo:3'>
-  <area shape='rect' coords='817.529,424,921.529,448' href='#mc:0,bo:0,bo:2,bo:4'>
-  <area shape='rect' coords='817.529,448,947.529,472' href='#mc:0,bo:0,bo:2,bo:5'>
-  <area shape='rect' coords='817.529,472,944.529,496' href='#mc:0,bo:0,bo:2,bo:6'>
-  <area shape='rect' coords='817.529,496,964.529,520' href='#mc:0,bo:0,bo:2,bo:7'>
-  <area shape='rect' coords='817.529,520,985.529,544' href='#mc:0,bo:0,bo:2,bo:8'>
-  <area shape='rect' coords='817.529,544,956.529,568' href='#mc:0,bo:0,bo:2,bo:9'>
-  <area shape='rect' coords='633.529,608,775.529,634' href='#mc:0,bo:0,bo:3'>
-  <area shape='rect' coords='633.529,685,810.529,711' href='#mc:0,bo:0,bo:4'>
-  <area shape='rect' coords='874.529,674,1022.53,698' href='#mc:0,bo:0,bo:4,bo:0'>
-  <area shape='rect' coords='874.529,698,1014.53,722' href='#mc:0,bo:0,bo:4,bo:1'>
-  <area shape='rect' coords='633.529,762,814.529,788' href='#mc:0,bo:0,bo:5'>
-  <area shape='rect' coords='611.529,911,766.529,937' href='#mc:0,bo:0,bo:6'>
-  <area shape='rect' coords='830.529,828,879.529,852' href='#mc:0,bo:0,bo:6,bo:0'>
-  <area shape='rect' coords='830.529,852,903.529,876' href='#mc:0,bo:0,bo:6,bo:1'>
-  <area shape='rect' coords='830.529,876,906.529,900' href='#mc:0,bo:0,bo:6,bo:2'>
-  <area shape='rect' coords='830.529,900,888.529,924' href='#mc:0,bo:0,bo:6,bo:3'>
-  <area shape='rect' coords='830.529,924,896.529,948' href='#mc:0,bo:0,bo:6,bo:4'>
-  <area shape='rect' coords='830.529,948,959.529,972' href='#mc:0,bo:0,bo:6,bo:5'>
-  <area shape='rect' coords='830.529,972,942.529,996' href='#mc:0,bo:0,bo:6,bo:6'>
-  <area shape='rect' coords='830.529,996,969.529,1020' href='#mc:0,bo:0,bo:6,bo:7'>
-  <area shape='rect' coords='633.529,1119,698.529,1145' href='#mc:0,bo:0,bo:7'>
-  <area shape='rect' coords='762.529,1060,794.529,1084' href='#mc:0,bo:0,bo:7,bo:0'>
-  <area shape='rect' coords='762.529,1084,795.529,1108' href='#mc:0,bo:0,bo:7,bo:1'>
-  <area shape='rect' coords='762.529,1108,798.529,1132' href='#mc:0,bo:0,bo:7,bo:2'>
-  <area shape='rect' coords='762.529,1132,795.529,1156' href='#mc:0,bo:0,bo:7,bo:3'>
-  <area shape='rect' coords='762.529,1156,797.529,1180' href='#mc:0,bo:0,bo:7,bo:4'>
-  <area shape='rect' coords='762.529,1180,803.529,1204' href='#mc:0,bo:0,bo:7,bo:5'>
-  <area shape='rect' coords='633.529,1279,691.529,1305' href='#mc:0,bo:0,bo:8'>
-  <area shape='rect' coords='755.529,1244,836.529,1268' href='#mc:0,bo:0,bo:8,bo:0'>
-  <area shape='rect' coords='755.529,1268,854.529,1292' href='#mc:0,bo:0,bo:8,bo:1'>
-  <area shape='rect' coords='755.529,1292,851.529,1316' href='#mc:0,bo:0,bo:8,bo:2'>
-  <area shape='rect' coords='755.529,1316,882.529,1340' href='#mc:0,bo:0,bo:8,bo:3'>
-  <area shape='rect' coords='611.529,1463,672.529,1489' href='#mc:0,bo:0,bo:9'>
-  <area shape='rect' coords='736.529,1380,842.529,1404' href='#mc:0,bo:0,bo:9,bo:0'>
-  <area shape='rect' coords='736.529,1404,841.529,1428' href='#mc:0,bo:0,bo:9,bo:1'>
-  <area shape='rect' coords='736.529,1428,846.529,1452' href='#mc:0,bo:0,bo:9,bo:2'>
-  <area shape='rect' coords='736.529,1452,825.529,1476' href='#mc:0,bo:0,bo:9,bo:3'>
-  <area shape='rect' coords='736.529,1476,849.529,1500' href='#mc:0,bo:0,bo:9,bo:4'>
-  <area shape='rect' coords='736.529,1500,833.529,1524' href='#mc:0,bo:0,bo:9,bo:5'>
-  <area shape='rect' coords='736.529,1524,846.529,1548' href='#mc:0,bo:0,bo:9,bo:6'>
-  <area shape='rect' coords='736.529,1548,845.529,1572' href='#mc:0,bo:0,bo:9,bo:7'>
-  <area shape='rect' coords='611.529,1671,720.529,1697' href='#mc:0,bo:0,bo:10'>
-  <area shape='rect' coords='784.529,1612,890.529,1636' href='#mc:0,bo:0,bo:10,bo:0'>
-  <area shape='rect' coords='784.529,1636,890.529,1660' href='#mc:0,bo:0,bo:10,bo:1'>
-  <area shape='rect' coords='784.529,1660,858.529,1684' href='#mc:0,bo:0,bo:10,bo:2'>
-  <area shape='rect' coords='784.529,1684,858.529,1708' href='#mc:0,bo:0,bo:10,bo:3'>
-  <area shape='rect' coords='784.529,1708,892.529,1732' href='#mc:0,bo:0,bo:10,bo:4'>
-  <area shape='rect' coords='784.529,1732,888.529,1756' href='#mc:0,bo:0,bo:10,bo:5'>
-  <area shape='rect' coords='611.529,1831,736.529,1857' href='#mc:0,bo:0,bo:11'>
-  <area shape='rect' coords='800.529,1796,908.529,1820' href='#mc:0,bo:0,bo:11,bo:0'>
-  <area shape='rect' coords='778.529,1820,881.529,1844' href='#mc:0,bo:0,bo:11,bo:1'>
-  <area shape='rect' coords='778.529,1844,880.529,1868' href='#mc:0,bo:0,bo:11,bo:2'>
-  <area shape='rect' coords='800.529,1868,923.529,1892' href='#mc:0,bo:0,bo:11,bo:3'>
-  <area shape='rect' coords='340,949.664,393,978.664' href='#mc:0,bo:1'>
-  <area shape='rect' coords='151,421.164,300,447.164' href='#mc:0,bo:1,bo:0'>
-  <area shape='rect' coords='59,386.164,109,410.164' href='#mc:0,bo:1,bo:0,bo:0'>
-  <area shape='rect' coords='84,410.164,109,434.164' href='#mc:0,bo:1,bo:0,bo:1'>
-  <area shape='rect' coords='75,434.164,109,458.164' href='#mc:0,bo:1,bo:0,bo:2'>
-  <area shape='rect' coords='54,458.164,109,482.164' href='#mc:0,bo:1,bo:0,bo:3'>
-  <area shape='rect' coords='206,502.164,320,528.164' href='#mc:0,bo:1,bo:1'>
-  <area shape='rect' coords='233,528.164,320,554.164' href='#mc:0,bo:1,bo:2'>
-  <area shape='rect' coords='185,554.164,320,580.164' href='#mc:0,bo:1,bo:3'>
-  <area shape='rect' coords='192,580.164,320,606.164' href='#mc:0,bo:1,bo:4'>
-  <area shape='rect' coords='214,606.164,320,632.164' href='#mc:0,bo:1,bo:5'>
-  <area shape='rect' coords='183,632.164,320,658.164' href='#mc:0,bo:1,bo:6'>
-  <area shape='rect' coords='194,658.164,320,684.164' href='#mc:0,bo:1,bo:7'>
-  <area shape='rect' coords='190,811.164,300,837.164' href='#mc:0,bo:1,bo:8'>
-  <area shape='rect' coords='120,704.164,148,728.164' href='#mc:0,bo:1,bo:8,bo:0'>
-  <area shape='rect' coords='92,728.164,148,752.164' href='#mc:0,bo:1,bo:8,bo:1'>
-  <area shape='rect' coords='91,752.164,148,776.164' href='#mc:0,bo:1,bo:8,bo:2'>
-  <area shape='rect' coords='95,776.164,148,800.164' href='#mc:0,bo:1,bo:8,bo:3'>
-  <area shape='rect' coords='121,800.164,148,824.164' href='#mc:0,bo:1,bo:8,bo:4'>
-  <area shape='rect' coords='92,824.164,148,848.164' href='#mc:0,bo:1,bo:8,bo:5'>
-  <area shape='rect' coords='77,848.164,148,872.164' href='#mc:0,bo:1,bo:8,bo:6'>
-  <area shape='rect' coords='109,872.164,148,896.164' href='#mc:0,bo:1,bo:8,bo:7'>
-  <area shape='rect' coords='109,896.164,148,920.164' href='#mc:0,bo:1,bo:8,bo:8'>
-  <area shape='rect' coords='107,920.164,148,944.164' href='#mc:0,bo:1,bo:8,bo:9'>
-  <area shape='rect' coords='231,964.164,320,990.164' href='#mc:0,bo:1,bo:9'>
-  <area shape='rect' coords='253,990.164,320,1016.16' href='#mc:0,bo:1,bo:10'>
-  <area shape='rect' coords='153,1016.16,320,1042.16' href='#mc:0,bo:1,bo:11'>
-  <area shape='rect' coords='166,1042.16,320,1068.16' href='#mc:0,bo:1,bo:12'>
-  <area shape='rect' coords='152,1068.16,320,1094.16' href='#mc:0,bo:1,bo:13'>
-  <area shape='rect' coords='168,1094.16,320,1120.16' href='#mc:0,bo:1,bo:14'>
-  <area shape='rect' coords='157,1120.16,320,1146.16' href='#mc:0,bo:1,bo:15'>
-  <area shape='rect' coords='160,1146.16,320,1172.16' href='#mc:0,bo:1,bo:16'>
-  <area shape='rect' coords='175,1172.16,320,1198.16' href='#mc:0,bo:1,bo:17'>
-  <area shape='rect' coords='158,1198.16,320,1224.16' href='#mc:0,bo:1,bo:18'>
-  <area shape='rect' coords='136,1224.16,320,1250.16' href='#mc:0,bo:1,bo:19'>
-  <area shape='rect' coords='171,1250.16,320,1276.16' href='#mc:0,bo:1,bo:20'>
-  <area shape='rect' coords='236,1276.16,320,1302.16' href='#mc:0,bo:1,bo:21'>
-  <area shape='rect' coords='245,1302.16,320,1328.16' href='#mc:0,bo:1,bo:22'>
-  <area shape='rect' coords='240,1328.16,320,1354.16' href='#mc:0,bo:1,bo:23'>
-  <area shape='rect' coords='250,1354.16,320,1380.16' href='#mc:0,bo:1,bo:24'>
-  <area shape='rect' coords='209,1380.16,320,1406.16' href='#mc:0,bo:1,bo:25'>
-  <area shape='rect' coords='222,1406.16,320,1432.16' href='#mc:0,bo:1,bo:26'>
-  <area shape='rect' coords='224,1432.16,320,1458.16' href='#mc:0,bo:1,bo:27'>
-  <area shape='rect' coords='152,1458.16,320,1484.16' href='#mc:0,bo:1,bo:28'>
-  <area shape='rect' coords='235,1484.16,320,1510.16' href='#mc:0,bo:1,bo:29'>
-  <area shape='rect' coords='191,1510.16,320,1536.16' href='#mc:0,bo:1,bo:30'>
-  <area shape='rect' coords='254,1536.16,320,1562.16' href='#mc:0,bo:1,bo:31'>
+  <area shape='rect' coords='451.38,1131.11,537.38,1162.11' href='#mc:0'>
+  <area shape='rect' coords='581.529,1131.5,629.529,1160.5' href='#mc:0,bo:0'>
+  <area shape='rect' coords='713.529,30,805.529,56' href='#mc:0,bo:0,bo:0'>
+  <area shape='rect' coords='713.529,179,809.529,205' href='#mc:0,bo:0,bo:1'>
+  <area shape='rect' coords='873.529,96,1051.53,120' href='#mc:0,bo:0,bo:1,bo:0'>
+  <area shape='rect' coords='873.529,120,1051.53,144' href='#mc:0,bo:0,bo:1,bo:1'>
+  <area shape='rect' coords='873.529,144,1077.53,168' href='#mc:0,bo:0,bo:1,bo:2'>
+  <area shape='rect' coords='873.529,168,1042.53,192' href='#mc:0,bo:0,bo:1,bo:3'>
+  <area shape='rect' coords='873.529,192,1033.53,216' href='#mc:0,bo:0,bo:1,bo:4'>
+  <area shape='rect' coords='873.529,216,1047.53,240' href='#mc:0,bo:0,bo:1,bo:5'>
+  <area shape='rect' coords='873.529,240,1051.53,264' href='#mc:0,bo:0,bo:1,bo:6'>
+  <area shape='rect' coords='873.529,264,1078.53,288' href='#mc:0,bo:0,bo:1,bo:7'>
+  <area shape='rect' coords='713.529,391,811.529,417' href='#mc:0,bo:0,bo:2'>
+  <area shape='rect' coords='875.529,328,1018.53,352' href='#mc:0,bo:0,bo:2,bo:0'>
+  <area shape='rect' coords='875.529,352,961.529,376' href='#mc:0,bo:0,bo:2,bo:1'>
+  <area shape='rect' coords='875.529,384,1000.53,408' href='#mc:0,bo:0,bo:2,bo:2'>
+  <area shape='rect' coords='875.529,408,961.529,432' href='#mc:0,bo:0,bo:2,bo:3'>
+  <area shape='rect' coords='875.529,432,979.529,456' href='#mc:0,bo:0,bo:2,bo:4'>
+  <area shape='rect' coords='875.529,456,1014.53,480' href='#mc:0,bo:0,bo:2,bo:5'>
+  <area shape='rect' coords='713.529,520,855.529,546' href='#mc:0,bo:0,bo:3'>
+  <area shape='rect' coords='713.529,597,890.529,623' href='#mc:0,bo:0,bo:4'>
+  <area shape='rect' coords='954.529,586,1102.53,610' href='#mc:0,bo:0,bo:4,bo:0'>
+  <area shape='rect' coords='954.529,610,1094.53,634' href='#mc:0,bo:0,bo:4,bo:1'>
+  <area shape='rect' coords='713.529,674,894.529,700' href='#mc:0,bo:0,bo:5'>
+  <area shape='rect' coords='713.529,751,855.529,777' href='#mc:0,bo:0,bo:6'>
+  <area shape='rect' coords='897.529,740,1027.53,764' href='#mc:0,bo:0,bo:6,bo:0'>
+  <area shape='rect' coords='897.529,764,1019.53,788' href='#mc:0,bo:0,bo:6,bo:1'>
+  <area shape='rect' coords='713.529,839,831.529,865' href='#mc:0,bo:0,bo:7'>
+  <area shape='rect' coords='873.529,828,982.529,852' href='#mc:0,bo:0,bo:7,bo:0'>
+  <area shape='rect' coords='873.529,852,967.529,876' href='#mc:0,bo:0,bo:7,bo:1'>
+  <area shape='rect' coords='713.529,916,848.529,942' href='#mc:0,bo:0,bo:8'>
+  <area shape='rect' coords='713.529,1065,835.529,1091' href='#mc:0,bo:0,bo:9'>
+  <area shape='rect' coords='899.529,982,948.529,1006' href='#mc:0,bo:0,bo:9,bo:0'>
+  <area shape='rect' coords='899.529,1006,972.529,1030' href='#mc:0,bo:0,bo:9,bo:1'>
+  <area shape='rect' coords='899.529,1030,975.529,1054' href='#mc:0,bo:0,bo:9,bo:2'>
+  <area shape='rect' coords='899.529,1054,957.529,1078' href='#mc:0,bo:0,bo:9,bo:3'>
+  <area shape='rect' coords='899.529,1078,965.529,1102' href='#mc:0,bo:0,bo:9,bo:4'>
+  <area shape='rect' coords='899.529,1102,1028.53,1126' href='#mc:0,bo:0,bo:9,bo:5'>
+  <area shape='rect' coords='899.529,1126,1011.53,1150' href='#mc:0,bo:0,bo:9,bo:6'>
+  <area shape='rect' coords='899.529,1150,1038.53,1174' href='#mc:0,bo:0,bo:9,bo:7'>
+  <area shape='rect' coords='713.529,1273,778.529,1299' href='#mc:0,bo:0,bo:10'>
+  <area shape='rect' coords='842.529,1214,874.529,1238' href='#mc:0,bo:0,bo:10,bo:0'>
+  <area shape='rect' coords='842.529,1238,875.529,1262' href='#mc:0,bo:0,bo:10,bo:1'>
+  <area shape='rect' coords='842.529,1262,878.529,1286' href='#mc:0,bo:0,bo:10,bo:2'>
+  <area shape='rect' coords='842.529,1286,875.529,1310' href='#mc:0,bo:0,bo:10,bo:3'>
+  <area shape='rect' coords='842.529,1310,877.529,1334' href='#mc:0,bo:0,bo:10,bo:4'>
+  <area shape='rect' coords='842.529,1334,883.529,1358' href='#mc:0,bo:0,bo:10,bo:5'>
+  <area shape='rect' coords='713.529,1437,771.529,1463' href='#mc:0,bo:0,bo:11'>
+  <area shape='rect' coords='835.529,1398,916.529,1422' href='#mc:0,bo:0,bo:11,bo:0'>
+  <area shape='rect' coords='835.529,1430,934.529,1454' href='#mc:0,bo:0,bo:11,bo:1'>
+  <area shape='rect' coords='835.529,1454,931.529,1478' href='#mc:0,bo:0,bo:11,bo:2'>
+  <area shape='rect' coords='835.529,1478,962.529,1502' href='#mc:0,bo:0,bo:11,bo:3'>
+  <area shape='rect' coords='691.529,1625,752.529,1651' href='#mc:0,bo:0,bo:12'>
+  <area shape='rect' coords='816.529,1542,922.529,1566' href='#mc:0,bo:0,bo:12,bo:0'>
+  <area shape='rect' coords='816.529,1566,921.529,1590' href='#mc:0,bo:0,bo:12,bo:1'>
+  <area shape='rect' coords='816.529,1590,926.529,1614' href='#mc:0,bo:0,bo:12,bo:2'>
+  <area shape='rect' coords='816.529,1614,905.529,1638' href='#mc:0,bo:0,bo:12,bo:3'>
+  <area shape='rect' coords='816.529,1638,929.529,1662' href='#mc:0,bo:0,bo:12,bo:4'>
+  <area shape='rect' coords='816.529,1662,913.529,1686' href='#mc:0,bo:0,bo:12,bo:5'>
+  <area shape='rect' coords='816.529,1686,926.529,1710' href='#mc:0,bo:0,bo:12,bo:6'>
+  <area shape='rect' coords='816.529,1710,925.529,1734' href='#mc:0,bo:0,bo:12,bo:7'>
+  <area shape='rect' coords='691.529,1929,800.529,1955' href='#mc:0,bo:0,bo:13'>
+  <area shape='rect' coords='864.529,1774,970.529,1798' href='#mc:0,bo:0,bo:13,bo:0'>
+  <area shape='rect' coords='864.529,1798,970.529,1822' href='#mc:0,bo:0,bo:13,bo:1'>
+  <area shape='rect' coords='864.529,1822,938.529,1846' href='#mc:0,bo:0,bo:13,bo:2'>
+  <area shape='rect' coords='864.529,1846,938.529,1870' href='#mc:0,bo:0,bo:13,bo:3'>
+  <area shape='rect' coords='864.529,1870,972.529,1894' href='#mc:0,bo:0,bo:13,bo:4'>
+  <area shape='rect' coords='842.529,1894,938.529,1918' href='#mc:0,bo:0,bo:13,bo:5'>
+  <area shape='rect' coords='842.529,1918,969.529,1942' href='#mc:0,bo:0,bo:13,bo:6'>
+  <area shape='rect' coords='842.529,1942,960.529,1966' href='#mc:0,bo:0,bo:13,bo:7'>
+  <area shape='rect' coords='864.529,1966,968.529,1990' href='#mc:0,bo:0,bo:13,bo:8'>
+  <area shape='rect' coords='842.529,1990,977.529,2014' href='#mc:0,bo:0,bo:13,bo:9'>
+  <area shape='rect' coords='842.529,2014,968.529,2038' href='#mc:0,bo:0,bo:13,bo:10'>
+  <area shape='rect' coords='842.529,2038,983.529,2062' href='#mc:0,bo:0,bo:13,bo:11'>
+  <area shape='rect' coords='842.529,2062,973.529,2086' href='#mc:0,bo:0,bo:13,bo:12'>
+  <area shape='rect' coords='842.529,2086,988.529,2110' href='#mc:0,bo:0,bo:13,bo:13'>
+  <area shape='rect' coords='691.529,2193,816.529,2219' href='#mc:0,bo:0,bo:14'>
+  <area shape='rect' coords='880.529,2150,988.529,2174' href='#mc:0,bo:0,bo:14,bo:0'>
+  <area shape='rect' coords='880.529,2182,983.529,2206' href='#mc:0,bo:0,bo:14,bo:1'>
+  <area shape='rect' coords='880.529,2214,982.529,2238' href='#mc:0,bo:0,bo:14,bo:2'>
+  <area shape='rect' coords='880.529,2238,1003.53,2262' href='#mc:0,bo:0,bo:14,bo:3'>
+  <area shape='rect' coords='340,1130.66,393,1159.66' href='#mc:0,bo:1'>
+  <area shape='rect' coords='151,602.164,300,628.164' href='#mc:0,bo:1,bo:0'>
+  <area shape='rect' coords='59,567.164,109,591.164' href='#mc:0,bo:1,bo:0,bo:0'>
+  <area shape='rect' coords='84,591.164,109,615.164' href='#mc:0,bo:1,bo:0,bo:1'>
+  <area shape='rect' coords='75,615.164,109,639.164' href='#mc:0,bo:1,bo:0,bo:2'>
+  <area shape='rect' coords='54,639.164,109,663.164' href='#mc:0,bo:1,bo:0,bo:3'>
+  <area shape='rect' coords='206,683.164,320,709.164' href='#mc:0,bo:1,bo:1'>
+  <area shape='rect' coords='233,709.164,320,735.164' href='#mc:0,bo:1,bo:2'>
+  <area shape='rect' coords='185,735.164,320,761.164' href='#mc:0,bo:1,bo:3'>
+  <area shape='rect' coords='192,761.164,320,787.164' href='#mc:0,bo:1,bo:4'>
+  <area shape='rect' coords='214,787.164,320,813.164' href='#mc:0,bo:1,bo:5'>
+  <area shape='rect' coords='183,813.164,320,839.164' href='#mc:0,bo:1,bo:6'>
+  <area shape='rect' coords='194,839.164,320,865.164' href='#mc:0,bo:1,bo:7'>
+  <area shape='rect' coords='190,992.164,300,1018.16' href='#mc:0,bo:1,bo:8'>
+  <area shape='rect' coords='120,885.164,148,909.164' href='#mc:0,bo:1,bo:8,bo:0'>
+  <area shape='rect' coords='92,909.164,148,933.164' href='#mc:0,bo:1,bo:8,bo:1'>
+  <area shape='rect' coords='91,933.164,148,957.164' href='#mc:0,bo:1,bo:8,bo:2'>
+  <area shape='rect' coords='95,957.164,148,981.164' href='#mc:0,bo:1,bo:8,bo:3'>
+  <area shape='rect' coords='121,981.164,148,1005.16' href='#mc:0,bo:1,bo:8,bo:4'>
+  <area shape='rect' coords='92,1005.16,148,1029.16' href='#mc:0,bo:1,bo:8,bo:5'>
+  <area shape='rect' coords='77,1029.16,148,1053.16' href='#mc:0,bo:1,bo:8,bo:6'>
+  <area shape='rect' coords='109,1053.16,148,1077.16' href='#mc:0,bo:1,bo:8,bo:7'>
+  <area shape='rect' coords='109,1077.16,148,1101.16' href='#mc:0,bo:1,bo:8,bo:8'>
+  <area shape='rect' coords='107,1101.16,148,1125.16' href='#mc:0,bo:1,bo:8,bo:9'>
+  <area shape='rect' coords='231,1145.16,320,1171.16' href='#mc:0,bo:1,bo:9'>
+  <area shape='rect' coords='253,1171.16,320,1197.16' href='#mc:0,bo:1,bo:10'>
+  <area shape='rect' coords='153,1197.16,320,1223.16' href='#mc:0,bo:1,bo:11'>
+  <area shape='rect' coords='166,1223.16,320,1249.16' href='#mc:0,bo:1,bo:12'>
+  <area shape='rect' coords='152,1249.16,320,1275.16' href='#mc:0,bo:1,bo:13'>
+  <area shape='rect' coords='168,1275.16,320,1301.16' href='#mc:0,bo:1,bo:14'>
+  <area shape='rect' coords='157,1301.16,320,1327.16' href='#mc:0,bo:1,bo:15'>
+  <area shape='rect' coords='160,1327.16,320,1353.16' href='#mc:0,bo:1,bo:16'>
+  <area shape='rect' coords='175,1353.16,320,1379.16' href='#mc:0,bo:1,bo:17'>
+  <area shape='rect' coords='158,1379.16,320,1405.16' href='#mc:0,bo:1,bo:18'>
+  <area shape='rect' coords='136,1405.16,320,1431.16' href='#mc:0,bo:1,bo:19'>
+  <area shape='rect' coords='171,1431.16,320,1457.16' href='#mc:0,bo:1,bo:20'>
+  <area shape='rect' coords='236,1457.16,320,1483.16' href='#mc:0,bo:1,bo:21'>
+  <area shape='rect' coords='245,1483.16,320,1509.16' href='#mc:0,bo:1,bo:22'>
+  <area shape='rect' coords='240,1509.16,320,1535.16' href='#mc:0,bo:1,bo:23'>
+  <area shape='rect' coords='250,1535.16,320,1561.16' href='#mc:0,bo:1,bo:24'>
+  <area shape='rect' coords='209,1561.16,320,1587.16' href='#mc:0,bo:1,bo:25'>
+  <area shape='rect' coords='222,1587.16,320,1613.16' href='#mc:0,bo:1,bo:26'>
+  <area shape='rect' coords='224,1613.16,320,1639.16' href='#mc:0,bo:1,bo:27'>
+  <area shape='rect' coords='152,1639.16,320,1665.16' href='#mc:0,bo:1,bo:28'>
+  <area shape='rect' coords='235,1665.16,320,1691.16' href='#mc:0,bo:1,bo:29'>
+  <area shape='rect' coords='191,1691.16,320,1717.16' href='#mc:0,bo:1,bo:30'>
+  <area shape='rect' coords='254,1717.16,320,1743.16' href='#mc:0,bo:1,bo:31'>
 </map>
 <hr/>
 <table class="vym-footer">   
