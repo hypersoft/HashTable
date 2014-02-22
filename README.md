@@ -35,6 +35,7 @@ also supports binary keys and data of arbitrary lengths.
 *  Load Factor Metering
 *  Item Access Hit Counter
 *  Jenkins' One At a Time Hashing
+*  Selective User Sorting Call Backs
 
 ## Discussion
 
