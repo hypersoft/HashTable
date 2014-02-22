@@ -509,6 +509,7 @@ void HashTableEnumerate
 	if (! handler ) { errno = HT_ERROR_UNSUPPORTED_FUNCTION; return; }
 	size_t index, maximum = ht->itemsMax;
 	HashTableRecord item;
+	if (! maximum ) return;
 	if (direction == HT_ENUMERATE_FORWARD) {
 		for (index = 0; index < maximum; index++) {
 			item = ht->item[index];
@@ -517,16 +518,17 @@ void HashTableEnumerate
 			}
 		}
 	} else {
-		for (index = (maximum - 1); index != 0; index--) {
+		index = maximum - 1;
+		while (index) {
 			item = ht->item[index];
 			if (item && ! (htRecordConfiguration(item) & HTI_NON_ENUMERABLE)) {
-				if ( ! handler(ht, direction, index, private) ) break;
+				if ( ! handler(ht, direction, index--, private) ) break;
 			}
 		}
 		/* manually enumerate the last item (0) */
 		item = ht->item[0];
 		if (item && ! (htRecordConfiguration(item) & HTI_NON_ENUMERABLE)) {
-			if ( ! handler(ht, direction, index, private) ) break;
+			handler(ht, direction, index, private);
 		}
 	}
 }
