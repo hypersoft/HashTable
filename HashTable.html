@@ -118,17 +118,33 @@ typedef bool (*HashTableEnumerationHandler) (void * hashTable, HashTableEnumerat
 enum HashTableSortDirection<br/>
 </td></tr></table>
 <ul>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:6,bo:0'>HT_SORT_DESCENDING</span></li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:6,bo:1'>HT_SORT_ASCENDING</span></li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:6,bo:0'>HT_SORT_DESCENDING</span>
+<table class="vym-note"><tr><td>
+size_t HT_SORT_DESCENDING<br/><br/>The user specified descending sort function.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:6,bo:1'>HT_SORT_ASCENDING</span>
+<table class="vym-note"><tr><td>
+size_t HT_SORT_ASCENDING<br/><br/>The user specified ascending sort function.<br/>
+</td></tr></table>
+</li>
 </ul>
 </li>
 <li><span class='vym-branch2'  id='mc:0,bo:0,bo:7'>HashTableSortType</span>
 <table class="vym-note"><tr><td>
-enum HashTableSortType<br/>
+enum HashTableSortType<br/><br/>Numeric and Alpha-Numeric sorting are predefined. The user may supply any implementation defined flags to meet sorting objectives.<br/>
 </td></tr></table>
 <ul>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:7,bo:0'>HT_SORT_NUMERIC</span></li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:7,bo:1'>HT_SORT_ALPHA</span></li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:7,bo:0'>HT_SORT_NUMERIC</span>
+<table class="vym-note"><tr><td>
+size_t HT_SORT_NUMERIC<br/><br/>The user specified numeric sort function.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:7,bo:1'>HT_SORT_ALPHA</span>
+<table class="vym-note"><tr><td>
+size_t HT_SORT_ALPHA<br/><br/>The user specified alpha-numeric sort function.<br/>
+</td></tr></table>
+</li>
 </ul>
 </li>
 <li><span class='vym-branch2'  id='mc:0,bo:0,bo:8'>HashTableSortHandler</span>
@@ -210,12 +226,12 @@ parameter list htInt(char * s)<br/><br/>Returns parameter list for API functions
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:10,bo:4'>htBlk</span>
 <table class="vym-note"><tr><td>
-parameter list htInt(void * b, size_t s)<br/><br/>Returns parameter list for API functions to diagnose and transpose an arbitrary block of data with specified length as a record key or value.<br/>
+parameter list htInt(void * b, size_t length)<br/><br/>Returns parameter list for API functions to diagnose and transpose an arbitrary block of data with specified length as a record key or value.<br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:10,bo:5'>htStrN</span>
 <table class="vym-note"><tr><td>
-parameter list htInt(char * b, size_t s)<br/><br/>Returns parameter list for API functions to diagnose and transpose an arbitrary length ANSI or UTF-8 string pointer as a record key or value.<br/>
+parameter list htInt(char * s, size_t length)<br/><br/>Returns parameter list for API functions to diagnose and transpose an arbitrary length ANSI or UTF-8 string pointer as a record key or value.<br/>
 </td></tr></table>
 </li>
 </ul>
@@ -414,12 +430,17 @@ void HashTableEnumerate(HashTable hashTable, 	HashTableEnumerateDirection direct
 void HashTableSortItems<br/>(<br/>	HashTable hashTable,<br/>	HashTableSortType type,<br/>	HashTableSortDirection direction,<br/>	HashTableSortHandler sortHandler,<br/>	void * private<br/>)<br/><br/>This function is defined but is not yet supported.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:14,bo:2'>HashTableSortHash</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:14,bo:2'>HashTableSortItemHash</span>
 <table class="vym-note"><tr><td>
-void HashTableSortHash<br/>(<br/>	HashTable hashTable,<br/>	size_t keyLength,<br/>	double key,<br/>	HashTableItemFlags keyHint,<br/>	HashTableSortType type,<br/>	HashTableSortDirection direction,<br/>	HashTableSortHandler sortHandler,<br/>	void * private<br/>)<br/><br/>This function is defined but is not yet supported.<br/>
+void HashTableSortItemHash<br/>(<br/>	HashTable hashTable,<br/>	HashTableItem reference,<br/>	HashTableSortType type,<br/>	HashTableSortDirection direction,<br/>	HashTableSortHandler sortHandler,<br/>	void * private<br/>)<br/><br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch3'  id='mc:0,bo:0,bo:14,bo:3'>HashTableErrorMessage</span>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:14,bo:3'>HashTableEnumerateItemHash</span>
+<table class="vym-note"><tr><td>
+void HashTableEnumerateItemHash<br/>(HashTable hashTable, HashTableItem reference, HashTableEnumerateDirection direction, HashTableEnumerationHandler handler, void * private)<br/><br/>Enumerate and item's hash slot.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch3'  id='mc:0,bo:0,bo:14,bo:4'>HashTableErrorMessage</span>
 <table class="vym-note"><tr><td>
 const char * HashTableErrorMessage(void)<br/><br/>Returns a string representing the contents of errno, if errno equates to a HashTableError.<br/><br/>
 </td></tr></table>
@@ -609,52 +630,57 @@ void htReturnIfItemNotFound(HashTableRecord item)<br/><br/>If item is null, set 
 void htValidateReference(HashTable ht, HashTableItem reference)<br/><br/>Return error if table uninitialized, return error if invalid reference, decrement reference (must be an lvalue!), return error if hash table item reference is invalid.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch2'  id='mc:0,bo:1,bo:22'>htDblIsNaN</span>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:22'>htVoidValidateReference</span>
+<table class="vym-note"><tr><td>
+void htValidateReference(HashTable ht, HashTableItem reference)<br/><br/>Return error if table uninitialized, return error if invalid reference, decrement reference (must be an lvalue!), return error if hash table item reference is invalid.<br/>
+</td></tr></table>
+</li>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:23'>htDblIsNaN</span>
 <table class="vym-note"><tr><td>
 boolean htDblIsNaN(volatile double value)<br/><br/>Returns true or false if the value specified is representative of the IEEE 754 floating point value NaN.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch2'  id='mc:0,bo:1,bo:23'>htDblInfinity</span>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:24'>htDblInfinity</span>
 <table class="vym-note"><tr><td>
 (signed int) trilean htDblInfinity(double value)<br/><br/>Returns -1 if the double value specified is an IEEE 754 negative infinity, 1 if the value specified is an IEEE 754 positive infinity, and zero otherwise. Trilean meaning three state value.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch2'  id='mc:0,bo:1,bo:24'>htKeyHash</span>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:25'>htKeyHash</span>
 <table class="vym-note"><tr><td>
 size_t htKeyHash(HashTable ht, size_t keyLength, void * realKey)<br/><br/>Hashes a key and distributes (selects a slot for) the key in the table.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch2'  id='mc:0,bo:1,bo:25'>void * htRealKey()</span>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:26'>void * htRealKey()</span>
 <table class="vym-note"><tr><td>
 void * htRealKey(HashTableRecordFlag hint, double value)<br/><br/>Automatically selects pointer to double, or pointer in double based on the contents of flag.<br/><br/>Value must be an lvalue.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch2'  id='mc:0,bo:1,bo:26'>htRecordImpact</span>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:27'>htRecordImpact</span>
 <table class="vym-note"><tr><td>
 size_t htRecordImpact(HashTableRecord record)<br/><br/>Returns the size in bytes occupied by a hash table record.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch2'  id='mc:0,bo:1,bo:27'>htCreateRecord</span>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:28'>htCreateRecord</span>
 <table class="vym-note"><tr><td>
 HashTableRecord htCreateRecord(HashTable ht, size_t keyLength, double key, HashTableItemFlags keyHint, size_t valueLength, double value, HashTableItemFlags valueHint)<br/><br/>Creates a new hash table record.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch2'  id='mc:0,bo:1,bo:28'>htCompareRecordToRealKey</span>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:29'>htCompareRecordToRealKey</span>
 <table class="vym-note"><tr><td>
 boolean htCompareRecordToRealKey(HashTable ht, HashTableRecord record, size_t keyLength, void * realKey)<br/><br/>Compares a hash table record to a real key.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch2'  id='mc:0,bo:1,bo:29'>htCreateHash</span>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:30'>htCreateHash</span>
 <table class="vym-note"><tr><td>
 size_t htCreateHash(size_t keyLength, void * realKey)<br/><br/>Creates a hash of any data supplied, using the hash table library's hashing algorithm.<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch2'  id='mc:0,bo:1,bo:30'>htFindKeyWithParent</span>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:31'>htFindKeyWithParent</span>
 <table class="vym-note"><tr><td>
 HashTableRecord htFindKeyWithParent(HashTable table, size_t keyLength, void * realKey, HashTableRecord primary, HashTableRecord * parent)<br/><br/>Locate a key within the table beginning the search at primary, returning the results found, as well as the predecessor of the key found (or not found).<br/>
 </td></tr></table>
 </li>
-<li><span class='vym-branch2'  id='mc:0,bo:1,bo:31'>htFindKey</span>
+<li><span class='vym-branch2'  id='mc:0,bo:1,bo:32'>htFindKey</span>
 <table class="vym-note"><tr><td>
 HashTableRecord htFindKey(HashTable table, size_t keyLength, void * realKey)<br/><br/>Locate a key within a table's records and return its 1 based index within the linear list or zero if not found.<br/>
 </td></tr></table>
@@ -663,8 +689,8 @@ HashTableRecord htFindKey(HashTable table, size_t keyLength, void * realKey)<br/
 </li>
 </ul>
 <map name='imagemap'>
-  <area shape='rect' coords='497.851,1206.11,583.851,1237.11' href='#mc:0'>
-  <area shape='rect' coords='439,1207.5,487,1236.5' href='#mc:0,bo:0'>
+  <area shape='rect' coords='497.851,1214.11,583.851,1245.11' href='#mc:0'>
+  <area shape='rect' coords='439,1215.5,487,1244.5' href='#mc:0,bo:0'>
   <area shape='rect' coords='307,30,399,56' href='#mc:0,bo:0,bo:0'>
   <area shape='rect' coords='303,179,399,205' href='#mc:0,bo:0,bo:1'>
   <area shape='rect' coords='83,96,261,120' href='#mc:0,bo:0,bo:1,bo:0'>
@@ -746,58 +772,60 @@ HashTableRecord htFindKey(HashTable table, size_t keyLength, void * realKey)<br/
   <area shape='rect' coords='138,2198,270,2222' href='#mc:0,bo:0,bo:13,bo:16'>
   <area shape='rect' coords='116,2222,270,2246' href='#mc:0,bo:0,bo:13,bo:17'>
   <area shape='rect' coords='117,2246,270,2270' href='#mc:0,bo:0,bo:13,bo:18'>
-  <area shape='rect' coords='274,2349,399,2375' href='#mc:0,bo:0,bo:14'>
+  <area shape='rect' coords='274,2357,399,2383' href='#mc:0,bo:0,bo:14'>
   <area shape='rect' coords='146,2310,254,2334' href='#mc:0,bo:0,bo:14,bo:0'>
   <area shape='rect' coords='151,2334,254,2358' href='#mc:0,bo:0,bo:14,bo:1'>
-  <area shape='rect' coords='120,2366,222,2390' href='#mc:0,bo:0,bo:14,bo:2'>
-  <area shape='rect' coords='131,2390,254,2414' href='#mc:0,bo:0,bo:14,bo:3'>
-  <area shape='rect' coords='617.471,1207.66,670.471,1236.66' href='#mc:0,bo:1'>
-  <area shape='rect' coords='710.471,679.164,859.471,705.164' href='#mc:0,bo:1,bo:0'>
-  <area shape='rect' coords='901.471,644.164,951.471,668.164' href='#mc:0,bo:1,bo:0,bo:0'>
-  <area shape='rect' coords='901.471,668.164,926.471,692.164' href='#mc:0,bo:1,bo:0,bo:1'>
-  <area shape='rect' coords='901.471,692.164,935.471,716.164' href='#mc:0,bo:1,bo:0,bo:2'>
-  <area shape='rect' coords='901.471,716.164,956.471,740.164' href='#mc:0,bo:1,bo:0,bo:3'>
-  <area shape='rect' coords='712.471,760.164,826.471,786.164' href='#mc:0,bo:1,bo:1'>
-  <area shape='rect' coords='712.471,786.164,799.471,812.164' href='#mc:0,bo:1,bo:2'>
-  <area shape='rect' coords='712.471,812.164,847.471,838.164' href='#mc:0,bo:1,bo:3'>
-  <area shape='rect' coords='712.471,838.164,840.471,864.164' href='#mc:0,bo:1,bo:4'>
-  <area shape='rect' coords='712.471,864.164,818.471,890.164' href='#mc:0,bo:1,bo:5'>
-  <area shape='rect' coords='712.471,890.164,849.471,916.164' href='#mc:0,bo:1,bo:6'>
-  <area shape='rect' coords='712.471,916.164,838.471,942.164' href='#mc:0,bo:1,bo:7'>
-  <area shape='rect' coords='710.471,1069.16,820.471,1095.16' href='#mc:0,bo:1,bo:8'>
-  <area shape='rect' coords='862.471,962.164,890.471,986.164' href='#mc:0,bo:1,bo:8,bo:0'>
-  <area shape='rect' coords='862.471,986.164,918.471,1010.16' href='#mc:0,bo:1,bo:8,bo:1'>
-  <area shape='rect' coords='862.471,1010.16,919.471,1034.16' href='#mc:0,bo:1,bo:8,bo:2'>
-  <area shape='rect' coords='862.471,1034.16,915.471,1058.16' href='#mc:0,bo:1,bo:8,bo:3'>
-  <area shape='rect' coords='862.471,1058.16,889.471,1082.16' href='#mc:0,bo:1,bo:8,bo:4'>
-  <area shape='rect' coords='862.471,1082.16,918.471,1106.16' href='#mc:0,bo:1,bo:8,bo:5'>
-  <area shape='rect' coords='862.471,1106.16,933.471,1130.16' href='#mc:0,bo:1,bo:8,bo:6'>
-  <area shape='rect' coords='862.471,1130.16,901.471,1154.16' href='#mc:0,bo:1,bo:8,bo:7'>
-  <area shape='rect' coords='862.471,1154.16,901.471,1178.16' href='#mc:0,bo:1,bo:8,bo:8'>
-  <area shape='rect' coords='862.471,1178.16,903.471,1202.16' href='#mc:0,bo:1,bo:8,bo:9'>
-  <area shape='rect' coords='712.471,1222.16,801.471,1248.16' href='#mc:0,bo:1,bo:9'>
-  <area shape='rect' coords='712.471,1248.16,779.471,1274.16' href='#mc:0,bo:1,bo:10'>
-  <area shape='rect' coords='712.471,1274.16,879.471,1300.16' href='#mc:0,bo:1,bo:11'>
-  <area shape='rect' coords='712.471,1300.16,866.471,1326.16' href='#mc:0,bo:1,bo:12'>
-  <area shape='rect' coords='712.471,1326.16,880.471,1352.16' href='#mc:0,bo:1,bo:13'>
-  <area shape='rect' coords='712.471,1352.16,864.471,1378.16' href='#mc:0,bo:1,bo:14'>
-  <area shape='rect' coords='712.471,1378.16,875.471,1404.16' href='#mc:0,bo:1,bo:15'>
-  <area shape='rect' coords='712.471,1404.16,872.471,1430.16' href='#mc:0,bo:1,bo:16'>
-  <area shape='rect' coords='712.471,1430.16,857.471,1456.16' href='#mc:0,bo:1,bo:17'>
-  <area shape='rect' coords='712.471,1456.16,874.471,1482.16' href='#mc:0,bo:1,bo:18'>
-  <area shape='rect' coords='712.471,1482.16,896.471,1508.16' href='#mc:0,bo:1,bo:19'>
-  <area shape='rect' coords='712.471,1508.16,861.471,1534.16' href='#mc:0,bo:1,bo:20'>
-  <area shape='rect' coords='712.471,1534.16,833.471,1560.16' href='#mc:0,bo:1,bo:21'>
-  <area shape='rect' coords='712.471,1560.16,787.471,1586.16' href='#mc:0,bo:1,bo:22'>
-  <area shape='rect' coords='712.471,1586.16,792.471,1612.16' href='#mc:0,bo:1,bo:23'>
-  <area shape='rect' coords='712.471,1612.16,782.471,1638.16' href='#mc:0,bo:1,bo:24'>
-  <area shape='rect' coords='712.471,1638.16,823.471,1664.16' href='#mc:0,bo:1,bo:25'>
-  <area shape='rect' coords='712.471,1664.16,810.471,1690.16' href='#mc:0,bo:1,bo:26'>
-  <area shape='rect' coords='712.471,1690.16,808.471,1716.16' href='#mc:0,bo:1,bo:27'>
-  <area shape='rect' coords='712.471,1716.16,880.471,1742.16' href='#mc:0,bo:1,bo:28'>
-  <area shape='rect' coords='712.471,1742.16,797.471,1768.16' href='#mc:0,bo:1,bo:29'>
-  <area shape='rect' coords='712.471,1768.16,841.471,1794.16' href='#mc:0,bo:1,bo:30'>
-  <area shape='rect' coords='712.471,1794.16,778.471,1820.16' href='#mc:0,bo:1,bo:31'>
+  <area shape='rect' coords='132,2358,254,2382' href='#mc:0,bo:0,bo:14,bo:2'>
+  <area shape='rect' coords='103,2382,254,2406' href='#mc:0,bo:0,bo:14,bo:3'>
+  <area shape='rect' coords='131,2406,254,2430' href='#mc:0,bo:0,bo:14,bo:4'>
+  <area shape='rect' coords='617.471,1215.66,670.471,1244.66' href='#mc:0,bo:1'>
+  <area shape='rect' coords='710.471,674.164,859.471,700.164' href='#mc:0,bo:1,bo:0'>
+  <area shape='rect' coords='901.471,639.164,951.471,663.164' href='#mc:0,bo:1,bo:0,bo:0'>
+  <area shape='rect' coords='901.471,663.164,926.471,687.164' href='#mc:0,bo:1,bo:0,bo:1'>
+  <area shape='rect' coords='901.471,687.164,935.471,711.164' href='#mc:0,bo:1,bo:0,bo:2'>
+  <area shape='rect' coords='901.471,711.164,956.471,735.164' href='#mc:0,bo:1,bo:0,bo:3'>
+  <area shape='rect' coords='712.471,755.164,826.471,781.164' href='#mc:0,bo:1,bo:1'>
+  <area shape='rect' coords='712.471,781.164,799.471,807.164' href='#mc:0,bo:1,bo:2'>
+  <area shape='rect' coords='712.471,807.164,847.471,833.164' href='#mc:0,bo:1,bo:3'>
+  <area shape='rect' coords='712.471,833.164,840.471,859.164' href='#mc:0,bo:1,bo:4'>
+  <area shape='rect' coords='712.471,859.164,818.471,885.164' href='#mc:0,bo:1,bo:5'>
+  <area shape='rect' coords='712.471,885.164,849.471,911.164' href='#mc:0,bo:1,bo:6'>
+  <area shape='rect' coords='712.471,911.164,838.471,937.164' href='#mc:0,bo:1,bo:7'>
+  <area shape='rect' coords='710.471,1064.16,820.471,1090.16' href='#mc:0,bo:1,bo:8'>
+  <area shape='rect' coords='862.471,957.164,890.471,981.164' href='#mc:0,bo:1,bo:8,bo:0'>
+  <area shape='rect' coords='862.471,981.164,918.471,1005.16' href='#mc:0,bo:1,bo:8,bo:1'>
+  <area shape='rect' coords='862.471,1005.16,919.471,1029.16' href='#mc:0,bo:1,bo:8,bo:2'>
+  <area shape='rect' coords='862.471,1029.16,915.471,1053.16' href='#mc:0,bo:1,bo:8,bo:3'>
+  <area shape='rect' coords='862.471,1053.16,889.471,1077.16' href='#mc:0,bo:1,bo:8,bo:4'>
+  <area shape='rect' coords='862.471,1077.16,918.471,1101.16' href='#mc:0,bo:1,bo:8,bo:5'>
+  <area shape='rect' coords='862.471,1101.16,933.471,1125.16' href='#mc:0,bo:1,bo:8,bo:6'>
+  <area shape='rect' coords='862.471,1125.16,901.471,1149.16' href='#mc:0,bo:1,bo:8,bo:7'>
+  <area shape='rect' coords='862.471,1149.16,901.471,1173.16' href='#mc:0,bo:1,bo:8,bo:8'>
+  <area shape='rect' coords='862.471,1173.16,903.471,1197.16' href='#mc:0,bo:1,bo:8,bo:9'>
+  <area shape='rect' coords='712.471,1217.16,801.471,1243.16' href='#mc:0,bo:1,bo:9'>
+  <area shape='rect' coords='712.471,1243.16,779.471,1269.16' href='#mc:0,bo:1,bo:10'>
+  <area shape='rect' coords='712.471,1269.16,879.471,1295.16' href='#mc:0,bo:1,bo:11'>
+  <area shape='rect' coords='712.471,1295.16,866.471,1321.16' href='#mc:0,bo:1,bo:12'>
+  <area shape='rect' coords='712.471,1321.16,880.471,1347.16' href='#mc:0,bo:1,bo:13'>
+  <area shape='rect' coords='712.471,1347.16,864.471,1373.16' href='#mc:0,bo:1,bo:14'>
+  <area shape='rect' coords='712.471,1373.16,875.471,1399.16' href='#mc:0,bo:1,bo:15'>
+  <area shape='rect' coords='712.471,1399.16,872.471,1425.16' href='#mc:0,bo:1,bo:16'>
+  <area shape='rect' coords='712.471,1425.16,857.471,1451.16' href='#mc:0,bo:1,bo:17'>
+  <area shape='rect' coords='712.471,1451.16,874.471,1477.16' href='#mc:0,bo:1,bo:18'>
+  <area shape='rect' coords='712.471,1477.16,896.471,1503.16' href='#mc:0,bo:1,bo:19'>
+  <area shape='rect' coords='712.471,1503.16,861.471,1529.16' href='#mc:0,bo:1,bo:20'>
+  <area shape='rect' coords='712.471,1529.16,833.471,1555.16' href='#mc:0,bo:1,bo:21'>
+  <area shape='rect' coords='712.471,1555.16,858.471,1581.16' href='#mc:0,bo:1,bo:22'>
+  <area shape='rect' coords='712.471,1581.16,787.471,1607.16' href='#mc:0,bo:1,bo:23'>
+  <area shape='rect' coords='712.471,1607.16,792.471,1633.16' href='#mc:0,bo:1,bo:24'>
+  <area shape='rect' coords='712.471,1633.16,782.471,1659.16' href='#mc:0,bo:1,bo:25'>
+  <area shape='rect' coords='712.471,1659.16,823.471,1685.16' href='#mc:0,bo:1,bo:26'>
+  <area shape='rect' coords='712.471,1685.16,810.471,1711.16' href='#mc:0,bo:1,bo:27'>
+  <area shape='rect' coords='712.471,1711.16,808.471,1737.16' href='#mc:0,bo:1,bo:28'>
+  <area shape='rect' coords='712.471,1737.16,880.471,1763.16' href='#mc:0,bo:1,bo:29'>
+  <area shape='rect' coords='712.471,1763.16,797.471,1789.16' href='#mc:0,bo:1,bo:30'>
+  <area shape='rect' coords='712.471,1789.16,841.471,1815.16' href='#mc:0,bo:1,bo:31'>
+  <area shape='rect' coords='712.471,1815.16,778.471,1841.16' href='#mc:0,bo:1,bo:32'>
 </map>
 <hr/>
 <table class="vym-footer">   

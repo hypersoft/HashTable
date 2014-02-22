@@ -146,6 +146,15 @@ if (htRecordConfiguration(i) & HTI_NON_CONFIGURABLE) { \
 	htReturnIfInvalidReference(ht, r); \
 	htReturnIfItemNotFound(ht->item[--r])
 
+#define htVoidValidateReference(ht, reference) \
+if (! ht) { errno = HT_ERROR_TABLE_UNINITIALIZED; return; } \
+if (! (reference) || ht ->itemsMax < reference) { \
+	errno = HT_ERROR_INVALID_REFERENCE; return; \
+} \
+if (! (ht->item[--reference])) { \
+	errno = HT_ERROR_INVALID_REFERENCE; return; \
+}
+
 /* for these inlines: d should be volatile; re: optimization issues */
 #define htDblIsNaN(d) (d != d)
 #define htDblInfinity(d) \
@@ -808,20 +817,90 @@ BuildItemReferences:
 
 }
 
-void HashTableSortHash
+void HashTableSortItemHash
 (
 	HashTable ht,
-	size_t keyLength,
-	double key,
-	HashTableItemFlags keyHint,
+	HashTableItem reference,
 	HashTableSortType type,
 	HashTableSortDirection direction,
 	HashTableSortHandler sortHandler,
 	void * private
 ) {
-	htVoidIfTableUninitialized(ht);
-	/* doesn't do anything yet */
-	htVoidUnsupportedFunction();
+	htVoidValidateReference(ht, reference);
+	HashTableRecord item = ht->item[reference];
+	size_t maximum = 0, index = 0, recordHash = htRecordHash(item);
+	item = ht->slot[recordHash];
+	while (item) maximum++, item = item->successor;
+	if (maximum < 2) return;
+	HashTableRecord array[maximum];
+	item = ht->slot[recordHash];
+	while (item) array[index++] = item, item = item->successor;
+
+	HashTableItem primary, secondary, selection;
+	HashTableItem realPrimary, realSecondary;
+	for (primary = 0; primary < maximum; primary++) {
+		for (secondary = primary + 1; secondary < maximum; secondary++) {
+			realPrimary = htRecordReference(array[primary]),
+			realSecondary = htRecordReference(array[secondary]);
+			selection = sortHandler(
+				ht, type, direction, realPrimary, realSecondary, NULL
+			);
+			if (! selection--) goto BuildItemLinks;
+			else if (selection == realSecondary){
+				array[secondary] = ht->item[realPrimary];
+				array[primary] = ht->item[realSecondary];
+			}
+		}
+	}
+
+BuildItemLinks:
+	for(index = 0; index < maximum;) array[index]->successor = array[++index];
+}
+
+void HashTableEnumerateItemHash
+(
+	HashTable ht,
+	HashTableItem reference,
+	HashTableEnumerateDirection direction,
+	HashTableEnumerationHandler handler,
+	void * private
+) {
+	htVoidValidateReference(ht, reference);
+	if (! handler ) { errno = HT_ERROR_UNSUPPORTED_FUNCTION; return; }
+
+	HashTableRecord item = ht->item[reference];
+	size_t maximum = 0, index = 0, recordHash = htRecordHash(item);
+	item = ht->slot[recordHash];
+	while (item) maximum++, item = item->successor;
+	HashTableRecord array[maximum];
+	item = ht->slot[recordHash];
+	while (item) array[index++] = item, item = item->successor;
+
+	if (direction == HT_ENUMERATE_FORWARD) {
+		for (index = 0; index < maximum; index++) {
+			item = array[index];
+			if (! (htRecordConfiguration(item) & HTI_NON_ENUMERABLE)) {
+				if ( ! handler(
+					ht, direction, htRecordReference(item), private)
+				) break;
+			}
+		}
+	} else {
+		index = maximum;
+		while (--index) {
+			item = array[index];
+			if (! (htRecordConfiguration(item) & HTI_NON_ENUMERABLE)) {
+				if ( ! handler(
+					ht, direction, htRecordReference(item), private)
+				) break;
+			}
+		}
+		/* manually enumerate the last item (0) */
+		item = array[0];
+		if (! (htRecordConfiguration(item) & HTI_NON_ENUMERABLE)) {
+			handler(ht, direction, htRecordReference(item), private);
+		}
+	}
 }
 
 const char * HashTableErrorMessage

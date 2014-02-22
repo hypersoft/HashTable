@@ -374,15 +374,22 @@ void HashTableSortItems
 	void * private
 );
 
-void HashTableSortHash
+void HashTableSortItemHash
 (
 	HashTable hashTable,
-	size_t keyLength,
-	double key,
-	HashTableItemFlags keyHint,
+	HashTableItem reference,
 	HashTableSortType type,
 	HashTableSortDirection direction,
 	HashTableSortHandler sortHandler,
+	void * private
+);
+
+void HashTableEnumerateItemHash
+(
+	HashTable hashTable,
+	HashTableItem reference,
+	HashTableEnumerateDirection direction,
+	HashTableEnumerationHandler handler,
 	void * private
 );
 
