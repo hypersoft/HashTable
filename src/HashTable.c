@@ -513,7 +513,7 @@ bool HashTableDeleteItem
 	htReturnIfNotConfigurableItem(item);
 
 	if (ht->events & HT_EVENT_CONSTRUCTED && ht->eventHandler) {
-		if (! ht->eventHandler(ht, HT_EVENT_DELETE, reference, ht->private) )
+		if (! ht->eventHandler(ht, HT_EVENT_DELETE, reference+1, ht->private) )
 			return false;
 	}
 
