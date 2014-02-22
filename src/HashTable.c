@@ -58,6 +58,7 @@ typedef struct sHashTableRecord {
 
 #define htRecordReference(r) varprvti (r->key)
 #define htRecordHash(r) varprvti (r->value)
+#define htRecordConfiguration(r) vartype(r->value)
 
 #define HashTableRecordSize sizeof(sHashTableRecord)
 #define HashTableRecord sHashTableRecord *
@@ -103,12 +104,13 @@ typedef struct sHashTable {
 #define htReturnIfKeyNotFound(i) \
 	if ( ! (i) ) { errno = HT_ERROR_KEY_NOT_FOUND; return 0; }
 
-#define htReturnIfNotWritableItem(i) if (vartype(i->value) & HTR_NON_WRITABLE) { \
+#define htReturnIfNotWritableItem(i) \
+if (htRecordConfiguration(i) & HTR_NON_WRITABLE) { \
 	errno = HT_ERROR_NOT_WRITABLE_ITEM; return 0; \
 }
 
 #define htReturnIfNotConfigurableItem(i) \
-if (vartype(i->value) & HTR_NON_CONFIGURABLE) { \
+if (htRecordConfiguration(i) & HTR_NON_CONFIGURABLE) { \
 	errno = HT_ERROR_NOT_CONFIGURABLE_ITEM; return 0; \
 }
 
