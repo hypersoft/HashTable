@@ -23,20 +23,20 @@ also supports binary keys and data of arbitrary lengths.
 
 ## Notable Feature List
 
+*  Item Access via Linear Item Reference or Key
+*  Arbitrary Binary Key +/ Data (UTF-8, Integer, Double, Pointer, and Block
 *  Jenkins' One At a Time Hashing (Perl Like)
 *  Enumerable, Writable and Configurable Item Properties (ECMAScript Like)
 *  Call Back Events: Construct, Deconstruct, Put, Get, and Delete
 *  Selective Linear Sorting Call Back Interface with User Function
 *  Selective Hash Sorting Call Back Interface with User Function
-*  Error Reporting Using Function Return Sentinels + `errno`
-*  Descriptive Error Retrieval
-*  Item Access via Linear Item Reference or Key
 *  Automated Linear Enumeration Call Back Interface with Forward, Reverse, and
 User Function
 *  Automated Hash Enumeration Call Back Interface with Forward, Reverse and User
 Function
 *  Manual Linear Enumeration via Probing
-*  Arbitrary Binary Key +/ Data (UTF-8, Integer, Double, Pointer, and Block
+*  Error Reporting Using Function Return Sentinels + `errno`
+*  Descriptive Error Retrieval
 *  Private Data Association
 *  Load Factor Metering
 *  Item Access Hit Counters
