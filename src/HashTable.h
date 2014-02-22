@@ -356,6 +356,11 @@ void HashTableSortHash
 	void * private
 );
 
+const char * HashTableErrorMessage
+(
+	void
+);
+
 #endif
 
 #endif /* HashTable_h */

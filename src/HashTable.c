@@ -49,6 +49,30 @@ const char * HashTableVersion = BUILD_VERSION_TRIPLET;
 const char * HashTableDescription = BUILD_VERSION_DESCRIPTION;
 const long HashTableBuildNumber = BUILD_VERSION_NUMBER;
 
+const char * htErrorTableUninitialized = \
+	"The hash table parameter was invalid";
+
+const char * htErrorAllocationFailure = \
+	"A data allocation request failed";
+
+const char * htErrorUnsupportedFunction = \
+	"The HashTable library does not support the function called";
+
+const char * htErrorZeroLengthKey = \
+	"A key specifying zero length was supplied";
+
+const char * htErrorKeyNotFound = \
+	"The specified key could not be located";
+
+const char * htErrorInvalidReference = \
+	"The specified item reference was invalid";
+
+const char * htErrorNotWritableItem = \
+	"The request could not be completed because the item is read only";
+
+const char * htErrorNotConfigurableItem = \
+"The request could not be completed because the item is non-configurable";
+
 typedef struct sHashTableRecord {
 	size_t hitCount;
 	HyperVariant key;
@@ -511,7 +535,6 @@ bool HashTableDeleteItem
 
 }
 
-#include <stdio.h>
 const void * HashTableItemKey
 (
 	HashTable ht,
@@ -732,4 +755,28 @@ void HashTableSortHash
 	htVoidIfTableUninitialized(ht);
 	/* doesn't do anything yet */
 	htVoidUnsupportedFunction();
+}
+
+const char * HashTableErrorMessage
+(
+	void
+) {
+	size_t err = errno;
+	if (err == HT_ERROR_TABLE_UNINITIALIZED)
+		return htErrorTableUninitialized;
+	else if (err == HT_ERROR_ALLOCATION_FAILURE)
+		return htErrorAllocationFailure;
+	else if (err == HT_ERROR_UNSUPPORTED_FUNCTION)
+		return htErrorUnsupportedFunction;
+	else if (err == HT_ERROR_ZERO_LENGTH_KEY)
+		return htErrorZeroLengthKey;
+	else if (err == HT_ERROR_KEY_NOT_FOUND)
+		return htErrorKeyNotFound;
+	else if (err == HT_ERROR_INVALID_REFERENCE)
+		return htErrorInvalidReference;
+	else if (err == HT_ERROR_NOT_WRITABLE_ITEM)
+		return htErrorNotWritableItem;
+	else if (err == HT_ERROR_NOT_CONFIGURABLE_ITEM)
+		return htErrorNotConfigurableItem;
+	else return NULL;
 }
