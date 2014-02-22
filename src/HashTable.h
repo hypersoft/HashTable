@@ -39,7 +39,7 @@
 
 #define HashTableBitFlag(n) (1 << (n))
 
-typedef enum HashTableError {
+typedef enum eHashTableError {
 	HT_ERROR_TABLE_UNINITIALIZED = EOWNERDEAD,
 	HT_ERROR_ALLOCATION_FAILURE = ENOMEM,
 	HT_ERROR_UNSUPPORTED_FUNCTION = ENOTSUP,
@@ -56,13 +56,25 @@ typedef enum eHashTableEvent {
 	HT_EVENT_OVERWRITE       = HashTableBitFlag( 3),
 	HT_EVENT_GET             = HashTableBitFlag( 4),
 	HT_EVENT_DELETE          = HashTableBitFlag( 5),
-	HT_EVENT_ENUMERATE       = HashTableBitFlag( 6),
-	HT_EVENT_SORT_TABLE      = HashTableBitFlag( 7),
-	HT_EVENT_SORT_HASH       = HashTableBitFlag( 8),
-	HT_EVENT_SORT_NUMERIC    = HashTableBitFlag( 9),
-	HT_EVENT_SORT_DESCENDING = HashTableBitFlag(10),
-	HT_EVENT_DESTRUCTING     = HashTableBitFlag(11)
+	HT_EVENT_SORT_TABLE      = HashTableBitFlag( 6),
+	HT_EVENT_SORT_HASH       = HashTableBitFlag( 7),
+	HT_EVENT_SORT_NUMERIC    = HashTableBitFlag( 8),
+	HT_EVENT_SORT_DESCENDING = HashTableBitFlag( 9),
+	HT_EVENT_DESTRUCTING     = HashTableBitFlag(10)
 } HashTableEvent;
+
+typedef enum eHashTableEnumerateDirection {
+	HT_ENUMERATE_FORWARD = 0,
+	HT_ENUMERATE_REVERSE = 1
+} HashTableEnumerateDirection;
+
+typedef bool (*HashTableEnumerationHandler)
+(
+	void * hashTable,
+	HashTableEnumerateDirection direction,
+	HashTableItem item,
+	void * private
+);
 
 typedef enum eHashTableRecordFlags {
 	HTR_INT              = HashTableBitFlag(1),
@@ -193,6 +205,7 @@ size_t HashTableItemImpact
 
 /* Data Management */
 // =============================================================================
+
 extern bool HashTablePutPrivate
 (
 	HashTable hashTable,
@@ -233,6 +246,17 @@ HashTableItemFlags HashTableItemGetFlags
 (
 	HashTable hashTable,
 	HashTableItem reference
+);
+
+/* Extended Operations */
+// =============================================================================
+
+void HashTableEnumerate
+(
+	HashTable ht,
+	HashTableEnumerateDirection direction,
+	HashTableEnumerationHandler handler,
+	void * private
 );
 
 #endif

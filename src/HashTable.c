@@ -497,3 +497,36 @@ const void * HashTableItemGetValue
 ) {
 	htItemAccess(ht, reference, item, item->value);
 }
+
+void HashTableEnumerate
+(
+	HashTable ht,
+	HashTableEnumerateDirection direction,
+	HashTableEnumerationHandler handler,
+	void * private
+) {
+	htVoidIfTableUninitialized(ht);
+	if (! handler ) { errno = HT_ERROR_UNSUPPORTED_FUNCTION; return; }
+	size_t index, maximum = ht->itemsMax;
+	HashTableRecord item;
+	if (direction == HT_ENUMERATE_FORWARD) {
+		for (index = 0; index < maximum; index++) {
+			item = ht->item[index];
+			if (item && ! (htRecordConfiguration(item) & HTR_NON_ENUMERABLE)) {
+				if ( ! handler(ht, direction, index, private) ) break;
+			}
+		}
+	} else {
+		for (index = (maximum - 1); index != 0; index--) {
+			item = ht->item[index];
+			if (item && ! (htRecordConfiguration(item) & HTR_NON_ENUMERABLE)) {
+				if ( ! handler(ht, direction, index, private) ) break;
+			}
+		}
+		/* manually enumerate the last item (0) */
+		item = ht->item[0];
+		if (item && ! (htRecordConfiguration(item) & HTR_NON_ENUMERABLE)) {
+			if ( ! handler(ht, direction, index, private) ) break;
+		}
+	}
+}
