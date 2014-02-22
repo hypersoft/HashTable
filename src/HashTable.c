@@ -115,16 +115,12 @@ if (htRecordConfiguration(i) & HTI_NON_CONFIGURABLE) { \
 }
 
 #define htReturnIfItemNotFound(i) \
-	if ( ! i ) { errno = HT_ERROR_INVALID_REFERENCE; return 0; }
+	if ( ! (i) ) { errno = HT_ERROR_INVALID_REFERENCE; return 0; }
 
-#define htItemAccess(ht, r, label, expr) \
+#define htValidateReference(ht, r) \
 	htReturnIfTableUninitialized(ht); \
 	htReturnIfInvalidReference(ht, r); \
-	HashTableRecord label = ht->item[r]; \
-	htReturnIfItemNotFound(label);	\
-	if (label) return expr; \
-	else errno = HT_ERROR_INVALID_REFERENCE; \
-	return 0
+	htReturnIfItemNotFound(ht->item[r])
 
 /* for these inlines: d should be volatile; re: optimization issues */
 #define htDblIsNaN(d) (d != d)
@@ -351,15 +347,8 @@ size_t HashTableItemHits
 	HashTable ht,
 	HashTableItem reference
 ) {
-	htItemAccess(ht, reference, item, item->hitCount);
-}
-
-size_t HashTableItemLength
-(
-	HashTable ht,
-	HashTableItem reference
-) {
-	htItemAccess(ht, reference, item, varlen(item->value));
+	htValidateReference(ht, reference);
+	return ht->item[reference]->hitCount;
 }
 
 size_t HashTableItemImpact
@@ -367,7 +356,8 @@ size_t HashTableItemImpact
 	HashTable ht,
 	HashTableItem reference
 ) {
-	htItemAccess(ht, reference, item, htRecordImpact(item));
+	htValidateReference(ht, reference);
+	return htRecordImpact(ht->item[reference]);
 }
 
 bool HashTablePutPrivate
@@ -493,12 +483,9 @@ bool HashTableDeleteItem
 	HashTable ht,
 	HashTableItem reference
 ) {
-
-	htReturnIfTableUninitialized(ht);
-	htReturnIfInvalidReference(ht, reference);
+	htValidateReference(ht, reference);
 	HashTableRecord parent = NULL;
 	HashTableRecord item = ht->item[reference];
-	htReturnIfItemNotFound(item);
 	htReturnIfNotConfigurableItem(item);
 
 	if (ht->events & HT_EVENT_CONSTRUCTED && ht->eventHandler) {
@@ -524,12 +511,162 @@ bool HashTableDeleteItem
 
 }
 
-const void * HashTableItemGetValue
+const void * HashTableItemKey
 (
 	HashTable ht,
 	HashTableItem reference
 ) {
-	htItemAccess(ht, reference, item, item->value);
+	htValidateReference(ht, reference);
+	return ht->item[reference]->key;
+}
+
+size_t HashTableItemKeyLength
+(
+	HashTable ht,
+	HashTableItem reference
+) {
+	htValidateReference(ht, reference);
+	return varlen(ht->item[reference]->key);
+}
+
+HashTableItemFlags HashTableItemKeyType
+(
+	HashTable ht,
+	HashTableItem reference
+) {
+	htValidateReference(ht, reference);
+	return (vartype(ht->item[reference]->key) &
+		(HTI_INT | HTI_DOUBLE | HTI_POINTER | HTI_BLOCK)
+	);
+}
+
+HashTableItemFlags HashTableItemKeyConfiguration
+(
+	HashTable ht,
+	HashTableItem reference
+) {
+	htValidateReference(ht, reference);
+	return vartype(ht->item[reference]->key);
+}
+
+const void * HashTableItemValue
+(
+	HashTable ht,
+	HashTableItem reference
+) {
+	htValidateReference(ht, reference);
+	return ht->item[reference]->value;
+}
+
+size_t HashTableItemValueLength
+(
+	HashTable ht,
+	HashTableItem reference
+) {
+	htValidateReference(ht, reference);
+	return varlen(ht->item[reference]->value);
+}
+
+HashTableItemFlags HashTableItemValueType
+(
+	HashTable ht,
+	HashTableItem reference
+) {
+	htValidateReference(ht, reference);
+	return (vartype(ht->item[reference]->value) &
+		(HTI_INT | HTI_DOUBLE | HTI_POINTER | HTI_BLOCK)
+	);
+}
+
+HashTableItemFlags HashTableItemValueConfiguration
+(
+	HashTable ht,
+	HashTableItem reference
+) {
+	htValidateReference(ht, reference);
+	return vartype(ht->item[reference]->value);
+}
+
+bool HashTableItemGetEnumerable
+(
+	HashTable ht,
+	HashTableItem reference
+) {
+	htValidateReference(ht, reference);
+	return \
+		(htRecordConfiguration(ht->item[reference]) & HTI_NON_ENUMERABLE) == 0;
+}
+
+bool HashTableItemSetEnumerable
+(
+	HashTable ht,
+	HashTableItem reference,
+	bool value
+) {
+	htValidateReference(ht, reference);
+	HashTableRecord item = ht->item[reference];
+	htReturnIfNotConfigurableItem(item);
+	if (value) {
+		htRecordConfiguration(item) &= ~HTI_NON_ENUMERABLE;
+	} else {
+		htRecordConfiguration(item) |= HTI_NON_ENUMERABLE;
+	}
+	return true;
+}
+
+bool HashTableItemGetWritable
+(
+	HashTable ht,
+	HashTableItem reference
+) {
+	htValidateReference(ht, reference);
+	return \
+		(htRecordConfiguration(ht->item[reference]) & HTI_NON_WRITABLE) == 0;
+}
+
+bool HashTableItemSetWritable
+(
+	HashTable ht,
+	HashTableItem reference,
+	bool value
+) {
+	htValidateReference(ht, reference);
+	HashTableRecord item = ht->item[reference];
+	htReturnIfNotConfigurableItem(item);
+	if (value) {
+		htRecordConfiguration(item) &= ~HTI_NON_WRITABLE;
+	} else {
+		htRecordConfiguration(item) |= HTI_NON_WRITABLE;
+	}
+	return true;
+}
+
+bool HashTableItemGetConfigurable
+(
+	HashTable ht,
+	HashTableItem reference
+) {
+	htValidateReference(ht, reference);
+	return \
+		(htRecordConfiguration(ht->item[reference]) & HTI_NON_CONFIGURABLE) == 0
+	;
+}
+
+bool HashTableItemSetConfigurable
+(
+	HashTable ht,
+	HashTableItem reference,
+	bool value
+) {
+	htValidateReference(ht, reference);
+	HashTableRecord item = ht->item[reference];
+	htReturnIfNotConfigurableItem(item);
+	if (value) {
+		htRecordConfiguration(item) &= ~HTI_NON_CONFIGURABLE;
+	} else {
+		htRecordConfiguration(item) |= HTI_NON_CONFIGURABLE;
+	}
+	return true;
 }
 
 void HashTableEnumerate

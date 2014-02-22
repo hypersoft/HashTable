@@ -192,18 +192,11 @@ size_t HashTableItemHits
 	HashTableItem reference
 );
 
-size_t HashTableItemLength
-(
-	HashTable hashTable,
-	HashTableItem reference
-);
-
 size_t HashTableItemImpact
 (
 	HashTable hashTable,
 	HashTableItem reference
 );
-
 
 /* Data Management */
 // =============================================================================
@@ -244,10 +237,91 @@ bool HashTableDeleteItem
 	HashTableItem reference
 );
 
-HashTableItemFlags HashTableItemGetFlags
+const void * HashTableItemKey
 (
 	HashTable hashTable,
 	HashTableItem reference
+);
+
+size_t HashTableItemKeyLength
+(
+	HashTable hashTable,
+	HashTableItem reference
+);
+
+HashTableItemFlags HashTableItemKeyType
+(
+	HashTable hashTable,
+	HashTableItem reference
+);
+
+HashTableItemFlags HashTableItemKeyConfiguration
+(
+	HashTable hashTable,
+	HashTableItem reference
+);
+
+const void * HashTableItemValue
+(
+	HashTable hashTable,
+	HashTableItem reference
+);
+
+size_t HashTableItemValueLength
+(
+	HashTable hashTable,
+	HashTableItem reference
+);
+
+HashTableItemFlags HashTableItemValueType
+(
+	HashTable hashTable,
+	HashTableItem reference
+);
+
+HashTableItemFlags HashTableItemValueConfiguration
+(
+	HashTable hashTable,
+	HashTableItem reference
+);
+
+bool HashTableItemGetEnumerable
+(
+	HashTable hashTable,
+	HashTableItem reference
+);
+
+bool HashTableItemSetEnumerable
+(
+	HashTable hashTable,
+	HashTableItem reference,
+	bool value
+);
+
+bool HashTableItemGetWritable
+(
+	HashTable hashTable,
+	HashTableItem reference
+);
+
+bool HashTableItemSetWritable
+(
+	HashTable hashTable,
+	HashTableItem reference,
+	bool value
+);
+
+bool HashTableItemGetConfigurable
+(
+	HashTable hashTable,
+	HashTableItem reference
+);
+
+bool HashTableItemSetConfigurable
+(
+	HashTable hashTable,
+	HashTableItem reference,
+	bool value
 );
 
 /* Extended Operations */
