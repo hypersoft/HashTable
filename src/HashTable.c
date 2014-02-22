@@ -460,7 +460,7 @@ HashTableItem HashTablePut
 				ht->private
 			);
 			if (! put ) {
-				ht->item[htRecordReference(this)] = NULL,
+				ht->item[htRecordReference(this) - 1] = NULL,
 				ht->itemsTotal--, ht->itemsUsed--,
 				ht->impact -= htRecordImpact(this);
 				varfree(this->key); varfree(this->value); free(this);
@@ -709,21 +709,21 @@ void HashTableEnumerate
 		for (index = 0; index < maximum; index++) {
 			item = ht->item[index];
 			if (item && ! (htRecordConfiguration(item) & HTI_NON_ENUMERABLE)) {
-				if ( ! handler(ht, direction, index, private) ) break;
+				if ( ! handler(ht, direction, index + 1, private) ) break;
 			}
 		}
 	} else {
-		index = maximum - 1;
-		while (index) {
+		index = maximum;
+		while (--index) {
 			item = ht->item[index];
 			if (item && ! (htRecordConfiguration(item) & HTI_NON_ENUMERABLE)) {
-				if ( ! handler(ht, direction, index--, private) ) break;
+				if ( ! handler(ht, direction, index + 1, private) ) break;
 			}
 		}
 		/* manually enumerate the last item (0) */
 		item = ht->item[0];
 		if (item && ! (htRecordConfiguration(item) & HTI_NON_ENUMERABLE)) {
-			handler(ht, direction, index, private);
+			handler(ht, direction, index + 1, private);
 		}
 	}
 }
