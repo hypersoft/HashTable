@@ -29,6 +29,9 @@ HashTableItem htEventCallBack
 		printf("HashTable (%p) requesting put item:\n\n", ht);
 		htItemReport(ht, item);
 		return true;
+	} else if (event == HT_EVENT_DELETE) {
+		printf("HashTable (%p) requesting delete item: %i\n", ht, item);
+		return true;
 	} else if (event == HT_EVENT_DESTRUCTING) {
 		printf("Destroying HashTable (%p)\n", ht);
 	}
@@ -66,7 +69,7 @@ int main ( int argc, char **argv )
 
 	HashTable x = NewHashTable(0,
 		HT_EVENT_CONSTRUCTED | HT_EVENT_DESTRUCTING |
-		HT_EVENT_PUT,
+		HT_EVENT_PUT | HT_EVENT_DELETE,
 		htEventCallBack, NULL
 	);
 
@@ -80,8 +83,15 @@ int main ( int argc, char **argv )
 		x, htStr("Second Item"), htStr("My second item")
 	);
 
+	HashTableItem third = HashTablePut(
+		x, htStr("Third Item"), htStr("My third item")
+	);
+
 	puts("Enumerate forwards");
 	HashTableEnumerate(x, HT_ENUMERATE_FORWARD, htEnumerationCallBack, NULL);
+	puts("");
+
+	HashTableDeleteItem(x, second);
 	puts("");
 
 	puts("Enumerate backwards");
