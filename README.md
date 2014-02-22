@@ -23,19 +23,19 @@ also supports binary keys and data of arbitrary lengths.
 
 ## Notable Feature List
 
+*  Jenkins' One At a Time Hashing (Perl Like)
+*  Selective User Algorithm Based Sorting Call Backs
 *  Error Reporting Using Function Return Sentinels + `errno`
+*  Descriptive Error Retrieval
 *  Automated Item Enumeration in Forward and Reverse
 *  Manual Enumeration Capable
 *  Item Access by Item Reference or Key
-*  Descriptive Error Retrieval
 *  Call Back Events: Construct, Deconstruct, Put, Get, and Delete
+*  Enumerable, Writable and Configurable Item Properties (ECMAScript Like)
 *  Arbitrary Binary Key +/ Data (UTF-8, Integer, Double, Pointer, and Block
 *  Private Data Association
-*  Enumerable, Writable and Configurable Item Properties (ECMAScript Like)
 *  Load Factor Metering
 *  Item Access Hit Counter
-*  Jenkins' One At a Time Hashing
-*  Selective User Sorting Call Backs
 
 ## Discussion
 
