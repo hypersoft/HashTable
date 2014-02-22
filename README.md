@@ -24,7 +24,7 @@ also supports binary keys and data of arbitrary lengths.
 ## Notable Feature List
 
 *  Item Access via Linear Item Reference or Key
-*  Arbitrary Binary Key +/ Data (UTF-8, Integer, Double, Pointer, and Block
+*  Arbitrary Binary Key +/ Data (UTF-8, Integer, Double, Pointer, and Block)
 *  Jenkins' One At a Time Hashing (Perl Like)
 *  Enumerable, Writable and Configurable Item Properties (ECMAScript Like)
 *  Call Back Events: Construct, Deconstruct, Put, Get, and Delete
