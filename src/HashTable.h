@@ -53,10 +53,9 @@ typedef enum eHashTableError {
 typedef enum eHashTableEvent {
 	HT_EVENT_CONSTRUCTED     = HashTableBitFlag(1),
 	HT_EVENT_PUT             = HashTableBitFlag(2),
-	HT_EVENT_OVERWRITE       = HashTableBitFlag(3),
-	HT_EVENT_GET             = HashTableBitFlag(4),
-	HT_EVENT_DELETE          = HashTableBitFlag(5),
-	HT_EVENT_DESTRUCTING     = HashTableBitFlag(6)
+	HT_EVENT_GET             = HashTableBitFlag(3),
+	HT_EVENT_DELETE          = HashTableBitFlag(4),
+	HT_EVENT_DESTRUCTING     = HashTableBitFlag(5)
 } HashTableEvent;
 
 typedef HashTableItem (*HashTableEventHandler)

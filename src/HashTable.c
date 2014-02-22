@@ -434,7 +434,6 @@ HashTableItem HashTablePut
 		htReturnIfAllocationFailure(
 			(varValue = varcreate(valueLength, value, valueHint)), {}
 		);
-		/* TODO: HT_EVENT_OVERWRITE !*/
 		ht->impact -= varimpact(current->value),
 		ht->impact += varimpact(varValue);
 		varfree(current->value);
