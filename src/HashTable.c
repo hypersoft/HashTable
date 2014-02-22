@@ -276,7 +276,8 @@ HashTable NewHashTable
 void OptimizeHashTable
 (
 	HashTable ht,
-	size_t slots
+	size_t slots,
+	size_t references
 ) {
 	htVoidIfTableUninitialized(ht);
 	/* doesn't do anything yet */
@@ -315,6 +316,22 @@ void HashTableRegisterEvents
 	if ( eventHandler ) ht->eventHandler = eventHandler;
 }
 
+size_t HashTableItemsUsed
+(
+	HashTable ht
+) {
+	htReturnIfTableUninitialized(ht);
+	return ht->itemsUsed;
+}
+
+size_t HashTableItemsMax
+(
+	HashTable ht
+) {
+	htReturnIfTableUninitialized(ht);
+	return ht->itemsMax;
+}
+
 size_t HashTableSlotCount
 (
 	HashTable ht
@@ -350,7 +367,7 @@ size_t HashTableImpact
 	return ht->impact;
 }
 
-size_t HashTableDistribution
+HashTableItem HashTableHasKey
 (
 	HashTable ht,
 	size_t keyLength,
@@ -358,10 +375,32 @@ size_t HashTableDistribution
 	HashTableItemFlags hint
 ) {
 	htReturnIfTableUninitialized(ht);
-	void * realKey = htRealKey(keyLength, key, hint);
+	char * realKey = htRealKey(keyLength, key, hint);
+	htReturnIfZeroLengthKey(keyLength);
+	HashTableRecord item = htFindKey(ht, keyLength, realKey);
+	if (item) return htRecordReference(item);
+	return 0;
+}
+
+bool HashTableHasItem
+(
+	HashTable ht,
+	HashTableItem reference
+) {
+	htReturnIfTableUninitialized(ht);
+	if ( ! (reference) || ht->itemsMax < reference) return false;
+	return (ht->item[reference]) ? true : false;
+}
+
+size_t HashTableItemDistribution
+(
+	HashTable ht,
+	HashTableItem reference
+) {
+	htValidateReference(ht, reference);
 	register HashTableRecord child;
 	register size_t distribution = 0;
-	child = ht->slot[htKeyHash(ht, keyLength, realKey)];
+	child = ht->slot[htRecordHash(ht->item[reference])];
 	while (child) distribution++, child = child->successor;
 	return distribution;
 }
@@ -736,8 +775,37 @@ void HashTableSortItems
 	void * private
 ) {
 	htVoidIfTableUninitialized(ht);
-	/* doesn't do anything yet */
-	htVoidUnsupportedFunction();
+
+	if (ht->itemsMax < 2) return;
+
+	size_t maximum = ht->itemsMax;
+	register HashTableItem primary,secondary;
+	HashTableItem selection;
+
+	HashTableRecord primaryRecord;
+	HashTableRecord secondaryRecord;
+
+	for (primary = 0; primary < maximum; primary++) {
+		for (secondary = primary + 1; secondary < maximum; secondary++) {
+			selection = sortHandler(
+				ht, type, direction, primary+1, secondary+1, NULL
+			);
+			if (! selection--) goto BuildItemReferences;
+			else if (selection == secondary){
+				primaryRecord = ht->item[primary];
+				secondaryRecord = ht->item[secondary];
+				ht->item[primary] = secondaryRecord;
+				ht->item[secondary] = primaryRecord;
+			}
+		}
+	}
+
+BuildItemReferences:
+	for(primary = 0; primary < maximum;) {
+		primaryRecord = ht->item[primary++];
+		if (primaryRecord) htRecordReference(primaryRecord) = primary;
+	}
+
 }
 
 void HashTableSortHash

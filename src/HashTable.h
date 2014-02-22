@@ -80,13 +80,13 @@ typedef bool (*HashTableEnumerationHandler)
 );
 
 typedef enum eHashTableSortType {
-	HT_SORT_NUMERIC = 0,
-	HT_SORT_ALPHA   = 1
+	HT_SORT_NUMERIC  = HashTableBitFlag(1),
+	HT_SORT_ALPHA    = HashTableBitFlag(2)
 } HashTableSortType;
 
 typedef enum eHashTableSortDirection {
-	HT_SORT_ASCENDING  = 0,
-	HT_SORT_DESCENDING = 1
+	HT_SORT_ASCENDING  = HashTableBitFlag(1),
+	HT_SORT_DESCENDING = HashTableBitFlag(2)
 } HashTableSortDirection;
 
 typedef HashTableItem (*HashTableSortHandler)
@@ -139,7 +139,8 @@ extern HashTable NewHashTable
 extern void OptimizeHashTable
 (
 	HashTable hashTable,
-	size_t slots
+	size_t slots,
+	size_t references
 );
 
 extern HashTable DestroyHashTable
@@ -156,6 +157,16 @@ void HashTableRegisterEvents
 
 /* Statistics */
 // =============================================================================
+
+size_t HashTableItemsUsed
+(
+	HashTable hashTable
+);
+
+size_t HashTableItemsMax
+(
+	HashTable hashTable
+);
 
 extern size_t HashTableSlotCount
 (
@@ -177,12 +188,32 @@ extern size_t HashTableImpact
 	HashTable hashTable
 );
 
-extern size_t HashTableDistribution
+HashTableItem HashTableHasKey
 (
 	HashTable hashTable,
 	size_t keyLength,
 	double key,
 	HashTableItemFlags hint
+);
+
+extern size_t HashTableKeyDistribution
+(
+	HashTable hashTable,
+	size_t keyLength,
+	double key,
+	HashTableItemFlags hint
+);
+
+bool HashTableHasItem
+(
+	HashTable hashTable,
+	HashTableItem reference
+);
+
+size_t HashTableItemDistribution
+(
+	HashTable hashTable,
+	HashTableItem reference
 );
 
 size_t HashTableItemHits
