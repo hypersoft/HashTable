@@ -20,8 +20,8 @@ void != echo >&2;
 # disable MakeStats notice
 BUILD_STATS_NOTICE=FALSE
 
-# enable MakeStats auto commit; Warning noisy commit history!
-BUILD_STATS_AUTO_COMMIT ?= TRUE
+# enable MakeStats auto commit; do not commit, just add the file to next commit
+BUILD_STATS_AUTO_COMMIT ?= add
 
 BUILD_FLAGS += \
 -DBUILD_VERSION_VENDOR='"$(BUILD_VENDOR)"' \
