@@ -492,7 +492,7 @@ HashTableItem HashTableGet
 	HashTableRecord item = htFindKey(ht, keyLength, realKey);
 	htReturnIfKeyNotFound(item);
 
-	if (ht->events & HT_EVENT_CONSTRUCTED && ht->eventHandler)
+	if (ht->events & HT_EVENT_GET && ht->eventHandler)
 		return ht->eventHandler(
 			ht, HT_EVENT_GET,
 			htRecordReference(item),
