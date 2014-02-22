@@ -3,12 +3,57 @@
 
 #include <stdio.h>
 
-void htStats(HashTable ht) {
+void htItemReport(HashTable ht, HashTableItem item) {
+	HashTableItemFlags keyFlags = HashTableItemKeyConfiguration(ht, item);
+	if (keyFlags & HTI_UTF8) {
+		printf("\tItem Reference: %i\n", item);
+		printf("\tItem Key Type: UTF8\n");
+		printf("\tItem Key Length: %i + (1 null) bytes\n",
+			HashTableItemKeyLength(ht, item)
+		);
+		printf("\tItem Key Value: %s\n", HashTableItemKey(ht, item));
+	}
+	puts("");
+}
+
+HashTableItem htEventCallBack
+(
+	HashTable ht,
+	HashTableEvent event,
+	HashTableItem item,
+	void * private
+) {
+	if (event == HT_EVENT_CONSTRUCTED) {
+		printf("New HashTable (%p) constructed\n", ht);
+	} else if (event == HT_EVENT_PUT) {
+		printf("HashTable (%p) requesting put item:\n\n", ht);
+		htItemReport(ht, item);
+		return true;
+	} else if (event == HT_EVENT_DESTRUCTING) {
+		printf("Destroying HashTable (%p)\n", ht);
+	}
+	return item;
+}
+
+bool htEnumerationCallBack
+(
+	void * hashTable,
+	HashTableEnumerateDirection direction,
+	HashTableItem item,
+	void * private
+) {
+	printf("Enumerating Item Reference: %i\n", item);
+	return true;
+}
+
+void DumpHashTableStats(HashTable ht) {
 	printf(
-		"Size: %i slots\n"
-		"Impact: %i bytes\n"
-		"Load: %g%%\n",
+		"HashTable Slot Count: %i slots\n"
+		"HashTable Slots Used: %i slots\n"
+		"HashTable Impact: %i bytes\n"
+		"HashTable Load: %.1g%%\n\n",
 		HashTableSlotCount(ht),
+		HashTableSlotsUsed(ht),
 		HashTableImpact(ht),
 		HashTableLoadFactor(ht)
 	);
@@ -16,15 +61,39 @@ void htStats(HashTable ht) {
 
 int main ( int argc, char **argv )
 {
-	HashTable x = NewHashTable(8, 0, NULL, NULL);
-	char * name = "this.value";
-	HashTableItem result = HashTablePut(x, htStr(name), htStr("unlimited"));
-	printf("Initial record index: %i\n", result);
-	result = HashTableGet(x, htStr(name));
-	printf("Retrieved record index: %i\n", result);
-	result = HashTableDistribution(x, htStr(name));
-	printf("Initial record distribution: %i\n", result);
-	htStats(x);
-	DestroyHashTable(x);
+
+	puts("");
+
+	HashTable x = NewHashTable(0,
+		HT_EVENT_CONSTRUCTED | HT_EVENT_DESTRUCTING |
+		HT_EVENT_PUT,
+		htEventCallBack, NULL
+	);
+
+	puts("");
+
+	HashTableItem first = HashTablePut(
+		x, htStr("First Item"), htStr("My first item")
+	);
+
+	HashTableItem second = HashTablePut(
+		x, htStr("Second Item"), htStr("My second item")
+	);
+
+	puts("Enumerate forwards");
+	HashTableEnumerate(x, HT_ENUMERATE_FORWARD, htEnumerationCallBack, NULL);
+	puts("");
+
+	puts("Enumerate backwards");
+	HashTableEnumerate(x, HT_ENUMERATE_REVERSE, htEnumerationCallBack, NULL);
+	puts("");
+
+	DumpHashTableStats(x);
+
+	x = DestroyHashTable(x);
+
+	puts("");
+
 	return 0;
+
 }
