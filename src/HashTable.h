@@ -76,27 +76,27 @@ typedef bool (*HashTableEnumerationHandler)
 	void * private
 );
 
-typedef enum eHashTableRecordFlags {
-	HTR_INT              = HashTableBitFlag(1),
-	HTR_DOUBLE           = HashTableBitFlag(2),
-	HTR_POINTER          = HashTableBitFlag(3),
-	HTR_UTF8             = HashTableBitFlag(4),
-	HTR_BLOCK            = HashTableBitFlag(5),
-	HTR_NON_ENUMERABLE   = HashTableBitFlag(6),
-	HTR_NON_WRITABLE     = HashTableBitFlag(7),
-	HTR_NON_CONFIGURABLE = HashTableBitFlag(8),
+typedef enum eHashTableItemFlags {
+	HTI_INT              = HashTableBitFlag(1),
+	HTI_DOUBLE           = HashTableBitFlag(2),
+	HTI_POINTER          = HashTableBitFlag(3),
+	HTI_UTF8             = HashTableBitFlag(4),
+	HTI_BLOCK            = HashTableBitFlag(5),
+	HTI_NON_ENUMERABLE   = HashTableBitFlag(6),
+	HTI_NON_WRITABLE     = HashTableBitFlag(7),
+	HTI_NON_CONFIGURABLE = HashTableBitFlag(8),
 } HashTableItemFlags;
 
 /* cast integer things to double */
 #define htIntVal(i) ((double)(uint)(i))
 
 /* Quick value parameter generators */
-#define htInt(i) sizeof(uint), htIntVal(i), HTR_INT
-#define htPtr(p) sizeof(void *), htIntVal(p), HTR_POINTER
-#define htDbl(d) sizeof(double), d, HTR_DOUBLE
-#define htStr(s) 0, htIntVal(s), HTR_UTF8
-#define htBlk(p, s) s, htIntVal((void*)p), HTR_BLOCK
-#define htStrN(s, l) l, htIntVal(s), HTR_UTF8
+#define htInt(i) sizeof(uint), htIntVal(i), HTI_INT
+#define htPtr(p) sizeof(void *), htIntVal(p), HTI_POINTER
+#define htDbl(d) sizeof(double), d, HTI_DOUBLE
+#define htStr(s) 0, htIntVal(s), HTI_UTF8
+#define htBlk(p, s) s, htIntVal((void*)p), HTI_BLOCK
+#define htStrN(s, l) l, htIntVal(s), HTI_UTF8
 
 #ifdef HashTable_c
 

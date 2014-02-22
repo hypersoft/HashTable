@@ -105,12 +105,12 @@ typedef struct sHashTable {
 	if ( ! (i) ) { errno = HT_ERROR_KEY_NOT_FOUND; return 0; }
 
 #define htReturnIfNotWritableItem(i) \
-if (htRecordConfiguration(i) & HTR_NON_WRITABLE) { \
+if (htRecordConfiguration(i) & HTI_NON_WRITABLE) { \
 	errno = HT_ERROR_NOT_WRITABLE_ITEM; return 0; \
 }
 
 #define htReturnIfNotConfigurableItem(i) \
-if (htRecordConfiguration(i) & HTR_NON_CONFIGURABLE) { \
+if (htRecordConfiguration(i) & HTI_NON_CONFIGURABLE) { \
 	errno = HT_ERROR_NOT_CONFIGURABLE_ITEM; return 0; \
 }
 
@@ -136,10 +136,10 @@ if (htRecordConfiguration(i) & HTR_NON_CONFIGURABLE) { \
 
 /* scan UTF strings for length if not supplied, and return FAIL if empty */
 #define __htKeyLength(l, v, h) if ( ! l ) { \
-	if (h & HTR_UTF8) l = strlen(ptrVar(v)); \
+	if (h & HTI_UTF8) l = strlen(ptrVar(v)); \
 }
 
-#define htRealKey(l, v, h) (h & HTR_DOUBLE)?&v:ptrVar(v); __htKeyLength(l, v, h)
+#define htRealKey(l, v, h) (h & HTI_DOUBLE)?&v:ptrVar(v); __htKeyLength(l, v, h)
 
 #define htCompareRecordToRealKey(e, l, k) \
 	(varlen(e->key) == l) && (memcmp(e->key, k, l) == 0)
@@ -400,7 +400,7 @@ HashTableItem HashTablePut
 	htReturnIfZeroLengthKey(keyLength);
 
 	if (!valueLength) {
-		if (valueHint & HTR_UTF8) valueLength = strlen(ptrVar(value));
+		if (valueHint & HTI_UTF8) valueLength = strlen(ptrVar(value));
 	}
 
 	size_t index = htKeyHash(ht, keyLength, realKey);
@@ -512,20 +512,20 @@ void HashTableEnumerate
 	if (direction == HT_ENUMERATE_FORWARD) {
 		for (index = 0; index < maximum; index++) {
 			item = ht->item[index];
-			if (item && ! (htRecordConfiguration(item) & HTR_NON_ENUMERABLE)) {
+			if (item && ! (htRecordConfiguration(item) & HTI_NON_ENUMERABLE)) {
 				if ( ! handler(ht, direction, index, private) ) break;
 			}
 		}
 	} else {
 		for (index = (maximum - 1); index != 0; index--) {
 			item = ht->item[index];
-			if (item && ! (htRecordConfiguration(item) & HTR_NON_ENUMERABLE)) {
+			if (item && ! (htRecordConfiguration(item) & HTI_NON_ENUMERABLE)) {
 				if ( ! handler(ht, direction, index, private) ) break;
 			}
 		}
 		/* manually enumerate the last item (0) */
 		item = ht->item[0];
-		if (item && ! (htRecordConfiguration(item) & HTR_NON_ENUMERABLE)) {
+		if (item && ! (htRecordConfiguration(item) & HTI_NON_ENUMERABLE)) {
 			if ( ! handler(ht, direction, index, private) ) break;
 		}
 	}
