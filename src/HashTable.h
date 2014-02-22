@@ -163,6 +163,11 @@ size_t HashTableItemsUsed
 	HashTable hashTable
 );
 
+size_t HashTableItemsTotal
+(
+	HashTable hashTable
+);
+
 size_t HashTableItemsMax
 (
 	HashTable hashTable

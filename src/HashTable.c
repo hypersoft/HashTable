@@ -333,6 +333,14 @@ size_t HashTableItemsUsed
 	return ht->itemsUsed;
 }
 
+size_t HashTableItemsTotal
+(
+	HashTable ht
+) {
+	htReturnIfTableUninitialized(ht);
+	return ht->itemsTotal;
+}
+
 size_t HashTableItemsMax
 (
 	HashTable ht
