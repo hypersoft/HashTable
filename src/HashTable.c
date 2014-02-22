@@ -120,7 +120,7 @@ if (htRecordConfiguration(i) & HTI_NON_CONFIGURABLE) { \
 #define htValidateReference(ht, r) \
 	htReturnIfTableUninitialized(ht); \
 	htReturnIfInvalidReference(ht, r); \
-	htReturnIfItemNotFound(ht->item[r])
+	htReturnIfItemNotFound(ht->item[--r])
 
 /* for these inlines: d should be volatile; re: optimization issues */
 #define htDblIsNaN(d) (d != d)
@@ -511,6 +511,7 @@ bool HashTableDeleteItem
 
 }
 
+#include <stdio.h>
 const void * HashTableItemKey
 (
 	HashTable ht,
