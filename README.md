@@ -29,7 +29,7 @@ also supports binary keys and data of arbitrary lengths.
 *  Descriptive Error Retrieval
 *  Enumeration Call Back Interface with Forward and Reverse Function
 *  Manual Enumeration via Probing
-*  Item Access by Item Reference or Key
+*  Item Access via Item Reference or Key
 *  Call Back Events: Construct, Deconstruct, Put, Get, and Delete
 *  Enumerable, Writable and Configurable Item Properties (ECMAScript Like)
 *  Arbitrary Binary Key +/ Data (UTF-8, Integer, Double, Pointer, and Block
