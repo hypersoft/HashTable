@@ -27,8 +27,8 @@ also supports binary keys and data of arbitrary lengths.
 *  Selective User Algorithm Based Sorting Call Backs
 *  Error Reporting Using Function Return Sentinels + `errno`
 *  Descriptive Error Retrieval
-*  Automated Item Enumeration in Forward and Reverse
-*  Manual Enumeration Capable
+*  Enumeration Call Back Interface with Forward and Reverse Function
+*  Manual Enumeration via Probing
 *  Item Access by Item Reference or Key
 *  Call Back Events: Construct, Deconstruct, Put, Get, and Delete
 *  Enumerable, Writable and Configurable Item Properties (ECMAScript Like)
