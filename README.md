@@ -1,8 +1,6 @@
 HashTable
 =========
 
-Breakfast is served.
-
 [Wikipedia Description of Hash Table](http://en.wikipedia.org/wiki/Hash_table)
 
 In computing, a hash table (also hash map) is a data structure used to implement
@@ -31,7 +29,7 @@ also supports binary keys and data of arbitrary lengths.
 *  Item Access by Item Reference or Key
 *  Descriptive Error Retrieval
 *  Call Back Events: Construct, Deconstruct, Put, Get, and Delete
-*  Arbitrary Binary Key +/ Data (UTF-8, Integer, Double, Pointer, and Block)
+*  Arbitrary Binary Key +/ Data (UTF-8, Integer, Double, Pointer, and Block
 *  Private Data Association
 *  Enumerable, Writable and Configurable Item Properties (ECMAScript Like)
 *  Load Factor Metering
@@ -39,6 +37,21 @@ also supports binary keys and data of arbitrary lengths.
 *  Jenkins' One At a Time Hashing
 
 ## Discussion
+
+### Make System
+The Makefile included with this project is specifically hand crafted for Unix
+Likes featuring the GNU Make tool. If your system does not have a POSIX shell
+layer, it is highly recommended that you should acquire one. Not only is the
+Makefile hand crafted, it features automated source code revision number
+tracking using Hypersoft Systems' MakeStats, which is an invaluable addition,
+for portable and robust runtime binary compatibility resolution.
+
+### Hypersoft Systems HyperVariant
+Binary data storage for items is achieved by employing the HyperVariant library
+as a static dependency. If you have HyperVariant installed locally, you will
+need to hand hack the Makefile to achieve system level linkage. HyperVariant in
+and of itself, is not a HUGE dependency, in light of this fact static linking
+is the recommended method of implementation.
 
 ### Binary/String Key Mixing
 Upon putting an entry into a hash table, both key and value are copied into
@@ -53,3 +66,15 @@ It is not advisable to employ binary keys with string keys in the same table.
 This equates most apparently to the end user, as two different representations,
 of the same value. Private data can be used to store a composite set of user
 managed key-value-pairs if need be.
+
+### Questions, Comments, Suggestions Networking and Donations
+By all means, feel free to make contributions to this project, as well as,
+inquire about your development issues. You can reach the maintainer
+[here](mailto:pc.wiz.tt@gmail.com) or if you feel like going social
+[here](https://facebook.com/pc.wiz.tt). This project is beyond low budget, and
+has taken significant resources in time, talent, experience, and equipment to
+produce. The maintainer is NOT a hobbyist; He is a full-time self-employed
+Software Engineer who could greatly use more than a free beer. Should you find
+this project to be of any commercial use to you, any level of
+[financial re-imbursement](https://paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DG3H6F8DSG4BC)
+would be prudent.
