@@ -488,34 +488,6 @@ bool HashTableDeleteItem
 
 }
 
-HashTableItemFlags HashTableItemGetFlags
-(
-	HashTable ht,
-	HashTableItem reference
-) {
-	htItemAccess(ht, reference, item, vartype(item->value));
-}
-
-bool HashTableItemPutFlags
-(
-	HashTable ht,
-	HashTableItem reference,
-	HashTableItemFlags settings
-) {
-	htReturnIfTableUninitialized(ht);
-	htReturnIfInvalidReference(ht, reference);
-	HashTableRecord item = ht->item[reference];
-	htReturnIfItemNotFound(item);
-	htReturnIfNotConfigurableItem(item);
-	/*
-	 we don't particularly use these flags, but to avoid future collision
-	 disallow setting them...
-	 */
-	settings |= ~(HTR_INT | HTR_DOUBLE | HTR_POINTER | HTR_UTF8 | HTR_BLOCK);
-	vartype(item->value) |= settings;
-	return true;
-}
-
 const void * HashTableItemGetValue
 (
 	HashTable ht,

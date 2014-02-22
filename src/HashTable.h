@@ -235,19 +235,6 @@ HashTableItemFlags HashTableItemGetFlags
 	HashTableItem reference
 );
 
-bool HashTableItemPutFlags
-(
-	HashTable hashTable,
-	HashTableItem reference,
-	HashTableItemFlags settings
-);
-
-const void * HashTableItemGetValue
-(
-	HashTable hashTable,
-	HashTableItem reference
-);
-
 #endif
 
 #endif /* HashTable_h */
