@@ -14,20 +14,29 @@ which the correct value can be found.
 ## Overview
 
 This library written in 100% C is an implementation of hash table featuring
-separate chaining with linked lists. It supports binary keys and data of
-arbitrary length.
+separate chaining with linked lists and guaranteed logical order enumeration. It
+also supports binary keys and data of arbitrary lengths.
 
 * Maintainer: [Triston J. Taylor](http://github.com/hypersoft)
+* License: BSD 2-Clause
 * Version Tracking: [Hypersoft MakeStats](http://github.com/hypersoft/MakeStats)
-* Operating System: Unix Like
-* Platform Architecture: Any C compatible system (support work may be required)
+* Source Code Platform: Any
+* Documentation: HTML with Hierarchical Image Map Navigation
 
-Convenience procedures are provided to facilitate common value profiles such as:
+## Notable Feature List
 
-*  UTF-8 String (ANSI C String)
-*  Integer
-*  Double
-*  Pointer
+*  Error Reporting Using Function Return Sentinels + `errno`
+*  Automated Item Enumeration in Forward and Reverse
+*  Manual Enumeration Capable
+*  Item Access by Item Reference or Key
+*  Descriptive Error Retrieval
+*  Call Back Events: Construct, Deconstruct, Put, Get, and Delete
+*  Arbitrary Binary Key +/ Data (UTF-8, Integer, Double, Pointer, and Block)
+*  Private Data Association
+*  Enumerable, Writable and Configurable Item Properties (ECMAScript Like)
+*  Load Factor Metering
+*  Item Access Hit Counter
+*  Jenkins' One At a Time Hashing
 
 ## Discussion
 
