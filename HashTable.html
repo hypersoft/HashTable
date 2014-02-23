@@ -271,17 +271,17 @@ void HashTableRegisterEvents(HashTable ht, HashTableEvent withEvents, HashTableE
 <li><span class='vym-branch2'  id='mc:0,bo:0,bo:12'>Statistics</span><ul>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:12,bo:0'>HashTableItemsUsed</span>
 <table class="vym-note"><tr><td>
-size_t HashTableItemsUsed<br/>(<br/>	HashTable ht<br/>)<br/><br/>Returns the number of item references currently dispatched. This number includes items which have been deleted.<br/>
+size_t HashTableItemsUsed(HashTable ht)<br/><br/>Returns the number of item references currently dispatched. This number includes items which have been deleted.<br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:12,bo:1'>HashTableItemsTotal</span>
 <table class="vym-note"><tr><td>
-size_t HashTableItemsTotal<br/>(<br/>	HashTable ht<br/>)<br/><br/>Returns the current number of valid item references.<br/>
+size_t HashTableItemsTotal(HashTable ht)<br/><br/>Returns the current number of valid item references.<br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:12,bo:2'>HashTableItemsMax</span>
 <table class="vym-note"><tr><td>
-size_t HashTableItemsMax<br/>(<br/>	HashTable hashTable<br/>)<br/><br/>Returns the current maximum number of item references. The maximum number of item references grows as needed. This procedure is provided mostly for instrumentation purposes.<br/>
+size_t HashTableItemsMax(HashTable hashTable)<br/><br/>Returns the current maximum number of item references. The maximum number of item references grows as needed. This procedure is provided mostly for instrumentation purposes.<br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:12,bo:3'>HashTableSlotCount</span>
@@ -306,17 +306,17 @@ size_t HashTableImpact(HashTable ht)<br/><br/>Get report on how many logical byt
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:12,bo:7'>HashTableHasKey</span>
 <table class="vym-note"><tr><td>
-HashTableItem HashTableHasKey<br/>(<br/>	HashTable hashTable,<br/>	size_t keyLength,<br/>	double key,<br/>	HashTableItemFlags hint<br/>)<br/><br/>This procedure works mostly like HashTableGet, except it does not raise events, and will not throw an error if the key is not found.<br/><br/>Technically the return type for this procedure is bool, however to save API calls, it actually returns the item reference if the key is found due to the fact that item references are factually boolean return values.<br/>
+HashTableItem HashTableHasKey(HashTable hashTable, size_t keyLength, double key, HashTableItemFlags hint)<br/><br/>This procedure works mostly like HashTableGet, except it does not raise events, and will not throw an error if the key is not found.<br/><br/>Technically the return type for this procedure is bool, however to save API calls, it actually returns the item reference if the key is found due to the fact that item references are factually boolean return values.<br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:12,bo:8'>HashTableHasItem</span>
 <table class="vym-note"><tr><td>
-bool HashTableHasItem<br/>(<br/>	HashTable hashTable,<br/>	HashTableItem reference<br/>)<br/><br/>This procedure checks to see if the reference is in range and if the reference is non-null. Only throws an error if the hash table is uninitialized.<br/><br/>Use this procedure to perform manual enumerations and sorting decisions based on reference existence.<br/>
+bool HashTableHasItem(HashTable hashTable, HashTableItem reference)<br/><br/>This procedure checks to see if the reference is in range and if the reference is non-null. Only throws an error if the hash table is uninitialized.<br/><br/>Use this procedure to perform manual enumerations and sorting decisions based on reference existence.<br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:12,bo:9'>HashTableItemDistribution</span>
 <table class="vym-note"><tr><td>
-size_t HashTableItemDistribution<br/>(<br/>	HashTable hashTable,<br/>	HashTableItem reference<br/>)<br/><br/>Generate a report on how many entries are associated with an item's hash.
+size_t HashTableItemDistribution(HashTable hashTable, HashTableItem reference)<br/><br/>Generate a report on how many entries are associated with an item's hash.<br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:12,bo:10'>HashTableItemHits</span>
@@ -374,7 +374,7 @@ HashTableItemFlags HashTableItemKeyType(HashTable hashTable, HashTableItem refer
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:8'>HashTableItemKeyConfiguration</span>
 <table class="vym-note"><tr><td>
-HashTableItemFlags HashTableItemKeyConfiguration<br/>(<br/>	HashTable hashTable,<br/>	HashTableItem reference<br/>)<br/>
+HashTableItemFlags HashTableItemKeyConfiguration(HashTable hashTable, HashTableItem reference)<br/><br/>Retrieve all of an item key's configuration flags.<br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:9'>HashTableItemValue</span>
@@ -394,37 +394,37 @@ HashTableItemFlags HashTableItemValueType(HashTable hashTable, HashTableItem ref
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:12'>HashTableItemValueConfiguration</span>
 <table class="vym-note"><tr><td>
-HashTableItemFlags HashTableItemValueConfiguration<br/>(<br/>	HashTable hashTable,<br/>	HashTableItem reference<br/>)<br/>
+HashTableItemFlags HashTableItemValueConfiguration(HashTable hashTable, HashTableItem reference)<br/><br/>Retrieve all configuration flags for an item value.<br/><br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:13'>HashTableItemGetEnumerable</span>
 <table class="vym-note"><tr><td>
-bool HashTableItemGetEnumerable<br/>(<br/>	HashTable hashTable,<br/>	HashTableItem reference<br/>)<br/>
+bool HashTableItemGetEnumerable(HashTable hashTable, HashTableItem reference)<br/><br/>Get the item's enumerable flag.<br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:14'>HashTableItemSetEnumerable</span>
 <table class="vym-note"><tr><td>
-bool HashTableItemSetEnumerable<br/>(<br/>	HashTable hashTable,<br/>	HashTableItem reference,<br/>	bool value<br/>)<br/>
+bool HashTableItemSetEnumerable(HashTable hashTable, HashTableItem reference, bool value)<br/><br/>If the item is configurable, set the item's enumerable flag to value.<br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:15'>HashTableItemGetWriteable</span>
 <table class="vym-note"><tr><td>
-bool HashTableItemGetWritable<br/>(<br/>	HashTable hashTable,<br/>	HashTableItem reference<br/>)<br/>
+bool HashTableItemGetWritable(HashTable hashTable, HashTableItem reference)<br/><br/>Get the item's writable flag.<br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:16'>HashTableItemSetWritable</span>
 <table class="vym-note"><tr><td>
-bool HashTableItemSetWritable<br/>(<br/>	HashTable hashTable,<br/>	HashTableItem reference,<br/>	bool value<br/>)<br/>
+bool HashTableItemSetWritable(HashTable hashTable, HashTableItem reference, bool value)<br/><br/>If the item is configurable, set the item's writable flag to value.<br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:17'>HashTableItemGetConfigurable</span>
 <table class="vym-note"><tr><td>
-bool HashTableItemGetConfigurable<br/>(<br/>	HashTable hashTable,<br/>	HashTableItem reference<br/>)<br/>
+bool HashTableItemGetConfigurable(HashTable hashTable, HashTableItem reference)<br/><br/>Get the item's configurable flag.<br/><br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:13,bo:18'>HashTableItemSetConfigurable</span>
 <table class="vym-note"><tr><td>
-bool HashTableItemSetConfigurable<br/>(<br/>	HashTable hashTable,<br/>	HashTableItem reference,<br/>	bool value<br/>)<br/>
+bool HashTableItemSetConfigurable(HashTable hashTable, HashTableItem reference, bool value)<br/><br/>If the item is configurable, set the configurable flag to value.<br/>
 </td></tr></table>
 </li>
 </ul>
@@ -442,7 +442,7 @@ void HashTableSortItems(HashTable hashTable, HashTableSortType type, HashTableSo
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:14,bo:2'>HashTableSortItemHash</span>
 <table class="vym-note"><tr><td>
-void HashTableSortItemHash(HashTable hashTable, HashTableItem reference, HashTableSortType type, HashTableSortDirection direction, HashTableSortHandler sortHandler, void * private)<br/><br/>Perform user defined sorting on an items's hash slot.<br/><br/><br/>
+void HashTableSortItemHash(HashTable hashTable, HashTableItem reference, HashTableSortType type, HashTableSortDirection direction, HashTableSortHandler sortHandler, void * private)<br/><br/>Perform user defined sorting on an items's hash slot.<br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch3'  id='mc:0,bo:0,bo:14,bo:3'>HashTableEnumerateItemHash</span>
