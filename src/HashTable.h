@@ -80,8 +80,9 @@ typedef bool (*HashTableEnumerationHandler)
 );
 
 typedef enum eHashTableSortType {
-	HT_SORT_NUMERIC  = HashTableBitFlag(1),
-	HT_SORT_ALPHA    = HashTableBitFlag(2)
+	HT_SORT_NUMERIC     = HashTableBitFlag(1),
+	HT_SORT_ALPHA       = HashTableBitFlag(2),
+	HT_SORT_EMPTY_ITEMS = HashTableBitFlag(3)
 } HashTableSortType;
 
 typedef enum eHashTableSortDirection {

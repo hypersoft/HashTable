@@ -792,6 +792,7 @@ void HashTableSortItems
 	void * private
 ) {
 	htVoidIfTableUninitialized(ht);
+	if (! sortHandler ) { errno = HT_ERROR_UNSUPPORTED_FUNCTION; return; }
 
 	if (ht->itemsMax < 2) return;
 
@@ -803,7 +804,9 @@ void HashTableSortItems
 	HashTableRecord secondaryRecord;
 
 	for (primary = 0; primary < maximum; primary++) {
+		if (! ht->item[primary] && ! type & HT_SORT_EMPTY_ITEMS) continue;
 		for (secondary = primary + 1; secondary < maximum; secondary++) {
+			if (! ht->item[secondary] && ! type & HT_SORT_EMPTY_ITEMS) continue;
 			selection = sortHandler(
 				ht, type, direction, primary+1, secondary+1, NULL
 			);
@@ -834,35 +837,40 @@ void HashTableSortItemHash
 	HashTableSortHandler sortHandler,
 	void * private
 ) {
+
 	htVoidValidateReference(ht, reference);
+	if (! sortHandler ) { errno = HT_ERROR_UNSUPPORTED_FUNCTION; return; }
 	HashTableRecord item = ht->item[reference];
 	size_t maximum = 0, index = 0, recordHash = htRecordHash(item);
 	item = ht->slot[recordHash];
 	while (item) maximum++, item = item->successor;
-	if (maximum < 2) return;
-	HashTableRecord array[maximum];
+	HashTableRecord array[maximum+1];
+	array[maximum] = NULL;
 	item = ht->slot[recordHash];
 	while (item) array[index++] = item, item = item->successor;
 
-	HashTableItem primary, secondary, selection;
-	HashTableItem realPrimary, realSecondary;
+	HashTableItem primary, secondary;
 	for (primary = 0; primary < maximum; primary++) {
 		for (secondary = primary + 1; secondary < maximum; secondary++) {
-			realPrimary = htRecordReference(array[primary]),
-			realSecondary = htRecordReference(array[secondary]);
+			HashTableItem selection,
+			primaryRef = htRecordReference(array[primary]),
+			secondaryRef = htRecordReference(array[secondary]);
 			selection = sortHandler(
-				ht, type, direction, realPrimary, realSecondary, NULL
+				ht, type, direction, primaryRef--, secondaryRef--, NULL
 			);
-			if (! selection--) goto BuildItemLinks;
-			else if (selection == realSecondary){
-				array[secondary] = ht->item[realPrimary];
-				array[primary] = ht->item[realSecondary];
+			if (--selection == secondaryRef){
+				array[secondary] = ht->item[primaryRef];
+				array[primary] = ht->item[secondaryRef];
 			}
 		}
 	}
 
-BuildItemLinks:
-	for(index = 0; index < maximum;) array[index]->successor = array[++index];
+MakeLinkedList:
+
+	for (index = 0; index < maximum;)
+		array[index]->successor = array[++index];
+	ht->slot[recordHash] = array[0];
+
 }
 
 void HashTableEnumerateItemHash
