@@ -232,7 +232,7 @@ build-stats:
 	    "  Build Version: $$1.$$2.$$3" \
 	    "   Build Number: $$4" \
 	    "     Build Date: `date --date=@$$5`" \
-	    "     Build Name: $${@:7}" \
+	    "     Build Name: `echo -n $${@:7}`" \
 	);
 	@$(BUILD_STATS_AUTO_REPO_COMMIT)
 	@echo
