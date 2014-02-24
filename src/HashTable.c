@@ -73,6 +73,12 @@ const char * htErrorNotWritableItem = \
 const char * htErrorNotConfigurableItem = \
 "The request could not be completed because the item is non-configurable";
 
+const char * htErrorNoCallBackHandler = \
+"The request could not be completed becuase the call back handler is undefined";
+
+const char * htErrorInvalidTypeRequest = \
+	"The request could not be completed because of a type error";
+
 typedef struct sHashTableRecord {
 	size_t hitCount;
 	HyperVariant key;
@@ -177,6 +183,9 @@ if (! (ht->item[--reference])) { \
 #define htRecordImpact(r) ( \
 	(varimpact(r->key)) + (varimpact(r->value)) + (HashTableRecordSize) \
 )
+
+#define htReturnVoidIfNoCallBackHandler(handler) \
+	if (! (handler) ) { errno = HT_ERROR_NO_CALLBACK_HANDLER; return; }
 
 /* Jenkins' "One At a Time Hash" === Perl "Like" Hashing */
 inline static size_t htCreateHash (size_t length, char * realKey)
@@ -300,7 +309,7 @@ HashTable DestroyHashTable
 ) {
 	htReturnIfTableUninitialized(ht);
 
-	if (ht->events & HT_EVENT_CONSTRUCTED && ht->eventHandler)
+	if (ht->events & HT_EVENT_DESTRUCTING && ht->eventHandler)
 		(void) ht->eventHandler(ht, HT_EVENT_DESTRUCTING, 0, ht->private);
 
 	size_t item = 0, length = ht->itemsMax; HashTableRecord target = NULL;
@@ -567,7 +576,7 @@ bool HashTableDeleteItem
 	HashTableRecord item = ht->item[reference];
 	htReturnIfNotConfigurableItem(item);
 
-	if (ht->events & HT_EVENT_CONSTRUCTED && ht->eventHandler) {
+	if (ht->events & HT_EVENT_DELETE && ht->eventHandler) {
 		if (! ht->eventHandler(ht, HT_EVENT_DELETE, reference+1, ht->private) )
 			return false;
 	}
@@ -756,7 +765,8 @@ void HashTableEnumerate
 	void * private
 ) {
 	htVoidIfTableUninitialized(ht);
-	if (! handler ) { errno = HT_ERROR_UNSUPPORTED_FUNCTION; return; }
+	htReturnVoidIfNoCallBackHandler(handler);
+
 	size_t index, maximum = ht->itemsMax;
 	HashTableRecord item;
 	if (! maximum ) return;
@@ -792,7 +802,7 @@ void HashTableSortItems
 	void * private
 ) {
 	htVoidIfTableUninitialized(ht);
-	if (! sortHandler ) { errno = HT_ERROR_UNSUPPORTED_FUNCTION; return; }
+	htReturnVoidIfNoCallBackHandler(sortHandler);
 
 	if (ht->itemsMax < 2) return;
 
@@ -839,7 +849,8 @@ void HashTableSortItemHash
 ) {
 
 	htVoidValidateReference(ht, reference);
-	if (! sortHandler ) { errno = HT_ERROR_UNSUPPORTED_FUNCTION; return; }
+	htReturnVoidIfNoCallBackHandler(sortHandler);
+
 	HashTableRecord item = ht->item[reference];
 	size_t maximum = 0, index = 0, recordHash = htRecordHash(item);
 	item = ht->slot[recordHash];
@@ -882,7 +893,7 @@ void HashTableEnumerateItemHash
 	void * private
 ) {
 	htVoidValidateReference(ht, reference);
-	if (! handler ) { errno = HT_ERROR_UNSUPPORTED_FUNCTION; return; }
+	htReturnVoidIfNoCallBackHandler(handler);
 
 	HashTableRecord item = ht->item[reference];
 	size_t maximum = 0, index = 0, recordHash = htRecordHash(item);
@@ -940,5 +951,9 @@ const char * HashTableErrorMessage
 		return htErrorNotWritableItem;
 	else if (err == HT_ERROR_NOT_CONFIGURABLE_ITEM)
 		return htErrorNotConfigurableItem;
+	else if (err == HT_ERROR_NO_CALLBACK_HANDLER)
+		return htErrorNoCallBackHandler;
+	else if (err == HT_ERROR_INVALID_TYPE_REQUEST)
+		return htErrorInvalidTypeRequest;
 	else return NULL;
 }
