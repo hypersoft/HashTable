@@ -816,7 +816,7 @@ void HashTableSortItems
 		for (secondary = primary + 1; secondary < maximum; secondary++) {
 			if (! ht->item[secondary] && ! type & HT_SORT_EMPTY_ITEMS) continue;
 			selection = sortHandler(
-				ht, type, direction, primary+1, secondary+1, NULL
+				ht, type, direction, primary+1, secondary+1, private
 			);
 			if (! selection--) goto BuildItemReferences;
 			else if (selection == secondary){
