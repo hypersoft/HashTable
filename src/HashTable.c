@@ -537,7 +537,7 @@ HashTableItem HashTablePut
 		return htRecordReference(this);
 	}
 
-	return 0;
+	return HT_ERROR_SENTINEL;
 
 }
 
@@ -953,5 +953,5 @@ const char * HashTableErrorMessage
 		return htErrorNoCallBackHandler;
 	else if (err == HT_ERROR_INVALID_TYPE_REQUEST)
 		return htErrorInvalidTypeRequest;
-	else return NULL;
+	else return HT_ERROR_SENTINEL;
 }
