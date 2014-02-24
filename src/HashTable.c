@@ -111,81 +111,77 @@ typedef struct sHashTable {
 #define HashTableSize sizeof(sHashTable)
 #define HashTable sHashTable *
 
-#define htReturnIfTableUninitialized(t) \
-	if ( ! (ht) ) { errno = HT_ERROR_TABLE_UNINITIALIZED; return 0; }
+#define HT_ERROR_SENTINEL 0
 
-#define htVoidIfTableUninitialized(t) \
-	if ( ! (ht) ) { errno = HT_ERROR_TABLE_UNINITIALIZED; return; }
+#define htReturnIfTableUninitialized(table)                                    \
+if ( ! (table) )                                                               \
+    { errno = HT_ERROR_TABLE_UNINITIALIZED; return HT_ERROR_SENTINEL; }
 
-#define htVoidUnsupportedFunction() \
-	errno = HT_ERROR_UNSUPPORTED_FUNCTION; return
+#define htReturnVoidIfTableUninitialized(table)                                \
+if ( ! (table) ) { errno = HT_ERROR_TABLE_UNINITIALIZED; return; }
 
-#define htReturnIfZeroLengthKey(l) \
-	if ( ! (l) ) { errno = HT_ERROR_ZERO_LENGTH_KEY; return 0; }
+#define htReturnVoidUnsupportedFunction()                                      \
+errno = HT_ERROR_UNSUPPORTED_FUNCTION; return
 
-#define htReturnIfAllocationFailure(p, ...) \
-	if ( ! (p) ) { errno = HT_ERROR_ALLOCATION_FAILURE; __VA_ARGS__; return 0; }
+#define htReturnIfZeroLengthKey(length)                                        \
+if ( ! (length) )                                                              \
+    { errno = HT_ERROR_ZERO_LENGTH_KEY; return HT_ERROR_SENTINEL; }
 
-#define htReturnIfInvalidReference(ht, r) \
-	if ( ! (r) || ht->itemsMax < r) { \
-		errno = HT_ERROR_INVALID_REFERENCE; return 0; \
+#define htReturnIfAllocationFailure(pointer, ...)                              \
+if ( ! (pointer) ) {                                                           \
+    errno = HT_ERROR_ALLOCATION_FAILURE;                                       \
+    __VA_ARGS__;                                                               \
+    return HT_ERROR_SENTINEL;                                                  \
 }
 
-#define htReturnIfKeyNotFound(i) \
-	if ( ! (i) ) { errno = HT_ERROR_KEY_NOT_FOUND; return 0; }
-
-#define htReturnIfNotWritableItem(i) \
-if (htRecordConfiguration(i) & HTI_NON_WRITABLE) { \
-	errno = HT_ERROR_NOT_WRITABLE_ITEM; return 0; \
+#define htReturnIfInvalidReference(table, reference)                           \
+htReturnIfTableUninitialized(table);                                           \
+if ( ! reference || ht->itemsMax < reference || ! ht->item[--reference]) {     \
+    errno = HT_ERROR_INVALID_REFERENCE; return HT_ERROR_SENTINEL;              \
 }
 
-#define htReturnIfNotConfigurableItem(i) \
-if (htRecordConfiguration(i) & HTI_NON_CONFIGURABLE) { \
-	errno = HT_ERROR_NOT_CONFIGURABLE_ITEM; return 0; \
+#define htReturnVoidIfInvalidReference(table, reference)                       \
+htReturnVoidIfTableUninitialized(table);                                       \
+if ( !reference || reference > table->itemsMax || !table->item[--reference]) { \
+    errno = HT_ERROR_INVALID_REFERENCE; return;                                \
 }
 
-#define htReturnIfItemNotFound(i) \
-	if ( ! (i) ) { errno = HT_ERROR_INVALID_REFERENCE; return 0; }
+#define htReturnVoidIfNoCallBackHandler(handler)                               \
+if (! (handler) ) { errno = HT_ERROR_NO_CALLBACK_HANDLER; return; }
 
-#define htValidateReference(ht, r) \
-	htReturnIfTableUninitialized(ht); \
-	htReturnIfInvalidReference(ht, r); \
-	htReturnIfItemNotFound(ht->item[--r])
+#define htReturnIfNotWritableItem(i)                                           \
+if (htRecordConfiguration(i) & HTI_NON_WRITABLE) {                             \
+    errno = HT_ERROR_NOT_WRITABLE_ITEM; return HT_ERROR_SENTINEL;              \
+}
 
-#define htVoidValidateReference(ht, reference) \
-if (! ht) { errno = HT_ERROR_TABLE_UNINITIALIZED; return; } \
-if (! (reference) || ht ->itemsMax < reference) { \
-	errno = HT_ERROR_INVALID_REFERENCE; return; \
-} \
-if (! (ht->item[--reference])) { \
-	errno = HT_ERROR_INVALID_REFERENCE; return; \
+#define htReturnIfNotConfigurableItem(i)                                       \
+if (htRecordConfiguration(i) & HTI_NON_CONFIGURABLE) {                         \
+    errno = HT_ERROR_NOT_CONFIGURABLE_ITEM; return HT_ERROR_SENTINEL;          \
 }
 
 /* for these inlines: d should be volatile; re: optimization issues */
 #define htDblIsNaN(d) (d != d)
-#define htDblInfinity(d) \
-	(((d == d) && ((d - d) != 0.0)) ? (d < 0.0 ? -1 : 1) : 0)
 
-#define htKeyHash(table, keyLength, realKey) \
-	( htCreateHash ( keyLength, realKey ) % (table->slotCount) )
+#define htDblInfinity(d)                                                       \
+(((d == d) && ((d - d) != 0.0)) ? (d < 0.0 ? -1 : 1) : 0)
 
-/* scan UTF strings for length if not supplied, and return FAIL if empty */
-#define __htKeyLength(l, v, h) if ( ! l ) { \
-	if (h & HTI_UTF8) l = strlen(ptrVar(v)); \
+#define htKeyHash(table, keyLength, realKey)                                   \
+( htCreateHash ( keyLength, realKey ) % (table->slotCount) )
+
+#define htRealKeyOrReturn(length, value, hint)                                 \
+(hint & HTI_DOUBLE)? &value : ptrVar(value);                                   \
+if ( ! length && (hint & HTI_UTF8)) length = strlen(ptrVar(value));            \
+if ( ! length ) {                                                              \
+    errno = HT_ERROR_ZERO_LENGTH_KEY; return HT_ERROR_SENTINEL;                \
 }
 
-#define htRealKey(l, v, h) (h & HTI_DOUBLE)?&v:ptrVar(v); __htKeyLength(l, v, h)
-
-#define htCompareRecordToRealKey(e, l, k) \
-	(varlen(e->key) == l) && (memcmp(e->key, k, l) == 0)
+#define htCompareRecordToRealKey(e, l, k)                                      \
+(varlen(e->key) == l) && (memcmp(e->key, k, l) == 0)
 
 /* I wouldn't call this on an incomplete record if I were you... */
-#define htRecordImpact(r) ( \
-	(varimpact(r->key)) + (varimpact(r->value)) + (HashTableRecordSize) \
+#define htRecordImpact(r) (                                                    \
+	(varimpact(r->key)) + (varimpact(r->value)) + (HashTableRecordSize)        \
 )
-
-#define htReturnVoidIfNoCallBackHandler(handler) \
-	if (! (handler) ) { errno = HT_ERROR_NO_CALLBACK_HANDLER; return; }
 
 /* Jenkins' "One At a Time Hash" === Perl "Like" Hashing */
 inline static size_t htCreateHash (size_t length, char * realKey)
@@ -206,6 +202,7 @@ inline static HashTableRecord htFindKeyWithParent (
 			return primary;
 		*parent = primary; primary = primary->successor;
 	}
+	errno = HT_ERROR_INVALID_REFERENCE;
 	return NULL;
 }
 
@@ -218,6 +215,7 @@ inline static HashTableRecord htFindKey (
 			return primary;
 		primary = primary->successor;
 	}
+	errno = HT_ERROR_INVALID_REFERENCE;
 	return NULL;
 }
 
@@ -297,10 +295,10 @@ void OptimizeHashTable
 	size_t slots,
 	size_t references
 ) {
-	htVoidIfTableUninitialized(ht);
+	htReturnVoidIfTableUninitialized(ht);
 	/* doesn't do anything yet */
 	slots+1;
-	htVoidUnsupportedFunction();
+	htReturnVoidUnsupportedFunction();
 }
 
 HashTable DestroyHashTable
@@ -329,7 +327,7 @@ void HashTableRegisterEvents
 	HashTableEvent withEvents,
 	HashTableEventHandler eventHandler
 ) {
-	htVoidIfTableUninitialized(ht);
+	htReturnVoidIfTableUninitialized(ht);
 	ht->events = withEvents;
 	if ( eventHandler ) ht->eventHandler = eventHandler;
 }
@@ -401,8 +399,8 @@ HashTableItem HashTableHasKey
 	HashTableItemFlags hint
 ) {
 	htReturnIfTableUninitialized(ht);
-	char * realKey = htRealKey(keyLength, key, hint);
-	htReturnIfZeroLengthKey(keyLength);
+	char * realKey = htRealKeyOrReturn(keyLength, key, hint);
+
 	HashTableRecord item = htFindKey(ht, keyLength, realKey);
 	if (item) return htRecordReference(item);
 	return 0;
@@ -423,7 +421,7 @@ size_t HashTableItemDistribution
 	HashTable ht,
 	HashTableItem reference
 ) {
-	htValidateReference(ht, reference);
+	htReturnIfInvalidReference(ht, reference);
 	register HashTableRecord child;
 	register size_t distribution = 0;
 	child = ht->slot[htRecordHash(ht->item[reference])];
@@ -436,7 +434,7 @@ size_t HashTableItemHits
 	HashTable ht,
 	HashTableItem reference
 ) {
-	htValidateReference(ht, reference);
+	htReturnIfInvalidReference(ht, reference);
 	return ht->item[reference]->hitCount;
 }
 
@@ -445,7 +443,7 @@ size_t HashTableItemImpact
 	HashTable ht,
 	HashTableItem reference
 ) {
-	htValidateReference(ht, reference);
+	htReturnIfInvalidReference(ht, reference);
 	return htRecordImpact(ht->item[reference]);
 }
 
@@ -479,8 +477,7 @@ HashTableItem HashTablePut
 
 	htReturnIfTableUninitialized(ht);
 
-	char * realKey = htRealKey(keyLength, key, keyHint);
-	htReturnIfZeroLengthKey(keyLength);
+	char * realKey = htRealKeyOrReturn(keyLength, key, keyHint);
 
 	if (!valueLength) {
 		if (valueHint & HTI_UTF8) valueLength = strlen(ptrVar(value));
@@ -551,12 +548,12 @@ HashTableItem HashTableGet
 	HashTableItemFlags hint
 ) {
 	htReturnIfTableUninitialized(ht);
-	char * realKey = htRealKey(keyLength, key, hint);
-	htReturnIfZeroLengthKey(keyLength);
-	HashTableRecord item = htFindKey(ht, keyLength, realKey);
-	htReturnIfKeyNotFound(item);
+	char * realKey = htRealKeyOrReturn(keyLength, key, hint);
 
-	if (ht->events & HT_EVENT_GET && ht->eventHandler)
+	HashTableRecord item;
+
+	if (! (item = htFindKey(ht, keyLength, realKey)) ) return HT_ERROR_SENTINEL;
+	else if (ht->events & HT_EVENT_GET && ht->eventHandler)
 		return ht->eventHandler(
 			ht, HT_EVENT_GET,
 			htRecordReference(item),
@@ -571,7 +568,7 @@ bool HashTableDeleteItem
 	HashTable ht,
 	HashTableItem reference
 ) {
-	htValidateReference(ht, reference);
+	htReturnIfInvalidReference(ht, reference);
 	HashTableRecord parent = NULL;
 	HashTableRecord item = ht->item[reference];
 	htReturnIfNotConfigurableItem(item);
@@ -604,7 +601,7 @@ const void * HashTableItemKey
 	HashTable ht,
 	HashTableItem reference
 ) {
-	htValidateReference(ht, reference);
+	htReturnIfInvalidReference(ht, reference);
 	return ht->item[reference]->key;
 }
 
@@ -613,7 +610,7 @@ size_t HashTableItemKeyLength
 	HashTable ht,
 	HashTableItem reference
 ) {
-	htValidateReference(ht, reference);
+	htReturnIfInvalidReference(ht, reference);
 	return varlen(ht->item[reference]->key);
 }
 
@@ -622,7 +619,7 @@ HashTableItemFlags HashTableItemKeyType
 	HashTable ht,
 	HashTableItem reference
 ) {
-	htValidateReference(ht, reference);
+	htReturnIfInvalidReference(ht, reference);
 	return (vartype(ht->item[reference]->key) &
 		(HTI_INT | HTI_DOUBLE | HTI_POINTER | HTI_BLOCK)
 	);
@@ -633,7 +630,7 @@ HashTableItemFlags HashTableItemKeyConfiguration
 	HashTable ht,
 	HashTableItem reference
 ) {
-	htValidateReference(ht, reference);
+	htReturnIfInvalidReference(ht, reference);
 	return vartype(ht->item[reference]->key);
 }
 
@@ -642,7 +639,7 @@ const void * HashTableItemValue
 	HashTable ht,
 	HashTableItem reference
 ) {
-	htValidateReference(ht, reference);
+	htReturnIfInvalidReference(ht, reference);
 	return ht->item[reference]->value;
 }
 
@@ -651,7 +648,7 @@ size_t HashTableItemValueLength
 	HashTable ht,
 	HashTableItem reference
 ) {
-	htValidateReference(ht, reference);
+	htReturnIfInvalidReference(ht, reference);
 	return varlen(ht->item[reference]->value);
 }
 
@@ -660,7 +657,7 @@ HashTableItemFlags HashTableItemValueType
 	HashTable ht,
 	HashTableItem reference
 ) {
-	htValidateReference(ht, reference);
+	htReturnIfInvalidReference(ht, reference);
 	return (vartype(ht->item[reference]->value) &
 		(HTI_INT | HTI_DOUBLE | HTI_POINTER | HTI_BLOCK)
 	);
@@ -671,7 +668,7 @@ HashTableItemFlags HashTableItemValueConfiguration
 	HashTable ht,
 	HashTableItem reference
 ) {
-	htValidateReference(ht, reference);
+	htReturnIfInvalidReference(ht, reference);
 	return vartype(ht->item[reference]->value);
 }
 
@@ -680,7 +677,7 @@ bool HashTableItemGetEnumerable
 	HashTable ht,
 	HashTableItem reference
 ) {
-	htValidateReference(ht, reference);
+	htReturnIfInvalidReference(ht, reference);
 	return \
 		(htRecordConfiguration(ht->item[reference]) & HTI_NON_ENUMERABLE) == 0;
 }
@@ -691,7 +688,7 @@ bool HashTableItemSetEnumerable
 	HashTableItem reference,
 	bool value
 ) {
-	htValidateReference(ht, reference);
+	htReturnIfInvalidReference(ht, reference);
 	HashTableRecord item = ht->item[reference];
 	htReturnIfNotConfigurableItem(item);
 	if (value) {
@@ -707,7 +704,7 @@ bool HashTableItemGetWritable
 	HashTable ht,
 	HashTableItem reference
 ) {
-	htValidateReference(ht, reference);
+	htReturnIfInvalidReference(ht, reference);
 	return \
 		(htRecordConfiguration(ht->item[reference]) & HTI_NON_WRITABLE) == 0;
 }
@@ -718,7 +715,7 @@ bool HashTableItemSetWritable
 	HashTableItem reference,
 	bool value
 ) {
-	htValidateReference(ht, reference);
+	htReturnIfInvalidReference(ht, reference);
 	HashTableRecord item = ht->item[reference];
 	htReturnIfNotConfigurableItem(item);
 	if (value) {
@@ -734,7 +731,7 @@ bool HashTableItemGetConfigurable
 	HashTable ht,
 	HashTableItem reference
 ) {
-	htValidateReference(ht, reference);
+	htReturnIfInvalidReference(ht, reference);
 	return \
 		(htRecordConfiguration(ht->item[reference]) & HTI_NON_CONFIGURABLE) == 0
 	;
@@ -746,7 +743,7 @@ bool HashTableItemSetConfigurable
 	HashTableItem reference,
 	bool value
 ) {
-	htValidateReference(ht, reference);
+	htReturnIfInvalidReference(ht, reference);
 	HashTableRecord item = ht->item[reference];
 	htReturnIfNotConfigurableItem(item);
 	if (value) {
@@ -764,7 +761,7 @@ void HashTableEnumerate
 	HashTableEnumerationHandler handler,
 	void * private
 ) {
-	htVoidIfTableUninitialized(ht);
+	htReturnVoidIfTableUninitialized(ht);
 	htReturnVoidIfNoCallBackHandler(handler);
 
 	size_t index, maximum = ht->itemsMax;
@@ -801,7 +798,7 @@ void HashTableSortItems
 	HashTableSortHandler sortHandler,
 	void * private
 ) {
-	htVoidIfTableUninitialized(ht);
+	htReturnVoidIfTableUninitialized(ht);
 	htReturnVoidIfNoCallBackHandler(sortHandler);
 
 	if (ht->itemsMax < 2) return;
@@ -848,7 +845,7 @@ void HashTableSortItemHash
 	void * private
 ) {
 
-	htVoidValidateReference(ht, reference);
+	htReturnVoidIfInvalidReference(ht, reference);
 	htReturnVoidIfNoCallBackHandler(sortHandler);
 
 	HashTableRecord item = ht->item[reference];
@@ -892,7 +889,7 @@ void HashTableEnumerateItemHash
 	HashTableEnumerationHandler handler,
 	void * private
 ) {
-	htVoidValidateReference(ht, reference);
+	htReturnVoidIfInvalidReference(ht, reference);
 	htReturnVoidIfNoCallBackHandler(handler);
 
 	HashTableRecord item = ht->item[reference];
