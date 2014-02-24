@@ -400,9 +400,11 @@ HashTableItem HashTableHasKey
 	htReturnIfTableUninitialized(ht);
 	char * realKey = htRealKeyOrReturn(keyLength, key, hint);
 
+	size_t oldError = errno;
 	HashTableRecord item = htFindKey(ht, keyLength, realKey);
 	if (item) return htRecordReference(item);
-	return 0;
+	else errno = oldError;
+	return HT_ERROR_SENTINEL;
 }
 
 bool HashTableHasItem
