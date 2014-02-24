@@ -126,6 +126,9 @@ typedef enum eHashTableItemFlags {
 
 #ifndef HashTable_c
 
+extern const char * HashTableVendor;
+extern const char * HashTableVersion;
+extern const char * HashTableDescription;
 extern const long HashTableBuildNumber;
 
 typedef void * HashTable;
