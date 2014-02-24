@@ -126,6 +126,8 @@ typedef enum eHashTableItemFlags {
 
 #ifndef HashTable_c
 
+extern const long HashTableBuildNumber;
+
 typedef void * HashTable;
 
 /* Lifecyle */

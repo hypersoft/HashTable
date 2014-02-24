@@ -47,7 +47,7 @@
 const char * HashTableVendor = BUILD_VERSION_VENDOR;
 const char * HashTableVersion = BUILD_VERSION_TRIPLET;
 const char * HashTableDescription = BUILD_VERSION_DESCRIPTION;
-const long HashTableBuildNumber = BUILD_VERSION_NUMBER;
+const unsigned long HashTableBuildNumber = BUILD_VERSION_NUMBER;
 
 const char * htErrorTableUninitialized = \
 	"The hash table parameter was invalid";
