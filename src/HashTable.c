@@ -202,7 +202,6 @@ inline static HashTableRecord htFindKeyWithParent (
 			return primary;
 		*parent = primary; primary = primary->successor;
 	}
-	errno = HT_ERROR_INVALID_REFERENCE;
 	return NULL;
 }
 
