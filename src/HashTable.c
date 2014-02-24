@@ -865,7 +865,7 @@ void HashTableSortItemHash
 			primaryRef = htRecordReference(array[primary]),
 			secondaryRef = htRecordReference(array[secondary]);
 			selection = sortHandler(
-				ht, type, direction, primaryRef--, secondaryRef--, NULL
+				ht, type, direction, primaryRef--, secondaryRef--, private
 			);
 			if (--selection == secondaryRef){
 				array[secondary] = ht->item[primaryRef];
