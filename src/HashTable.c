@@ -905,9 +905,8 @@ void HashTableEnumerateItemHash
 		for (index = 0; index < maximum; index++) {
 			item = array[index];
 			if (! (htRecordConfiguration(item) & HTI_NON_ENUMERABLE)) {
-				if ( ! handler(
-					ht, direction, htRecordReference(item), private)
-				) break;
+				if ( ! handler(ht, direction, htRecordReference(item), private))
+					break;
 			}
 		}
 	} else {
