@@ -209,14 +209,6 @@ HashTableItem HashTableHasKey
 	HashTableItemFlags hint
 );
 
-extern size_t HashTableKeyDistribution
-(
-	HashTable hashTable,
-	size_t keyLength,
-	double key,
-	HashTableItemFlags hint
-);
-
 bool HashTableHasItem
 (
 	HashTable hashTable,
