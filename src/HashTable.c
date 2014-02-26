@@ -557,13 +557,10 @@ HashTableItem HashTablePut
 		htRecordHash(thisRecord) = index;
 
 		HashTableItem
-
 			currentSelection = htRecordReference(thisRecord),
-
 			selection = htAutoFireItemEvent(
 				ht, currentSelection, HT_EVENT_PUT, thisRecord->value
 			)
-
 		;
 
 		if (selection == currentSelection) {
