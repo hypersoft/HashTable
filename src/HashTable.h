@@ -30,6 +30,10 @@
 
 #define HashTable_h
 
+#define htDoc(...) /* this thing */
+#define htDocFires(...) /* these events */
+#define htDocThrows(...) /* these errors */
+
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdbool.h>

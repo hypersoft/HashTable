@@ -43,6 +43,9 @@
 #define HT_RESERVE_ITEMS 8L
 #endif
 
+#define htVoidExpression (void)
+#define htVirtualImmediateFunction(type) static inline type
+
 // Compile Makefile Definitions
 const char * HashTableVendor = BUILD_VERSION_VENDOR;
 const char * HashTableVersion = BUILD_VERSION_TRIPLET;
@@ -108,6 +111,7 @@ typedef struct sHashTable {
 	void * private;
 } sHashTable;
 
+#define htGetEventMask(ht, withEvents) (ht->events & withEvents)
 #define HashTableSize sizeof(sHashTable)
 #define HashTable sHashTable *
 
@@ -261,8 +265,28 @@ static HashTableRecord htCreateRecord
 
 }
 
+htVirtualImmediateFunction (HashTableItem) htAutoFireItemEvent
+(
+	htDoc (does not check) HashTable ht,
+	htDoc (does not check) HashTableItem reference,
+	htDocFires (any registered) HashTableEvent withEvents,
+	htDoc (?:= ht->private) void * private
+) {
+	if (ht->eventHandler) {
+		if (htGetEventMask(ht, withEvents) == withEvents) {
+			return ht->eventHandler(
+				ht, withEvents,
+				reference,
+				(private) ? private : ht->private
+			);
+		}
+	}
+	return reference;
+}
+
 HashTable NewHashTable
-(size_t size,
+(
+	size_t size,
 	HashTableEvent withEvents,
 	HashTableEventHandler eventHandler,
 	void * private
@@ -277,12 +301,12 @@ HashTable NewHashTable
 	ht->eventHandler = eventHandler,
 	ht->private = private,
 	ht->slot = calloc(size, sizeof(void*));
+
 	htReturnIfAllocationFailure(ht->slot, free(ht));
 
 	ht->impact = HashTableSize + (sizeof(void*) * (size));
 
-	if (withEvents & HT_EVENT_CONSTRUCTED && eventHandler)
-		eventHandler(ht, HT_EVENT_CONSTRUCTED, 0, private);
+	htVoidExpression htAutoFireItemEvent(ht, 0, HT_EVENT_CONSTRUCTED, NULL);
 
 	return ht;
 
@@ -306,8 +330,7 @@ HashTable DestroyHashTable
 ) {
 	htReturnIfTableUninitialized(ht);
 
-	if (ht->events & HT_EVENT_DESTRUCTING && ht->eventHandler)
-		(void) ht->eventHandler(ht, HT_EVENT_DESTRUCTING, 0, ht->private);
+	htVoidExpression htAutoFireItemEvent(ht, 0, HT_EVENT_DESTRUCTING, NULL);
 
 	size_t item = 0, length = ht->itemsMax; HashTableRecord target = NULL;
 	for (item = 0; item < length; item++) {
@@ -413,7 +436,7 @@ bool HashTableHasItem
 	HashTableItem reference
 ) {
 	htReturnIfTableUninitialized(ht);
-	if ( ! (reference) || ht->itemsMax < reference) return false;
+	if ( ! (reference) || ht->itemsMax < --reference) return false;
 	return (ht->item[reference]) ? true : false;
 }
 
@@ -490,51 +513,75 @@ HashTableItem HashTablePut
 		ht, keyLength, realKey, (root = ht->slot[index]), &parent
 	);
 
-	HyperVariant varKey, varValue;
+	if ( current ) {
 
-	if ( current ) { /* There is already a pair for this key; Update Value */
 		htReturnIfNotWritableItem(current);
-		htReturnIfAllocationFailure(
-			(varValue = varcreate(valueLength, value, valueHint)), {}
-		);
-		ht->impact -= varimpact(current->value),
-		ht->impact += varimpact(varValue);
-		varfree(current->value);
-		current->value = varValue, current->hitCount++;
-		htRecordHash(current) = index;
-		return htRecordReference(current);
+
+		HyperVariant varValue = varcreate(valueLength, value, valueHint);
+		htReturnIfAllocationFailure(varValue, {});
+
+		HashTableItem
+			currentSelection = htRecordReference(current),
+			/* There is already a pair for this key; Update Value? */
+			selection = htAutoFireItemEvent(
+				ht, currentSelection, HT_EVENT_PUT, varValue
+			)
+		;
+
+		if (! selection) goto discardNewRecord;
+
+		if (selection == currentSelection) {
+			ht->impact -= varimpact(current->value),
+			ht->impact += varimpact(varValue);
+			varfree(current->value);
+			current->value = varValue,
+			current->hitCount++;
+			return selection;
+		}
+
+		discardNewRecord:
+			varfree(varValue);
+
+		return selection;
+
 	}
 
-	HashTableRecord this = htCreateRecord(
+	HashTableRecord thisRecord = htCreateRecord(
 		ht,
 		keyLength, key, keyHint,
 		valueLength, value, valueHint
 	);
 
-	bool put = true;
+	if (thisRecord) {
 
-	if (this) {
-		htRecordHash(this) = index;
-		if (ht->events & HT_EVENT_PUT && ht->eventHandler) {
-			put = ht->eventHandler(
-				ht, HT_EVENT_PUT,
-				htRecordReference(this),
-				ht->private
-			);
-			if (! put ) {
-				ht->item[htRecordReference(this) - 1] = NULL,
-				ht->itemsTotal--, ht->itemsUsed--,
-				ht->impact -= htRecordImpact(this);
-				varfree(this->key); varfree(this->value); free(this);
-			}
+		htRecordHash(thisRecord) = index;
+
+		HashTableItem
+
+			currentSelection = htRecordReference(thisRecord),
+
+			selection = htAutoFireItemEvent(
+				ht, currentSelection, HT_EVENT_PUT, thisRecord->value
+			)
+
+		;
+
+		if (selection == currentSelection) {
+			if ( ! root ) ht->slot[index] = thisRecord;
+			else if ( root == current ) root->successor = thisRecord;
+			else parent->successor = thisRecord;
+			return currentSelection;
 		}
-	} else put = false;
 
-	if (put) {
-		if ( ! root ) ht->slot[index] = this;
-		else if ( root == current ) root->successor = this;
-		else parent->successor = this;
-		return htRecordReference(this);
+		discardThisRecord:
+			ht->item[currentSelection - 1] = NULL,
+			ht->itemsTotal--, ht->itemsUsed--,
+			ht->impact -= htRecordImpact(thisRecord);
+			varfree(thisRecord->key), varfree(thisRecord->value);
+			free(thisRecord);
+
+		return selection;
+
 	}
 
 	return HT_ERROR_SENTINEL;
@@ -548,20 +595,25 @@ HashTableItem HashTableGet
 	double key,
 	HashTableItemFlags hint
 ) {
+
 	htReturnIfTableUninitialized(ht);
 	char * realKey = htRealKeyOrReturn(keyLength, key, hint);
 
-	HashTableRecord item;
+	HashTableRecord item = htFindKey(ht, keyLength, realKey);
 
-	if (! (item = htFindKey(ht, keyLength, realKey)) ) return HT_ERROR_SENTINEL;
-	else if (ht->events & HT_EVENT_GET && ht->eventHandler)
-		return ht->eventHandler(
-			ht, HT_EVENT_GET,
-			htRecordReference(item),
-			ht->private
-		);
+	if (! item) return HT_ERROR_SENTINEL;
 
-	return htRecordReference(item);
+	HashTableItem
+		currentSelection = htRecordReference(item),
+		selection = htAutoFireItemEvent(
+				ht, currentSelection, HT_EVENT_GET, item->value
+		)
+	;
+
+	if (selection == currentSelection) item->hitCount++;
+
+	return selection;
+
 }
 
 bool HashTableDeleteItem
@@ -574,26 +626,32 @@ bool HashTableDeleteItem
 	HashTableRecord item = ht->item[reference];
 	htReturnIfNotConfigurableItem(item);
 
-	if (ht->events & HT_EVENT_DELETE && ht->eventHandler) {
-		if (! ht->eventHandler(ht, HT_EVENT_DELETE, reference+1, ht->private) )
-			return false;
+	HashTableItem
+		currentSelection = htRecordReference(item),
+		selection = htAutoFireItemEvent(
+				ht, currentSelection, HT_EVENT_DELETE, item->value
+		)
+	;
+
+	if (selection == currentSelection) {
+		item = htFindKeyWithParent(
+			ht, varlen(item->key), item->key,
+			ht->slot[htRecordHash(item)],
+			&parent
+		);
+
+		if (parent) parent->successor = item->successor;
+		else {
+			ht->slot[htRecordHash(item)] = item->successor;
+		}
+
+		ht->item[reference] = NULL, ht->itemsTotal--,
+		ht->impact -= htRecordImpact(item);
+		varfree(item->key); varfree(item->value); free(item);
+		return true;
 	}
 
-	item = htFindKeyWithParent(
-		ht, varlen(item->key), item->key,
-		ht->slot[htRecordHash(item)],
-		&parent
-	);
-
-	if (parent) parent->successor = item->successor;
-	else {
-		ht->slot[htRecordHash(item)] = item->successor;
-	}
-
-	ht->item[reference] = NULL, ht->itemsTotal--,
-	ht->impact -= htRecordImpact(item);
-	varfree(item->key); varfree(item->value); free(item);
-	return true;
+	return false;
 
 }
 

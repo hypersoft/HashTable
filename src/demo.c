@@ -5,12 +5,12 @@
 
 void htItemReport(HashTable ht, HashTableItem item) {
 	HashTableItemFlags keyFlags = HashTableItemKeyConfiguration(ht, item);
+	printf("\tItem Reference: %i\n", item);
+	printf("\tItem Key Type: UTF8\n");
+	printf("\tItem Key Length: %i + (1 null) bytes\n",
+		HashTableItemKeyLength(ht, item)
+	);
 	if (keyFlags & HTI_UTF8) {
-		printf("\tItem Reference: %i\n", item);
-		printf("\tItem Key Type: UTF8\n");
-		printf("\tItem Key Length: %i + (1 null) bytes\n",
-			HashTableItemKeyLength(ht, item)
-		);
 		printf("\tItem Key Value: %s\n", HashTableItemKey(ht, item));
 	}
 	puts("");
@@ -28,10 +28,9 @@ HashTableItem htEventCallBack
 	} else if (event == HT_EVENT_PUT) {
 		printf("HashTable (%p) requesting put item:\n\n", ht);
 		htItemReport(ht, item);
-		return true;
+
 	} else if (event == HT_EVENT_DELETE) {
 		printf("HashTable (%p) requesting delete item: %i\n", ht, item);
-		return true;
 	} else if (event == HT_EVENT_DESTRUCTING) {
 		printf("Destroying HashTable (%p)\n", ht);
 	}
@@ -58,7 +57,7 @@ void DumpHashTableStats(HashTable ht) {
 		HashTableSlotCount(ht),
 		HashTableSlotsUsed(ht),
 		HashTableImpact(ht),
-		HashTableLoadFactor(ht)
+		HashTableLoadFactor(ht) * 100
 	);
 }
 
