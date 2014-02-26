@@ -264,6 +264,15 @@ HashTableItem HashTablePut
 	HashTableDataFlags valueHint
 );
 
+HashTableItem HashTablePutItemByKey
+(
+	HashTable hashTable,
+	HashTableData realKey,
+	size_t valueLength,
+	double value,
+	HashTableDataFlags valueHint
+);
+
 HashTableItem HashTableGetItemByKey
 (
 	HashTable hashTable,

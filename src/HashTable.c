@@ -585,6 +585,25 @@ HashTableItem HashTablePut
 
 }
 
+HashTableItem HashTablePutItemByKey
+(
+	HashTable ht,
+	HashTableData realKey,
+	size_t valueLength,
+	double value,
+	HashTableDataFlags valueHint
+) {
+
+	if (! realKey) {
+		errno = HT_ERROR_ZERO_LENGTH_KEY; return HT_ERROR_SENTINEL;
+	}
+
+	return HashTablePut(ht, varlen(realKey), (double)(size_t)realKey, vartype(realKey),
+		valueLength, value, valueHint
+	);
+
+}
+
 HashTableItem HashTableGetItemByKey
 (
 	HashTable ht,
