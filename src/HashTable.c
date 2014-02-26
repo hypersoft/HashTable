@@ -655,7 +655,7 @@ bool HashTableDeleteItem
 
 }
 
-const void * HashTableItemKey
+HashTableData HashTableItemKey
 (
 	HashTable ht,
 	HashTableItem reference
@@ -664,7 +664,7 @@ const void * HashTableItemKey
 	return ht->item[reference]->key;
 }
 
-const void * HashTableItemData
+HashTableData HashTableItemData
 (
 	HashTable ht,
 	HashTableItem reference
@@ -675,7 +675,7 @@ const void * HashTableItemData
 
 size_t HashTableDataLength
 (
-	const void * data
+	HashTableData data
 ) {
 	if (data) return varlen(data);
 	return HT_ERROR_SENTINEL;
@@ -683,7 +683,7 @@ size_t HashTableDataLength
 
 HashTableDataFlags HashTableDataType
 (
-	const void * data
+	HashTableData data
 ) {
 	if (data) return (vartype(data) &
 		(HTI_INT | HTI_DOUBLE | HTI_POINTER | HTI_BLOCK)
@@ -693,7 +693,7 @@ HashTableDataFlags HashTableDataType
 
 HashTableDataFlags HashTableDataSettings
 (
-	const void * data
+	HashTableData data
 ) {
 	if (data) return vartype(data);
 	return HT_ERROR_SENTINEL;
