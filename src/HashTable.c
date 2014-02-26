@@ -604,6 +604,28 @@ HashTableItem HashTablePutItemByKey
 
 }
 
+HashTableItem HashTablePutItemByKeyData
+(
+	HashTable ht,
+	HashTableData realKey,
+	HashTableData realData
+) {
+
+	if (! realKey) {
+		errno = HT_ERROR_ZERO_LENGTH_KEY; return HT_ERROR_SENTINEL;
+	}
+
+	if (! realData) {
+			errno = HT_ERROR_INVALID_REFERENCE; return HT_ERROR_SENTINEL;
+	}
+
+	return HashTablePut(ht,
+		varlen(realKey), (double)(size_t)realKey, vartype(realKey),
+		varlen(realData), (double)(size_t)realData, vartype(realData)
+	);
+
+}
+
 HashTableItem HashTableGetItemByKey
 (
 	HashTable ht,
