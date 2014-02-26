@@ -169,9 +169,9 @@ extern void OptimizeHashTable
 	size_t references
 );
 
-extern HashTable DestroyHashTable
+void DestroyHashTable
 (
-	HashTable hashTable
+	HashTable * ht
 );
 
 void HashTableRegisterEvents

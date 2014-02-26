@@ -300,7 +300,7 @@ void FreeHashTableUserData
 	HashTableData * data
 ) {
 	if (! data && ! *data) {
-		errno = HT_ERROR_INVALID_REFERENCE; return HT_ERROR_SENTINEL;
+		errno = HT_ERROR_INVALID_REFERENCE; return;
 	}
 	varfree(*data);
 }
@@ -349,19 +349,21 @@ void DestroyHashTable
 (
 	HashTable * ht
 ) {
-	htReturnIfTableUninitialized(ht);
+	htReturnVoidIfTableUninitialized((ht)?*ht:0);
 
-	htVoidExpression htAutoFireItemEvent(ht, 0, HT_EVENT_DESTRUCTING, NULL);
+	htVoidExpression htAutoFireItemEvent(*ht, 0, HT_EVENT_DESTRUCTING, NULL);
 
-	size_t item = 0, length = ht->itemsMax; HashTableRecord target = NULL;
+	sHashTable * xt = *ht;
+	size_t item = 0, length = xt->itemsMax; HashTableRecord target = NULL;
 	for (item = 0; item < length; item++) {
-		target = ht->item[item];
+		target = xt->item[item];
 		if (target) {
 			varfree(target->key); varfree(target->value); free(target);
 		}
 	}
-	free(ht->item), free(ht->slot), free(ht);
-	return NULL;
+	free(xt->item), free(xt->slot), free(xt);
+	*ht = NULL;
+	return;
 }
 
 void HashTableRegisterEvents

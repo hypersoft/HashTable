@@ -100,7 +100,7 @@ int main ( int argc, char **argv )
 
 	DumpHashTableStats(x);
 
-	x = DestroyHashTable(x);
+	DestroyHashTable(&x);
 
 	puts("");
 
