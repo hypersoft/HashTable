@@ -154,12 +154,12 @@ if ( !reference || reference > table->itemsMax || !table->item[--reference]) { \
 if (! (handler) ) { errno = HT_ERROR_NO_CALLBACK_HANDLER; return; }
 
 #define htReturnIfNotWritableItem(i)                                           \
-if (htRecordSettings(i) & HTI_NON_WRITABLE) {                             \
+if (htRecordSettings(i) & HTI_NON_WRITABLE) {                                  \
     errno = HT_ERROR_NOT_WRITABLE_ITEM; return HT_ERROR_SENTINEL;              \
 }
 
 #define htReturnIfNotConfigurableItem(i)                                       \
-if (htRecordSettings(i) & HTI_NON_CONFIGURABLE) {                         \
+if (htRecordSettings(i) & HTI_NON_CONFIGURABLE) {                              \
     errno = HT_ERROR_NOT_CONFIGURABLE_ITEM; return HT_ERROR_SENTINEL;          \
 }
 
@@ -585,7 +585,7 @@ HashTableItem HashTablePut
 
 }
 
-HashTableItem HashTableGetItemByKeyData
+HashTableItem HashTableGetItemByKey
 (
 	HashTable ht,
 	HashTableData realKey
