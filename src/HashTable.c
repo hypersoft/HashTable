@@ -284,6 +284,27 @@ htVirtualImmediateFunction (HashTableItem) htAutoFireItemEvent
 	return reference;
 }
 
+HashTableData HashTableUserData
+(
+	size_t valueLength,
+	double value,
+	size_t valueHint
+) {
+	HashTableData result = varcreate(valueLength, value, valueHint);
+	htReturnIfAllocationFailure(result,	{});
+	return result;
+}
+
+void FreeHashTableUserData
+(
+	HashTableData * data
+) {
+	if (! data && ! *data) {
+		errno = HT_ERROR_INVALID_REFERENCE; return HT_ERROR_SENTINEL;
+	}
+	varfree(*data);
+}
+
 HashTable NewHashTable
 (
 	size_t size,
@@ -324,9 +345,9 @@ void OptimizeHashTable
 	htReturnVoidUnsupportedFunction();
 }
 
-HashTable DestroyHashTable
+void DestroyHashTable
 (
-	HashTable ht
+	HashTable * ht
 ) {
 	htReturnIfTableUninitialized(ht);
 
@@ -598,7 +619,8 @@ HashTableItem HashTablePutItemByKey
 		errno = HT_ERROR_ZERO_LENGTH_KEY; return HT_ERROR_SENTINEL;
 	}
 
-	return HashTablePut(ht, varlen(realKey), (double)(size_t)realKey, vartype(realKey),
+	return HashTablePut(ht,
+		varlen(realKey), (double)(size_t)realKey, vartype(realKey),
 		valueLength, value, valueHint
 	);
 

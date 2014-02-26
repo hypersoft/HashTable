@@ -142,6 +142,18 @@ typedef void * HashTable;
 /* Lifecyle */
 // =============================================================================
 
+HashTableData HashTableUserData
+(
+	size_t valueLength,
+	double value,
+	size_t valueHint
+);
+
+void FreeHashTableUserData
+(
+	HashTableData * data
+);
+
 extern HashTable NewHashTable
 (
 	size_t size,
