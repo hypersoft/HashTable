@@ -174,7 +174,7 @@ size_t HT_SORT_EMPTY_ITEMS<br/><br/>When sorting an item list, include undefined
 </li>
 <li><span class='vym-branch2'  id='mc:1,bo:0,bo:11'>HashTableSortHandler</span>
 <table class="vym-note"><tr><td>
-typedef HashTableItem (*HashTableSortHandler) (	void * hashTable, HashTableSortType type, HashTableSortDirection direction, HashTableItem primary, HashTableItem secondary, void * private)<br/><br/>The hash table sort call back.<br/>
+typedef HashTableItem (*HashTableSortHandler) (void * hashTable, HashTableSortType type, HashTableSortDirection direction, HashTableItem primary, HashTableItem secondary, void * private)<br/><br/>The hash table sort call back.<br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch2'  id='mc:1,bo:0,bo:12'>HashTableItemFlags</span>
@@ -687,7 +687,7 @@ size_t htKeyHash(HashTable ht, size_t keyLength, void * realKey)<br/><br/>Hashes
 </li>
 <li><span class='vym-branch2'  id='mc:1,bo:1,bo:27'>htRealKeyOrReturn</span>
 <table class="vym-note"><tr><td>
-void * htRealKeyOrReturn(size_t length, double value, HashTableItemFlags hint)<br/><br/>Automatically selects pointer to double, or pointer in double based on the contents of flag.<br/><br/>Furthermore, if length is zero, and hint specifies HTI_UTF8, scan value length into length.<br/><br/>If after all prior operations, length is zero, set errno to HT_ERROR_ZERO_LENGTH_KEY and return HT_ERROR_SENTINEL.<br/><br/>
+void * htRealKeyOrReturn(size_t length, double value, HashTableItemFlags hint)<br/><br/>Automatically selects pointer to double, or pointer in double based on the contents of flag.<br/><br/>Furthermore, if length is zero, and hint specifies HTI_UTF8, scan value length into length.<br/><br/>If after all prior operations, length is zero, set errno to HT_ERROR_ZERO_LENGTH_KEY and return HT_ERROR_SENTINEL.<br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch2'  id='mc:1,bo:1,bo:28'>htRecordImpact</span>
