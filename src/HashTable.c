@@ -750,7 +750,7 @@ bool HashTableItemSetEnumerable
 	htReturnIfInvalidReference(ht, reference);
 	HashTableRecord item = ht->item[reference];
 	htReturnIfNotConfigurableItem(item);
-	if (value) {
+	if (! value) {
 		htRecordConfiguration(item) &= ~HTI_NON_ENUMERABLE;
 	} else {
 		htRecordConfiguration(item) |= HTI_NON_ENUMERABLE;
@@ -777,7 +777,7 @@ bool HashTableItemSetWritable
 	htReturnIfInvalidReference(ht, reference);
 	HashTableRecord item = ht->item[reference];
 	htReturnIfNotConfigurableItem(item);
-	if (value) {
+	if (! value) {
 		htRecordConfiguration(item) &= ~HTI_NON_WRITABLE;
 	} else {
 		htRecordConfiguration(item) |= HTI_NON_WRITABLE;
@@ -805,7 +805,7 @@ bool HashTableItemSetConfigurable
 	htReturnIfInvalidReference(ht, reference);
 	HashTableRecord item = ht->item[reference];
 	htReturnIfNotConfigurableItem(item);
-	if (value) {
+	if (! value) {
 		htRecordConfiguration(item) &= ~HTI_NON_CONFIGURABLE;
 	} else {
 		htRecordConfiguration(item) |= HTI_NON_CONFIGURABLE;
