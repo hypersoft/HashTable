@@ -236,27 +236,27 @@ parameter list htInt(size_t i)<br/><br/>Returns parameter list for API functions
 </li>
 <li><span class='vym-branch3'  id='mc:1,bo:0,bo:13,bo:1'>htPtr</span>
 <table class="vym-note"><tr><td>
-parameter list htInt(void * p)<br/><br/>Returns parameter list for API functions to diagnose and transpose a pointer as a record key or value.<br/>
+parameter list htPtr(void * p)<br/><br/>Returns parameter list for API functions to diagnose and transpose a pointer as a record key or value.<br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch3'  id='mc:1,bo:0,bo:13,bo:2'>htDbl</span>
 <table class="vym-note"><tr><td>
-parameter list htInt(dobule d)<br/><br/>Returns parameter list for API functions to diagnose and transpose a double as a record key or value.<br/>
+parameter list htDbl(dobule d)<br/><br/>Returns parameter list for API functions to diagnose and transpose a double as a record key or value.<br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch3'  id='mc:1,bo:0,bo:13,bo:3'>htStr</span>
 <table class="vym-note"><tr><td>
-parameter list htInt(char * s)<br/><br/>Returns parameter list for API functions to diagnose and transpose an ANSI or UTF-8 string as a record key or value.<br/>
+parameter list htStr(char * s)<br/><br/>Returns parameter list for API functions to diagnose and transpose an ANSI or UTF-8 string as a record key or value.<br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch3'  id='mc:1,bo:0,bo:13,bo:4'>htBlk</span>
 <table class="vym-note"><tr><td>
-parameter list htInt(void * b, size_t length)<br/><br/>Returns parameter list for API functions to diagnose and transpose an arbitrary block of data with specified length as a record key or value.<br/>
+parameter list htBlk(void * b, size_t length)<br/><br/>Returns parameter list for API functions to diagnose and transpose an arbitrary block of data with specified length as a record key or value.<br/>
 </td></tr></table>
 </li>
 <li><span class='vym-branch3'  id='mc:1,bo:0,bo:13,bo:5'>htStrN</span>
 <table class="vym-note"><tr><td>
-parameter list htInt(char * s, size_t length)<br/><br/>Returns parameter list for API functions to diagnose and transpose an arbitrary length ANSI or UTF-8 string pointer as a record key or value.<br/>
+parameter list htStrN(char * s, size_t length)<br/><br/>Returns parameter list for API functions to diagnose and transpose an arbitrary length ANSI or UTF-8 string pointer as a record key or value.<br/>
 </td></tr></table>
 </li>
 </ul>
@@ -795,18 +795,18 @@ HashTableRecord htFindKey(HashTable table, size_t keyLength, void * realKey)<br/
   <area shape='rect' coords='159,1797.03,255,1821.03' href='#mc:1,bo:0,bo:14,bo:2'>
   <area shape='rect' coords='150,1821.03,277,1845.03' href='#mc:1,bo:0,bo:14,bo:3'>
   <area shape='rect' coords='338,2016.03,399,2042.03' href='#mc:1,bo:0,bo:15'>
-  <area shape='rect' coords='212,1885.03,318,1909.03' href='#mc:1,bo:0,bo:15,bo:0'>
-  <area shape='rect' coords='211,1909.03,318,1933.03' href='#mc:1,bo:0,bo:15,bo:1'>
-  <area shape='rect' coords='215,1933.03,318,1957.03' href='#mc:1,bo:0,bo:15,bo:2'>
-  <area shape='rect' coords='212,1957.03,318,1981.03' href='#mc:1,bo:0,bo:15,bo:3'>
-  <area shape='rect' coords='213,1981.03,318,2005.03' href='#mc:1,bo:0,bo:15,bo:4'>
-  <area shape='rect' coords='208,2005.03,318,2029.03' href='#mc:1,bo:0,bo:15,bo:5'>
-  <area shape='rect' coords='229,2029.03,318,2053.03' href='#mc:1,bo:0,bo:15,bo:6'>
-  <area shape='rect' coords='224,2053.03,318,2077.03' href='#mc:1,bo:0,bo:15,bo:7'>
-  <area shape='rect' coords='222,2077.03,318,2101.03' href='#mc:1,bo:0,bo:15,bo:8'>
-  <area shape='rect' coords='185,2101.03,318,2125.03' href='#mc:1,bo:0,bo:15,bo:9'>
-  <area shape='rect' coords='221,2125.03,318,2149.03' href='#mc:1,bo:0,bo:15,bo:10'>
-  <area shape='rect' coords='209,2149.03,318,2173.03' href='#mc:1,bo:0,bo:15,bo:11'>
+  <area shape='rect' coords='190,1885.03,296,1909.03' href='#mc:1,bo:0,bo:15,bo:0'>
+  <area shape='rect' coords='189,1909.03,296,1933.03' href='#mc:1,bo:0,bo:15,bo:1'>
+  <area shape='rect' coords='193,1933.03,296,1957.03' href='#mc:1,bo:0,bo:15,bo:2'>
+  <area shape='rect' coords='190,1957.03,296,1981.03' href='#mc:1,bo:0,bo:15,bo:3'>
+  <area shape='rect' coords='191,1981.03,296,2005.03' href='#mc:1,bo:0,bo:15,bo:4'>
+  <area shape='rect' coords='186,2005.03,296,2029.03' href='#mc:1,bo:0,bo:15,bo:5'>
+  <area shape='rect' coords='207,2029.03,296,2053.03' href='#mc:1,bo:0,bo:15,bo:6'>
+  <area shape='rect' coords='202,2053.03,296,2077.03' href='#mc:1,bo:0,bo:15,bo:7'>
+  <area shape='rect' coords='200,2077.03,296,2101.03' href='#mc:1,bo:0,bo:15,bo:8'>
+  <area shape='rect' coords='163,2101.03,296,2125.03' href='#mc:1,bo:0,bo:15,bo:9'>
+  <area shape='rect' coords='199,2125.03,296,2149.03' href='#mc:1,bo:0,bo:15,bo:10'>
+  <area shape='rect' coords='187,2149.03,296,2173.03' href='#mc:1,bo:0,bo:15,bo:11'>
   <area shape='rect' coords='290,2428.03,399,2454.03' href='#mc:1,bo:0,bo:16'>
   <area shape='rect' coords='142,2213.03,248,2237.03' href='#mc:1,bo:0,bo:16,bo:0'>
   <area shape='rect' coords='142,2237.03,248,2261.03' href='#mc:1,bo:0,bo:16,bo:1'>
