@@ -264,6 +264,12 @@ HashTableItem HashTablePut
 	HashTableDataFlags valueHint
 );
 
+HashTableItem HashTableGetItemByKeyData
+(
+	HashTable hashTable,
+	HashTableData realKey
+);
+
 HashTableItem HashTableGet
 (
 	HashTable hashTable,

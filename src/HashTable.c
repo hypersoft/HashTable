@@ -180,7 +180,7 @@ if ( ! length ) {                                                              \
 }
 
 #define htCompareRecordToRealKey(e, l, k)                                      \
-(varlen(e->key) == l) && (memcmp(e->key, k, l) == 0)
+((e->key == k) || ((varlen(e->key) == l) && (memcmp(e->key, k, l) == 0)))
 
 /* I wouldn't call this on an incomplete record if I were you... */
 #define htRecordImpact(r) (                                                    \
@@ -582,6 +582,33 @@ HashTableItem HashTablePut
 	}
 
 	return HT_ERROR_SENTINEL;
+
+}
+
+HashTableItem HashTableGetItemByKeyData
+(
+	HashTable ht,
+	HashTableData realKey
+) {
+	htReturnIfTableUninitialized(ht);
+
+	if (! realKey) {
+		errno = HT_ERROR_ZERO_LENGTH_KEY; return HT_ERROR_SENTINEL;
+	}
+
+	HashTableRecord item = htFindKey(ht, varlen(realKey), (void*) realKey);
+
+	if (! item) return HT_ERROR_SENTINEL;
+
+	HashTableItem
+		currentSelection = htRecordReference(item),
+		selection = htAutoFireItemEvent(
+				ht, currentSelection, HT_EVENT_GET, item->value
+		)
+	;
+
+	if (selection == currentSelection) item->hitCount++;
+	return selection;
 
 }
 
