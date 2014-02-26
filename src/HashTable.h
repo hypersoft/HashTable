@@ -106,7 +106,9 @@ typedef HashTableItem (*HashTableSortHandler)
 	void * private
 );
 
-typedef enum eHashTableItemFlags {
+typedef const void * HashTableData;
+
+typedef enum eHashTableDataFlags {
 	HTI_INT              = HashTableBitFlag(1),
 	HTI_DOUBLE           = HashTableBitFlag(2),
 	HTI_POINTER          = HashTableBitFlag(3),
@@ -115,7 +117,7 @@ typedef enum eHashTableItemFlags {
 	HTI_NON_ENUMERABLE   = HashTableBitFlag(6),
 	HTI_NON_WRITABLE     = HashTableBitFlag(7),
 	HTI_NON_CONFIGURABLE = HashTableBitFlag(8),
-} HashTableItemFlags;
+} HashTableDataFlags;
 
 /* cast integer things to double */
 #define htIntVal(i) ((double)(uint)(i))
@@ -210,7 +212,7 @@ HashTableItem HashTableHasKey
 	HashTable hashTable,
 	size_t keyLength,
 	double key,
-	HashTableItemFlags hint
+	HashTableDataFlags hint
 );
 
 bool HashTableHasItem
@@ -256,10 +258,10 @@ HashTableItem HashTablePut
 	HashTable hashTable,
 	size_t keyLength,
 	double key,
-	HashTableItemFlags keyHint,
+	HashTableDataFlags keyHint,
 	size_t valueLength,
 	double value,
-	HashTableItemFlags valueHint
+	HashTableDataFlags valueHint
 );
 
 HashTableItem HashTableGet
@@ -267,7 +269,7 @@ HashTableItem HashTableGet
 	HashTable hashTable,
 	size_t keyLength,
 	double key,
-	HashTableItemFlags hint
+	HashTableDataFlags hint
 );
 
 bool HashTableDeleteItem
@@ -276,13 +278,13 @@ bool HashTableDeleteItem
 	HashTableItem reference
 );
 
-const void * HashTableItemKey
+HashTableData HashTableItemKey
 (
 	HashTable hashTable,
 	HashTableItem reference
 );
 
-const void * HashTableItemData
+HashTableData HashTableItemData
 (
 	HashTable hashTable,
 	HashTableItem reference
@@ -290,17 +292,17 @@ const void * HashTableItemData
 
 size_t HashTableDataLength
 (
-	const void * data
+	HashTableData data
 );
 
-HashTableItemFlags HashTableDataType
+HashTableDataFlags HashTableDataType
 (
-	const void * data
+	HashTableData data
 );
 
-HashTableItemFlags HashTableDataSettings
+HashTableDataFlags HashTableDataSettings
 (
-	const void * data
+	HashTableData data
 );
 
 bool HashTableItemGetEnumerable

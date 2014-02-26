@@ -225,8 +225,8 @@ inline static HashTableRecord htFindKey (
 static HashTableRecord htCreateRecord
 (
 	HashTable ht,
-	size_t keyLength, double key, HashTableItemFlags keyHint,
-	size_t valueLength, double value, HashTableItemFlags valueHint
+	size_t keyLength, double key, HashTableDataFlags keyHint,
+	size_t valueLength, double value, HashTableDataFlags valueHint
 ) {
 
 	HashTableRecord this = calloc(1, HashTableRecordSize);
@@ -418,7 +418,7 @@ HashTableItem HashTableHasKey
 	HashTable ht,
 	size_t keyLength,
 	double key,
-	HashTableItemFlags hint
+	HashTableDataFlags hint
 ) {
 	htReturnIfTableUninitialized(ht);
 	char * realKey = htRealKeyOrReturn(keyLength, key, hint);
@@ -493,10 +493,10 @@ HashTableItem HashTablePut
 	HashTable ht,
 	size_t keyLength,
 	double key,
-	HashTableItemFlags keyHint,
+	HashTableDataFlags keyHint,
 	size_t valueLength,
 	double value,
-	HashTableItemFlags valueHint
+	HashTableDataFlags valueHint
 ) {
 
 	htReturnIfTableUninitialized(ht);
@@ -593,7 +593,7 @@ HashTableItem HashTableGet
 	HashTable ht,
 	size_t keyLength,
 	double key,
-	HashTableItemFlags hint
+	HashTableDataFlags hint
 ) {
 
 	htReturnIfTableUninitialized(ht);
@@ -681,7 +681,7 @@ size_t HashTableDataLength
 	return HT_ERROR_SENTINEL;
 }
 
-HashTableItemFlags HashTableDataType
+HashTableDataFlags HashTableDataType
 (
 	const void * data
 ) {
@@ -691,7 +691,7 @@ HashTableItemFlags HashTableDataType
 	return HT_ERROR_SENTINEL;
 }
 
-HashTableItemFlags HashTableDataSettings
+HashTableDataFlags HashTableDataSettings
 (
 	const void * data
 ) {

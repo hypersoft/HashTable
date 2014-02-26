@@ -1,0 +1,1108 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE vymmap>
+<vymmap  version="2.2.4" author="" comment="" date="2014-02-25" branchCount="151" backgroundColor="#ffffff" defaultFont="Cantarell,16,-1,5,50,0,0,0,0,0" selectionColor="#ffff00" linkStyle="StyleLine" linkColor="#0000ff" defXLinkColor="#3232ff" defXLinkWidth="1" defXLinkPenStyle="Qt::DashLine" mapZoomFactor="0.85" mapRotationAngle="0">
+    <mapcenter absPosX="-356.701" absPosY="-1384.35" hideLink="true" uuid="{6fcf406b-219c-4ed7-a076-6ae14efb65c2}">
+        <heading  textColor="#000000">Map Key</heading>
+        <frame  frameType="Rectangle" penColor="#000000" brushColor="#ffffff" padding="50" borderWidth="1" />
+        <branch relPosX="-133" relPosY="178" hideLink="true" uuid="{6a1ea37a-7b1f-48ac-baaa-484bdba4fea9}">
+            <heading  textColor="#000000">Event Procedure</heading>
+            <standardflag>flash</standardflag>
+        </branch>
+        <branch relPosX="-150" relPosY="109" hideLink="true" uuid="{7ef23b63-5ddf-4499-a00b-1e09b5e558bf}">
+            <heading  textColor="#000000">Call Back Interface</heading>
+            <standardflag>phone</standardflag>
+        </branch>
+        <branch relPosX="-138" relPosY="211" hideLink="false" uuid="{45bb5cf2-f91b-4f08-960d-5ebbf67943df}">
+            <heading  textColor="#000000">Work In Progress</heading>
+            <standardflag>wip</standardflag>
+        </branch>
+        <branch relPosX="-225" relPosY="143" hideLink="true" uuid="{e3aab42d-cc0d-4ba4-b7f4-c07b68b4ffcf}">
+            <heading  textColor="#000000">Do Nothing; Developer Notice</heading>
+            <standardflag>lifebelt</standardflag>
+        </branch>
+        <branch relPosX="-123" relPosY="79" hideLink="true" uuid="{aad220b2-8ba4-4bfa-93bb-8071624518c6}">
+            <heading  textColor="#000000">Error Reporter</heading>
+            <standardflag>lamp</standardflag>
+        </branch>
+    </mapcenter>
+    <mapcenter absPosX="-684.742" absPosY="92.9295" hideLink="false" uuid="{07980ed4-96d7-4b74-a497-9100b053bb58}">
+        <heading  textColor="#000000">HashTable</heading>
+        <frame  frameType="Rectangle" penColor="#000000" brushColor="#ffffff" padding="0" borderWidth="1" />
+        <standardflag>wip</standardflag>
+        <branch relPosX="-132.851" relPosY="-34.1074" hideLink="true" uuid="{332ad1d7-a0a9-43fe-b8a3-bbcdc1e92234}">
+            <heading  textColor="#000000">Public</heading>
+            <frame  frameType="RoundedRectangle" penColor="#ffffff" brushColor="#ffffff" padding="20" borderWidth="1" includeChildren="true" />
+            <branch hideLink="false" uuid="{a6669bc5-69fd-4881-957c-e3a8a9ebb1dd}">
+                <heading  textColor="#000000">htDoc</heading>
+                <standardflag>lifebelt</standardflag>
+            </branch>
+            <branch hideLink="false" uuid="{58b52d48-58ba-4c55-9fbb-caf6d6bfe119}">
+                <heading  textColor="#000000">htDocFires</heading>
+                <standardflag>lifebelt</standardflag>
+            </branch>
+            <branch hideLink="false" uuid="{7b291b7f-cc41-40b5-8196-bab3a7921491}">
+                <heading  textColor="#000000">htDocThrows</heading>
+                <standardflag>lifebelt</standardflag>
+            </branch>
+            <branch hideLink="false" uuid="{24d0719e-3c5d-44b1-b173-a46d28b34f2b}">
+                <heading  textColor="#000000">HashTableItem</heading>
+                <frame  frameType="RoundedRectangle" penColor="#000000" brushColor="#ffffff" padding="20" borderWidth="1" includeChildren="true" />
+                <vymnote  fonthint="var">typedef size_t HashTableItem
+
+A temporary reference to an item within a hash table. This item is guaranteed valid, so long as no items have been deleted from the corresponding hash table, and that same hash table has not been optimized or item sorted since obtaining this reference.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{67b7f8fc-8327-42f7-8a4b-68ecd4659bdf}">
+                <heading  textColor="#000000">HashTableError</heading>
+                <frame  frameType="RoundedRectangle" penColor="#000000" brushColor="#ffffff" padding="20" borderWidth="1" includeChildren="true" />
+                <vymnote  fonthint="var">enum HashTableError
+
+Error codes that are set in errno in the event of an API call error.
+</vymnote>
+                <branch hideLink="false" uuid="{60d9e66e-c099-429d-8fa1-b575e2fa4789}">
+                    <heading  textColor="#000000">HT_ERROR_TABLE_UNINITIALIZED</heading>
+                    <vymnote  fonthint="var">size_t HT_ERROR_TABLE_UNINITIALIZED
+
+The hash table parameter was invalid.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{d0ce06f8-28d3-46ea-bee6-6cec077eaa62}">
+                    <heading  textColor="#000000">HT_ERROR_ALLOCATION_FAILURE</heading>
+                    <vymnote  fonthint="var">size_t HT_ERROR_ALLOCATION_FAILURE
+
+A data allocation request failed.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{11ca30dc-0d38-4744-89c6-140ca6817c78}">
+                    <heading  textColor="#000000">HT_ERROR_UNSUPPORTED_FUNCTION</heading>
+                    <vymnote  fonthint="var">size_t HT_ERROR_UNSUPPORTED_FUNCTION
+
+The library does not support the function called.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{80581d9b-b1e3-4dba-bb6e-38ceec74f507}">
+                    <heading  textColor="#000000">HT_ERROR_ZERO_LENGTH_KEY</heading>
+                    <vymnote  fonthint="var">size_t HT_ERROR_ZERO_LENGTH_KEY
+
+A key specifying zero length was supplied, or a UTF-8 key is empty. If you would like to specify a null key, specify the length as 1.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{b37923d8-8f13-4be9-9894-39e61dbf899d}">
+                    <heading  textColor="#000000">HT_ERROR_KEY_NOT_FOUND</heading>
+                    <vymnote  fonthint="var">size_t HT_ERROR_KEY_NOT_FOUND
+
+The specified key could not be located within the hash table.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{556880cf-d2a9-401a-993a-e420ca233836}">
+                    <heading  textColor="#000000">HT_ERROR_INVALID_REFERENCE</heading>
+                    <vymnote  fonthint="var">size_t HT_ERROR_INVALID_REFERENCE
+
+The specified item reference was invalid.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{de6fd79e-e026-4bec-ae2c-57453450eb36}">
+                    <heading  textColor="#000000">HT_ERROR_NOT_WRITABLE_ITEM</heading>
+                    <vymnote  fonthint="var">size_t HT_ERROR_NOT_WRITABLE_ITEM
+
+The request could not be completed because the item is configured read only.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{572e3935-4783-4a54-8b60-83856e756c19}">
+                    <heading  textColor="#000000">HT_ERROR_NOT_CONFIGURABLE_ITEM</heading>
+                    <vymnote  fonthint="var">size_t HT_ERROR_NOT_CONFIGURABLE_ITEM
+
+The request could not be completed because the item is non-configurable.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{1c25d39d-1c9a-454d-ae6f-5fe22b955b56}">
+                    <heading  textColor="#000000">HT_ERROR_NO_CALLBACK_HANDLER</heading>
+                    <vymnote  fonthint="var">size_t HT_ERROR_NO_CALLBACK_HANDLER
+
+The request could not be completed because the call back handler was undefined.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{016b45c5-962c-42e3-8e0a-e9547c8e6c0b}">
+                    <heading  textColor="#000000">HT_ERROR_INVALID_TYPE_REQUEST</heading>
+                    <vymnote  fonthint="var">size_t HT_ERROR_INVALID_TYPE_REQUEST
+
+The request could not be completed because of a type error.
+</vymnote>
+                </branch>
+            </branch>
+            <branch hideLink="false" uuid="{03e59f96-94f5-49ed-b718-874cd490a017}">
+                <heading  textColor="#000000">HashTableEvent</heading>
+                <frame  frameType="RoundedRectangle" penColor="#000000" brushColor="#ffffff" padding="20" borderWidth="1" includeChildren="true" />
+                <vymnote  fonthint="var">enum HashTableEvent
+</vymnote>
+                <branch hideLink="false" uuid="{e860eb08-a50b-49a0-ae2c-0cda649dbf04}">
+                    <heading  textColor="#000000">HT_EVENT_CONSTRUCTED</heading>
+                    <vymnote  fonthint="var">size_t HT_EVENT_CONSTRUCTED
+
+A new hash table has been successfully constructed.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{bd8b9ae2-911d-4690-ad52-fc187b1d5955}">
+                    <heading  textColor="#000000">HT_EVENT_PUT</heading>
+                    <vymnote  fonthint="var">size_T HT_EVENT_PUT
+
+The API has been instructed to put data into the hash table.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{a74694fd-d0cb-4293-bc5f-62d78ecbdf96}">
+                    <heading  textColor="#000000">HT_EVENT_GET</heading>
+                    <vymnote  fonthint="var">size_t HT_EVENT_GET
+
+The API has been queried for a record.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{063f90f9-82b6-41f0-be6e-3b4b9f5da6e8}">
+                    <heading  textColor="#000000">HT_EVENT_DELETE</heading>
+                    <vymnote  fonthint="var">size_t HT_EVENT_DELETE
+
+The API has been instructed to delete a record.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{5e21fd62-353f-4fe7-accd-3ba2514514b1}">
+                    <heading  textColor="#000000">HT_EVENT_DESTRUCTING</heading>
+                    <vymnote  fonthint="var">size_t HT_EVENT_DESTRUCTING
+
+A hash table is about to be destroyed.
+</vymnote>
+                </branch>
+            </branch>
+            <branch hideLink="false" uuid="{2b60d364-5acc-4dff-be62-7ff1732e46dc}">
+                <heading  textColor="#000000">HashTableEventHandler</heading>
+                <frame  frameType="RoundedRectangle" penColor="#000000" brushColor="#ffffff" padding="20" borderWidth="1" includeChildren="true" />
+                <standardflag>phone</standardflag>
+                <standardflag>flash</standardflag>
+                <vymnote  fonthint="var">typedef HashTableItem (*HashTableEventHandler) (HashTable ht, HashTableEvent event, HashTableItem primary, void * private)
+
+The hash table event call back.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{b5b1a6d0-e652-479f-8ee3-8b88af26d8c4}">
+                <heading  textColor="#000000">HashTableEnumerateDirection</heading>
+                <frame  frameType="RoundedRectangle" penColor="#000000" brushColor="#ffffff" padding="20" borderWidth="1" includeChildren="true" />
+                <vymnote  fonthint="var">enum HashTableEnumerateDirection
+</vymnote>
+                <branch hideLink="false" uuid="{080552fc-e6b1-44e6-816f-8fce3a8df63f}">
+                    <heading  textColor="#000000">HT_ENUMERATE_FORWARD</heading>
+                    <vymnote  fonthint="var">size_t HT_ENUMERATE_FORWARD
+
+Enumerate the entries from first to last.
+
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{985b8876-8900-41c5-9892-b03a32cb65dd}">
+                    <heading  textColor="#000000">HT_ENUMERATE_REVERSE</heading>
+                    <vymnote  fonthint="var">size_t HT_ENUMERATE_REVERSE
+
+Enumerate the entries from last to first.
+</vymnote>
+                </branch>
+            </branch>
+            <branch hideLink="false" uuid="{07144cbe-1694-4f1d-b021-7c0fc9def7ad}">
+                <heading  textColor="#000000">HashTableEnumerationHandler</heading>
+                <frame  frameType="RoundedRectangle" penColor="#000000" brushColor="#ffffff" padding="20" borderWidth="1" includeChildren="true" />
+                <standardflag>phone</standardflag>
+                <standardflag>lamp</standardflag>
+                <vymnote  fonthint="var">typedef bool (*HashTableEnumerationHandler) (void * hashTable, HashTableEnumerateDirection direction, HashTableItem item, void * private)
+
+The hash table enumeration call back.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{7cf1e61f-1463-4810-9d89-f70ddfbd5957}">
+                <heading  textColor="#000000">HashTableSortDirection</heading>
+                <frame  frameType="RoundedRectangle" penColor="#000000" brushColor="#ffffff" padding="20" borderWidth="1" includeChildren="true" />
+                <vymnote  fonthint="var">enum HashTableSortDirection
+</vymnote>
+                <branch hideLink="false" uuid="{62d25bfa-572b-478c-99d1-73fa4b0787a7}">
+                    <heading  textColor="#000000">HT_SORT_DESCENDING</heading>
+                    <vymnote  fonthint="var">size_t HT_SORT_DESCENDING
+
+The user specified descending sort function.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{2fade5d6-309c-4e07-a6c3-e750fd6f48f9}">
+                    <heading  textColor="#000000">HT_SORT_ASCENDING</heading>
+                    <vymnote  fonthint="var">size_t HT_SORT_ASCENDING
+
+The user specified ascending sort function.
+</vymnote>
+                </branch>
+            </branch>
+            <branch hideLink="false" uuid="{a3691a34-757b-4ae3-b92e-4642935c79a5}">
+                <heading  textColor="#000000">HashTableSortType</heading>
+                <frame  frameType="RoundedRectangle" penColor="#000000" brushColor="#ffffff" padding="20" borderWidth="1" includeChildren="true" />
+                <vymnote  fonthint="var">enum HashTableSortType
+
+Numeric and Alpha-Numeric sorting are predefined. The user may supply any implementation defined flags to meet sorting objectives.
+</vymnote>
+                <branch hideLink="false" uuid="{cabc87fb-4e0c-4bb7-9aee-fddc50fe30f7}">
+                    <heading  textColor="#000000">HT_SORT_NUMERIC</heading>
+                    <vymnote  fonthint="var">size_t HT_SORT_NUMERIC
+
+The user specified numeric sort function.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{fe696d8c-675d-46cd-b604-ba2c0f57b998}">
+                    <heading  textColor="#000000">HT_SORT_ALPHA</heading>
+                    <vymnote  fonthint="var">size_t HT_SORT_ALPHA
+
+The user specified alpha-numeric sort function.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{225fa4a0-82c8-47e9-ac96-4d87e6299445}">
+                    <heading  textColor="#000000">HT_SORT_EMPTY_ITEMS</heading>
+                    <vymnote  fonthint="var">size_t HT_SORT_EMPTY_ITEMS
+
+When sorting an item list, include undefined list entries.
+
+Note that this has significant meaning only int the context of HashTableSortItems.
+</vymnote>
+                </branch>
+            </branch>
+            <branch hideLink="false" uuid="{95e63230-aad5-41aa-97e7-dd83b89302bc}">
+                <heading  textColor="#000000">HashTableSortHandler</heading>
+                <frame  frameType="RoundedRectangle" penColor="#000000" brushColor="#ffffff" padding="20" borderWidth="1" includeChildren="true" />
+                <standardflag>phone</standardflag>
+                <standardflag>lamp</standardflag>
+                <vymnote  fonthint="var">typedef HashTableItem (*HashTableSortHandler) (void * hashTable, HashTableSortType type, HashTableSortDirection direction, HashTableItem primary, HashTableItem secondary, void * private)
+
+The hash table sort call back.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{51317f10-b04a-4836-ae1e-5f1b85e0c415}">
+                <heading  textColor="#000000">HashTableDataFlags</heading>
+                <frame  frameType="RoundedRectangle" penColor="#000000" brushColor="#ffffff" padding="20" borderWidth="1" includeChildren="true" />
+                <vymnote  fonthint="var">enum HashTableDataFlags
+</vymnote>
+                <branch hideLink="false" uuid="{e0d78803-7186-414c-b437-2429bd430155}">
+                    <heading  textColor="#000000">HTI_INT</heading>
+                    <vymnote  fonthint="var">size_t HTI_INT
+
+The data supplied is a platform sized integer value.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{fafb6d02-201d-4c71-9fd9-5e8b0acca09b}">
+                    <heading  textColor="#000000">HTI_DOUBLE</heading>
+                    <vymnote  fonthint="var">size_t HTI_DOUBLE
+
+The data supplied is an IEEE 754 double precision floating point value.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{7ff2a2d6-54bf-404f-9a00-3925679281e4}">
+                    <heading  textColor="#000000">HTI_POINTER</heading>
+                    <vymnote  fonthint="var">size_t HTI_POINTER
+
+The data supplied is a platform pointer value.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{c5fa57f4-80dc-472b-832b-ccf0b044b36b}">
+                    <heading  textColor="#000000">HTI_UTF8</heading>
+                    <vymnote  fonthint="var">size_T HTI_UTF8
+
+The data supplied is an ANSI C or UTF-8 encoded string.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{c52207c5-6eba-4f5d-bdcd-959f3d16cd6a}">
+                    <heading  textColor="#000000">HTI_BLOCK</heading>
+                    <vymnote  fonthint="var">size_T HTI_BLOCK
+
+Generic block data of the specified length.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{f356ffd0-d268-4141-af25-e0c19e429996}">
+                    <heading  textColor="#000000">HTI_NON_ENUMERABLE</heading>
+                    <vymnote  fonthint="var">size_t HTI_NON_ENUMERABLE
+
+Do not list in enumeration.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{d1cab46a-2001-41df-bd49-ac7c6b245436}">
+                    <heading  textColor="#000000">HTI_NON_WRITABLE</heading>
+                    <vymnote  fonthint="var">size_t HTI_NON_WRITABLE
+
+Do not overwrite.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{74d73c5a-21b9-4810-b87c-cee08e882700}">
+                    <heading  textColor="#000000">HTI_NON_CONFIGURABLE</heading>
+                    <vymnote  fonthint="var">size_t HTI_NON_CONFIGURABLE
+
+Do not delete, do not modify enumerable or configurable.
+</vymnote>
+                </branch>
+            </branch>
+            <branch hideLink="false" uuid="{f9ef0dd3-430d-4981-9d5e-05383c980e86}">
+                <heading  textColor="#000000">ht Macros</heading>
+                <frame  frameType="RoundedRectangle" penColor="#000000" brushColor="#ffffff" padding="20" borderWidth="1" includeChildren="true" />
+                <vymnote  fonthint="var">Use these macros to perform variant data requests between your application and the HashTable API.
+</vymnote>
+                <branch hideLink="false" uuid="{21d0e916-6649-49e0-888c-74e94352bb8d}">
+                    <heading  textColor="#000000">htInt</heading>
+                    <standardflag>present</standardflag>
+                    <vymnote  fonthint="var">parameter list htInt(size_t i)
+
+Returns parameter list for API functions to diagnose and transpose an integer as a record key or value.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{e987dfaf-4a4e-4310-bb50-9d99ef73288b}">
+                    <heading  textColor="#000000">htPtr</heading>
+                    <standardflag>present</standardflag>
+                    <vymnote  fonthint="var">parameter list htPtr(void * p)
+
+Returns parameter list for API functions to diagnose and transpose a pointer as a record key or value.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{805c25f3-7ffa-44cd-8df1-c4c47accb76e}">
+                    <heading  textColor="#000000">htDbl</heading>
+                    <standardflag>present</standardflag>
+                    <vymnote  fonthint="var">parameter list htDbl(dobule d)
+
+Returns parameter list for API functions to diagnose and transpose a double as a record key or value.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{9ad46c2f-8b6a-4811-b0ca-28280497174a}">
+                    <heading  textColor="#000000">htStr</heading>
+                    <standardflag>present</standardflag>
+                    <vymnote  fonthint="var">parameter list htStr(char * s)
+
+Returns parameter list for API functions to diagnose and transpose an ANSI or UTF-8 string as a record key or value.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{801e3c74-88fd-4c90-ab72-86d4511d9202}">
+                    <heading  textColor="#000000">htBlk</heading>
+                    <standardflag>present</standardflag>
+                    <vymnote  fonthint="var">parameter list htBlk(void * b, size_t length)
+
+Returns parameter list for API functions to diagnose and transpose an arbitrary block of data with specified length as a record key or value.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{a2aeac9a-7fb4-4b95-a15e-af7393ff4c42}">
+                    <heading  textColor="#000000">htStrN</heading>
+                    <standardflag>present</standardflag>
+                    <vymnote  fonthint="var">parameter list htStrN(char * s, size_t length)
+
+Returns parameter list for API functions to diagnose and transpose an arbitrary length ANSI or UTF-8 string pointer as a record key or value.
+</vymnote>
+                </branch>
+            </branch>
+            <branch hideLink="false" uuid="{44e74551-e649-4589-836e-7eb5ef51bbc6}">
+                <heading  textColor="#000000">Lifecycle</heading>
+                <frame  frameType="RoundedRectangle" penColor="#000000" brushColor="#ffffff" padding="20" borderWidth="1" includeChildren="true" />
+                <vymnote  fonthint="var">Operations which manage the existence or &amp;quot;instancing&amp;quot; of hash tables.
+</vymnote>
+                <branch hideLink="false" uuid="{05a55f90-5ed2-4c21-ac74-ebed02d626be}">
+                    <heading  textColor="#000000">NewHashTable</heading>
+                    <standardflag>flash</standardflag>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">HashTable NewHashTable(size_t size, HashTableEvent withEvents, HashTableEventHandler eventHandler, void * private)
+
+Create a new hash table from scratch. 
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{963da27a-9a4f-4bd4-8159-17488d6f7b58}">
+                    <heading  textColor="#000000">OptimizeHashTable</heading>
+                    <standardflag>flash</standardflag>
+                    <standardflag>lamp</standardflag>
+                    <standardflag>wip</standardflag>
+                    <standardflag>exclamationmark</standardflag>
+                    <vymnote  fonthint="var">void OptimizeHashTable(HashTable ht, size_t slots)
+
+This function is defined but is not yet supported.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{a850e0a6-ec64-4014-ab2d-ef94a7004798}">
+                    <heading  textColor="#000000">DestroyHashTable</heading>
+                    <standardflag>flash</standardflag>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">HashTable DestroyHashTable(HashTable ht)
+
+Completely destroys a hash table and all of its records, releasing the total memory impact.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{cc83b71d-b507-4b2a-a213-fe0f8e2c9b79}">
+                    <heading  textColor="#000000">HashTableRegisterEvents</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">void HashTableRegisterEvents(HashTable ht, HashTableEvent withEvents, HashTableEventHandler eventHandler)
+
+Modifies the event flags and callback (if supplied, non-zero) associated with a particular hash table.
+</vymnote>
+                </branch>
+            </branch>
+            <branch hideLink="false" uuid="{099d6516-64f4-4af8-9ab7-37ba7d41d671}">
+                <heading  textColor="#000000">Statistics</heading>
+                <frame  frameType="RoundedRectangle" penColor="#000000" brushColor="#ffffff" padding="20" borderWidth="1" includeChildren="true" />
+                <branch hideLink="false" uuid="{823008ae-cd7a-4d2e-a3a2-2100ee9985e9}">
+                    <heading  textColor="#000000">HashTableItemsUsed</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">size_t HashTableItemsUsed(HashTable ht)
+
+Returns the number of item references currently dispatched. This number includes items which have been deleted.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{1d97d356-b718-4049-85d7-530f3b568857}">
+                    <heading  textColor="#000000">HashTableItemsTotal</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">size_t HashTableItemsTotal(HashTable ht)
+
+Returns the current number of valid item references.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{42c389f9-13bd-44ba-bc4e-6b30d624bbab}">
+                    <heading  textColor="#000000">HashTableItemsMax</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">size_t HashTableItemsMax(HashTable hashTable)
+
+Returns the current maximum number of item references. The maximum number of item references grows as needed. This procedure is provided mostly for instrumentation purposes.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{0815abfc-e6c7-43cb-a1bc-49ee9a30701e}">
+                    <heading  textColor="#000000">HashTableSlotCount</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">size_t HashTableSlotCount(HashTable ht)
+
+Returns the total number of slots for a particular hash table.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{ca1508ed-27d4-42bf-bb79-8efbd4a34096}">
+                    <heading  textColor="#000000">HashTableSlotsUsed</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">size_t HashTableSlotsUsed(HashTable ht)
+
+Returns the number of slots containing one or more records.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{a2cfdbc9-3c8f-4307-bdb2-0d037261de99}">
+                    <heading  textColor="#000000">HashTableLoadFactor</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">double HashTableLoadFactor(HashTable ht)
+
+Returns the total number of hash table records divided by the number of slots for a particular hash table.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{36fffd96-95e8-4b36-a0a3-7e0c1ed5784f}">
+                    <heading  textColor="#000000">HashTableImpact</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">size_t HashTableImpact(HashTable ht)
+
+Get report on how many logical bytes this hash table occupies in memory.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{609d4203-c517-494c-b678-07d8f724068d}">
+                    <heading  textColor="#000000">HashTableHasKey</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">HashTableItem HashTableHasKey(HashTable hashTable, size_t keyLength, double key, HashTableDataFlags hint)
+
+This procedure works mostly like HashTableGet, except it does not raise events, and will not throw an error if the key is not found.
+
+Technically the return type for this procedure is bool, however to save API calls, it actually returns the item reference if the key is found due to the fact that item references are factually boolean return values.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{16ee5d73-5b06-4452-95c0-2a33308f6d65}">
+                    <heading  textColor="#000000">HashTableHasItem</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">bool HashTableHasItem(HashTable hashTable, HashTableItem reference)
+
+This procedure checks to see if the reference is in range and if the reference is non-null. Only throws an error if the hash table is uninitialized.
+
+Use this procedure to perform manual enumerations and sorting decisions based on reference existence.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{5478da01-784a-41b3-9022-6fbe582cecf2}">
+                    <heading  textColor="#000000">HashTableItemDistribution</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">size_t HashTableItemDistribution(HashTable hashTable, HashTableItem reference)
+
+Generate a report on how many entries are associated with an item's hash.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{01686568-d0c5-463a-85a1-628d249b9713}">
+                    <heading  textColor="#000000">HashTableItemHits</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">size_t HashTableItemHits(HashTable ht, HashTableItem reference)
+
+Returns the number of times a hash table item has been set or requested. This operation does not alter any items in the hash table nor does it alter the hash table itself.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{0692b602-a1be-432c-8cee-0b2d04d97f9a}">
+                    <heading  textColor="#000000">HashTableItemImpact</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">size_t HashTableItemImpact(HashTable ht, HashTableItem reference)
+
+Generates a report on the total number of bytes used to store an item.
+</vymnote>
+                </branch>
+            </branch>
+            <branch hideLink="false" uuid="{57f4ce6a-5bdb-4a13-906d-93d95c1f2f58}">
+                <heading  textColor="#000000">Data Management</heading>
+                <frame  frameType="RoundedRectangle" penColor="#000000" brushColor="#ffffff" padding="20" borderWidth="1" includeChildren="true" />
+                <branch hideLink="false" uuid="{dc67a547-5343-41bc-bc8a-9bb8db33b744}">
+                    <heading  textColor="#000000">HashTableGetPrivate</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">void * HashTableGetPrivate(HashTable ht)
+
+Returns the private user data associated with a hash table.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{2818e17e-c21f-40ad-ab49-24cff0612bf1}">
+                    <heading  textColor="#000000">HashTablePutPrivate</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">void HashTablePutPrivate(HashTable ht, void * private)
+
+Stores the private data supplied as an user association of data for a hash table.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{45bd94ad-5c21-489a-90fb-ae87b94c80f1}">
+                    <heading  textColor="#000000">HashTablePut</heading>
+                    <standardflag>flash</standardflag>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">HashTableItem HashTablePut(HashTable ht, size_t keyLength, double key, HashTableDataFlags keyHint, size_t valueLength, double value, HashTableDataFlags valueHint)
+
+Places a key value pair into the hash table and returns the item's reference.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{5aa17751-07f4-4fab-9aa4-814484fe18be}">
+                    <heading  textColor="#000000">HashTableGet</heading>
+                    <standardflag>flash</standardflag>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">HashTableItem HashTableGet(HashTable ht, size_t keyLength, double key, HashTableDataFlags hint)
+
+Get's an item reference by its key.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{6ec50ab0-ba87-4345-8ccf-aa18960566f3}">
+                    <heading  textColor="#000000">HashTableDeleteItem</heading>
+                    <standardflag>flash</standardflag>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">bool HashTableDeleteItem(HashTable ht, HashTableItem reference)
+
+Removes an item from a hash table.</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{cdaaed09-f755-4779-8e25-01e74674eb24}">
+                    <heading  textColor="#000000">HashTableItemKey</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">const void * HashTableItemKey(HashTable hashTable, HashTableItem reference)
+
+Returns a constant pointer to an item's key.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{e9ce6653-a77d-492d-8814-9c4d8ff53d63}">
+                    <heading  textColor="#000000">HashTableItemData</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">const void * HashTableItemData(HashTable hashTable, HashTableItem reference)
+
+Returns a constant pointer to an item's value.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{afd6611b-5c52-4ff8-99f0-2cb5ea25a379}">
+                    <heading  textColor="#000000">HashTableDataLength</heading>
+                    <vymnote  fonthint="var">size_t HashTableDataLength(const void * data)
+
+Retrieves the length of the data reference.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{dfb3af91-492a-44f9-a65c-6c351996be64}">
+                    <heading  textColor="#000000">HashTableDataType</heading>
+                    <vymnote  fonthint="var">HashTableDataFlags HashTableDataType(const void * data)
+
+Returns the type information associated with an item's value.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{d1ccbccd-6179-456d-9b75-35620e9fbd8e}">
+                    <heading  textColor="#000000">HashTableDataSettings</heading>
+                    <vymnote  fonthint="var">HashTableDataFlags HashTableDataSettings(const void * data)
+
+Retrieve all configuration flags for an item value.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{0e810909-41cd-4169-b3c2-b57ac5d407de}">
+                    <heading  textColor="#000000">HashTableItemGetEnumerable</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">bool HashTableItemGetEnumerable(HashTable hashTable, HashTableItem reference)
+
+Get the item's enumerable flag.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{deb9eda1-293f-46c6-bad9-2bbdaa6c001b}">
+                    <heading  textColor="#000000">HashTableItemSetEnumerable</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">bool HashTableItemSetEnumerable(HashTable hashTable, HashTableItem reference, bool value)
+
+If the item is configurable, set the item's enumerable flag to value.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{47ba218f-7b05-445b-adf6-3356d818c909}">
+                    <heading  textColor="#000000">HashTableItemGetWriteable</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">bool HashTableItemGetWritable(HashTable hashTable, HashTableItem reference)
+
+Get the item's writable flag.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{e2eb686c-1de3-46c3-9c7e-e375040e4cbb}">
+                    <heading  textColor="#000000">HashTableItemSetWritable</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">bool HashTableItemSetWritable(HashTable hashTable, HashTableItem reference, bool value)
+
+If the item is configurable, set the item's writable flag to value.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{bfc458bc-6292-4bc6-bdc4-8ef2bd68fad2}">
+                    <heading  textColor="#000000">HashTableItemGetConfigurable</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">bool HashTableItemGetConfigurable(HashTable hashTable, HashTableItem reference)
+
+Get the item's configurable flag.
+
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{4e84822b-230d-4e35-a2bc-fedcfcdc599a}">
+                    <heading  textColor="#000000">HashTableItemSetConfigurable</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">bool HashTableItemSetConfigurable(HashTable hashTable, HashTableItem reference, bool value)
+
+If the item is configurable, set the configurable flag to value.
+</vymnote>
+                </branch>
+            </branch>
+            <branch hideLink="false" uuid="{5173d992-273e-4239-aa65-aa2609f9d4c9}">
+                <heading  textColor="#000000">Extended Operations</heading>
+                <frame  frameType="RoundedRectangle" penColor="#000000" brushColor="#ffffff" padding="20" borderWidth="1" includeChildren="true" />
+                <branch hideLink="false" uuid="{ccfec321-73ec-469f-bb88-dc49274d32d5}">
+                    <heading  textColor="#000000">HashTableEnumerate</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">void HashTableEnumerate(HashTable hashTable, 	HashTableEnumerateDirection direction, 	HashTableEnumerationHandler handler, void * private)
+
+Enumerate a hash table's items in the specified direction.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{670530b2-0633-41ff-a111-4df35cbead92}">
+                    <heading  textColor="#000000">HashTableSortItems</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">void HashTableSortItems(HashTable hashTable, HashTableSortType type, HashTableSortDirection direction, HashTableSortHandler sortHandler, void * private)
+
+Sor the item list of the hash table.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{65e58d5e-c18e-42c0-8e00-0b9b03a4a01e}">
+                    <heading  textColor="#000000">HashTableSortItemHash</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">void HashTableSortItemHash(HashTable hashTable, HashTableItem reference, HashTableSortType type, HashTableSortDirection direction, HashTableSortHandler sortHandler, void * private)
+
+Perform user defined sorting on an items's hash slot.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{66a85a1d-cd7d-4097-890e-7638d8a5f963}">
+                    <heading  textColor="#000000">HashTableEnumerateItemHash</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">void HashTableEnumerateItemHash
+(HashTable hashTable, HashTableItem reference, HashTableEnumerateDirection direction, HashTableEnumerationHandler handler, void * private)
+
+Enumerate and item's hash slot.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{6fcfb219-342c-4fec-8c43-cbda22029b17}">
+                    <heading  textColor="#000000">HashTableErrorMessage</heading>
+                    <standardflag>lamp</standardflag>
+                    <vymnote  fonthint="var">const char * HashTableErrorMessage(void)
+
+Returns a string representing the contents of errno, if errno equates to a HashTableError.
+
+</vymnote>
+                </branch>
+            </branch>
+        </branch>
+        <branch relPosX="44.6202" relPosY="-31.9434" hideLink="true" uuid="{3c2b5a3f-d2cf-416f-96ef-10dfc173c20e}">
+            <heading  textColor="#000000">Private</heading>
+            <frame  frameType="RoundedRectangle" penColor="#ffffff" brushColor="#ffffff" padding="20" borderWidth="1" includeChildren="true" />
+            <vymnote  fonthint="var">Information in this section is only applicable to engineers who are revising the library code.
+</vymnote>
+            <branch hideLink="false" uuid="{c96e9d0d-0f15-4be4-866d-bee8fb07187a}">
+                <heading  textColor="#000000">htVoidExpression</heading>
+                <vymnote  fonthint="var">#define htVoidExpression (void)
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{9033286f-2557-47d1-b7be-a4475ecb208c}">
+                <heading  textColor="#000000">htVirtualImmediateFunction</heading>
+                <vymnote  fonthint="var">#define htVirtualImmediateFunction(type) static inline type
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{6bb2b81e-cc06-45f5-a7bf-1768b314909d}">
+                <heading  textColor="#000000">struct sHashTableRecord</heading>
+                <frame  frameType="RoundedRectangle" penColor="#000000" brushColor="#ffffff" padding="20" borderWidth="1" includeChildren="true" />
+                <branch hideLink="false" uuid="{c3f76bde-1067-415f-86c2-f6c0c2400f5e}">
+                    <heading  textColor="#000000">hitCount</heading>
+                    <vymnote  fonthint="var">size_t hitCount
+
+The number of times this record has been set or requested by the user. This number does not include initialization.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{212051ef-6f21-4759-8631-8f1d3fcc4fd7}">
+                    <heading  textColor="#000000">key</heading>
+                    <vymnote  fonthint="var">HyperVariant key
+
+As far as we are concerned, this is just a void * for allocated data.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{271e6ff4-c119-4aef-ac0a-03e2d20a89a3}">
+                    <heading  textColor="#000000">value</heading>
+                    <vymnote  fonthint="var">HyperVariant value
+
+See sHashTableRecord.key for more information.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{8f61dfb9-273b-4cf0-9424-5a918c13e0ac}">
+                    <heading  textColor="#000000">successor</heading>
+                    <vymnote  fonthint="var">struct sHashTableRecord * successor
+
+The next record to succeed this one in the hash table.
+</vymnote>
+                </branch>
+            </branch>
+            <branch hideLink="false" uuid="{ea036f5c-763d-40a0-8747-b7adbd8af961}">
+                <heading  textColor="#000000">htRecordReference</heading>
+                <vymnote  fonthint="var">HashTableItem htRecordReference(HashTableRecord r)
+
+Get/Set the record's item reference.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{f1146e1c-e3e8-4ded-9f7d-f386ab528258}">
+                <heading  textColor="#000000">htRecordHash</heading>
+                <vymnote  fonthint="var">size_t htRecordHash(HashTableRecord r)
+
+Get/Set the record's slot hash.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{e9df2c29-3896-439a-b07b-78983e9d78d4}">
+                <heading  textColor="#000000">htRecordConfiguration</heading>
+                <vymnote  fonthint="var">size_t htRecordConfiguration(HashTableRecord r)
+
+Get/Set the record's configuration flags.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{0698a689-2a70-4b36-a811-0183fac7989e}">
+                <heading  textColor="#000000">HashTableRecordSize</heading>
+                <vymnote  fonthint="var">#define HashTableRecordSize sizeof(sHashTableRecord)
+
+The size in bytes of a single sHashTableRecord.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{28ebde52-965a-445c-bc2f-cbecda0caefd}">
+                <heading  textColor="#000000">HashTableRecord</heading>
+                <vymnote  fonthint="var">#define HashTableRecord sHashTableRecord *
+
+An alias for sHashTableRecord *.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{28ebde52-965a-445c-bc2f-cbecda0caefd}">
+                <heading  textColor="#000000">HashTableRecordItems</heading>
+                <vymnote  fonthint="var">#define HashTableRecordItems sHashTableRecord **
+
+An alias for sHashTableRecord **.</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{28ebde52-965a-445c-bc2f-cbecda0caefd}">
+                <heading  textColor="#000000">HashTableRecordList</heading>
+                <vymnote  fonthint="var">#define HashTableRecordList sHashTableRecord **
+
+An alias for sHashTableRecord **.</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{705a9536-960d-4eac-9887-b47d6fb642e6}">
+                <heading  textColor="#000000">struct sHashTable</heading>
+                <frame  frameType="RoundedRectangle" penColor="#000000" brushColor="#ffffff" padding="20" borderWidth="1" includeChildren="true" />
+                <branch hideLink="false" uuid="{e70e3982-8c53-4c46-bd7c-defa50036094}">
+                    <heading  textColor="#000000">item</heading>
+                    <vymnote  fonthint="var">HashTableRecordItems item
+
+Pointer array containing the logical order of all hash table entries.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{f976c3a2-28d7-4370-ba93-26e174f73172}">
+                    <heading  textColor="#000000">itemsUsed</heading>
+                    <vymnote  fonthint="var">size_t itemsUsed
+
+The number of items written to in the linear pointer array.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{55384b12-5505-4ec0-9bb4-34c0ed334cbb}">
+                    <heading  textColor="#000000">itemsTotal</heading>
+                    <vymnote  fonthint="var">size_t itemsTotal
+
+The number of data records actually held by this hash table.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{7016d295-b3ab-48b3-ba63-31cca0a4a179}">
+                    <heading  textColor="#000000">itemsMax</heading>
+                    <vymnote  fonthint="var">size_t itemsMax
+
+The number of records that can be written to the linear pointer array.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{86427a11-505a-44d9-ba0e-ffaf305881cb}">
+                    <heading  textColor="#000000">slot</heading>
+                    <vymnote  fonthint="var">sHashTable ** slot
+
+This pointer array, stores the entries that are also stored in linear, except it stores them in true Hash Table fashion as a linked list of finite buckets or &amp;quot;slots&amp;quot;.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{1d60b954-e537-4930-83cf-427158823171}">
+                    <heading  textColor="#000000">slotCount</heading>
+                    <vymnote  fonthint="var">size_t slotCount
+
+The number of slots this table has allocated for record list storage.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{58c217bc-48a9-448c-9884-6d84dd82f12b}">
+                    <heading  textColor="#000000">eventHandler</heading>
+                    <vymnote  fonthint="var">HashTableEventHandler eventHandler
+
+The call back procedure which is called when hash table events are &amp;quot;raised&amp;quot;.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{b8124ece-6565-44c5-821a-12555c61fe5d}">
+                    <heading  textColor="#000000">events</heading>
+                    <vymnote  fonthint="var">size_t eventFlags
+
+The HashTableEvent flags this table's event handler handles.</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{2d259bbb-4f31-43ca-8eb5-ef9dc83d5851}">
+                    <heading  textColor="#000000">impact</heading>
+                    <vymnote  fonthint="var">size_t impact
+
+The number of bytes consumed in memory by this hash table and all of its records.
+</vymnote>
+                </branch>
+                <branch hideLink="false" uuid="{20056fd1-c513-471c-a4dd-b9da299b1130}">
+                    <heading  textColor="#000000">private</heading>
+                    <vymnote  fonthint="var">void * private
+
+The private data the user associates with this hash table.
+</vymnote>
+                </branch>
+            </branch>
+            <branch hideLink="false" uuid="{65e0b0c3-6a12-467b-ae9a-a10cb2b12c03}">
+                <heading  textColor="#000000">HashTableSize</heading>
+                <standardflag>lamp</standardflag>
+                <vymnote  fonthint="var">#define HashTableSize sizeof(sHashTable)
+
+The size in bytes of a single sHashTable.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{28ebde52-965a-445c-bc2f-cbecda0caefd}">
+                <heading  textColor="#000000">HashTable</heading>
+                <standardflag>lamp</standardflag>
+                <vymnote  fonthint="var">#define HashTable sHashTable *
+
+An alias for sHashTable *.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{6d032833-8a13-4fc9-88f2-c25474a92590}">
+                <heading  textColor="#000000">htGetEventMask</heading>
+                <vymnote  fonthint="var">#define htGetEventMask(ht, withEvents) (ht-&amp;gt;events &amp; withEvents)
+
+Create an event filter for the specified hash table.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{36b6735f-8d7f-46e7-9636-215b9317b98b}">
+                <heading  textColor="#000000">htReturnIfTableUninitialized</heading>
+                <standardflag>lamp</standardflag>
+                <vymnote  fonthint="var">void htReturnIfTableUninitialized(HashTable table)
+
+If table is null, set errno to HT_ERROR_TABLE_UNINITIALIZED and return HT_ERROR_SENTINEL.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{413f9a0a-7ee5-42a0-9381-f6dcb7aa1ffd}">
+                <heading  textColor="#000000">htReturnVoidIfTableUninitialized</heading>
+                <standardflag>lamp</standardflag>
+                <vymnote  fonthint="var">void htReturnVoidIfTableUninitialized(HashTable table)
+
+If table is null, set errno to HT_ERROR_TABLE_UNINITIALIZED and return.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{0383547b-55fc-4b43-88a9-028744c77824}">
+                <heading  textColor="#000000">htReturnVoidUnsupportedFunction</heading>
+                <standardflag>lamp</standardflag>
+                <vymnote  fonthint="var">void htReturnVoidUnsupportedFunction(void)
+
+Set errno to HT_ERROR_UNSUPPORTED_FUNCTION and return.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{48834b01-0c88-4b62-9048-6a7a250912ef}">
+                <heading  textColor="#000000">htReturnIfZeroLengthKey</heading>
+                <standardflag>lamp</standardflag>
+                <vymnote  fonthint="var">void htReturnIfZeroLengthKey(size_t length)
+
+If length is false, set errno to HT_ERROR_ZERO_LENGTH_KEY and return HT_ERROR_SENTINEL.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{223bfcb2-80c8-4879-8ba5-aded3e7fea95}">
+                <heading  textColor="#000000">htReturnIfAllocationFailure</heading>
+                <standardflag>lamp</standardflag>
+                <vymnote  fonthint="var">void htReturnIfAllocationFailure(void * pointer, expressions...)
+
+if pointer is null set errno to HT_ERROR_ALLOCATION_FAILURE, execute expressions, and return HT_ERROR_SENTINEL.
+
+Remarks:
+
+The purpose of expressions, is to allow you to free multiple pointers in the event of a failed allocation. In the event that no other pointers need to be freed, simply supply `{}' as the expressions to be executed; which is an equivalent of a NOP expression in C.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{3660608f-58e5-4a11-8f9f-10d45279b02c}">
+                <heading  textColor="#000000">htReturnIfInvalidReference</heading>
+                <standardflag>lamp</standardflag>
+                <vymnote  fonthint="var">void htReturnIfInvalidReference(HashTable table, HashTableItem reference)
+
+Call htReturnIfTableUninitialized(table).
+
+If reference is false or the table's  maximum number of item references is less than reference or the internalized reference does not exist in the table items set errno to HT_ERROR_INVALID_REFERENCE and return HT_ERROR_SENTINEL.
+
+An internalized reference is simply the reference decremented by 1. This implies that reference must be an lvalue. Furthermore, after calling this macro, no further operations shall internalize the reference and still possess a valid reference to the item in question.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{e2acd17e-70d5-49cb-a5a0-b9074c5dfcf7}">
+                <heading  textColor="#000000">htReturnVoidIfInvalidReference</heading>
+                <standardflag>lamp</standardflag>
+                <vymnote  fonthint="var">void htReturnVoidIfInvalidReference(HashTable ht, HashTableItem reference)
+
+Call htReturnVoidIfTableUninitialized(table).
+
+If reference is false or the table's  maximum number of item references is less than reference or the internalized reference does not exist in the table items set errno to HT_ERROR_INVALID_REFERENCE and return.
+
+An internalized reference is simply the reference decremented by 1. This implies that reference must be an lvalue. Furthermore, after calling this macro, no further operations shall internalize the reference and still possess a valid reference to the item in question.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{b6139fb2-d708-44de-af48-d218bc74ddcb}">
+                <heading  textColor="#000000">htReturnVoidIfNoCallBackHandler</heading>
+                <standardflag>lamp</standardflag>
+                <vymnote  fonthint="var">void htReturnVoidIfNoCallBackHandler(void * p)
+
+Return void and set errno to HT_ERROR_NO_CALLBACK_HANDLER if the supplied pointer is null.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{5c0f0dfb-d41b-4ef3-8115-669ace740137}">
+                <heading  textColor="#000000">htReturnIfNotWritableItem</heading>
+                <standardflag>lamp</standardflag>
+                <vymnote  fonthint="var">void htReturnIfNotWritableItem(HashTableRecord item)
+
+If item has flags HTI_CONSTANT, set errno to HT_ERROR_NOT_WRITABLE_ITEM and return 0.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{74d73c5a-21b9-4810-b87c-cee08e882700}">
+                <heading  textColor="#000000">htReturnIfNotConfigurableItem</heading>
+                <standardflag>lamp</standardflag>
+                <vymnote  fonthint="var">void htReturnIfNotConfigurableItem(HashTableItem reference)
+
+If the item cannot be configured set errno HT_ERROR_NOT_CONFIGURABLE_ITEM and return 0.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{9d4164ad-06c5-4ff5-8c71-43b69c9b7ba4}">
+                <heading  textColor="#000000">htDblIsNaN</heading>
+                <vymnote  fonthint="var">boolean htDblIsNaN(volatile double value)
+
+Returns true or false if the value specified is representative of the IEEE 754 floating point value NaN.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{edf7c299-b6b0-4941-88a5-b58a37be523d}">
+                <heading  textColor="#000000">htDblInfinity</heading>
+                <vymnote  fonthint="var">(signed int) trilean htDblInfinity(double value)
+
+Returns -1 if the double value specified is an IEEE 754 negative infinity, 1 if the value specified is an IEEE 754 positive infinity, and zero otherwise. Trilean meaning three state value.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{de47017c-54c4-46d7-a633-6a86ea7d0804}">
+                <heading  textColor="#000000">htKeyHash</heading>
+                <vymnote  fonthint="var">size_t htKeyHash(HashTable ht, size_t keyLength, void * realKey)
+
+Hashes a key and distributes (selects a slot for) the key in the table.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{497b43dc-d31d-4a73-bdb6-938e53f749b3}">
+                <heading  textColor="#000000">htRealKeyOrReturn</heading>
+                <standardflag>lamp</standardflag>
+                <vymnote  fonthint="var">void * htRealKeyOrReturn(size_t length, double value, HashTableDataFlags hint)
+
+Automatically selects pointer to double, or pointer in double based on the contents of flag.
+
+Furthermore, if length is zero, and hint specifies HTI_UTF8, scan value length into length.
+
+If after all prior operations, length is zero, set errno to HT_ERROR_ZERO_LENGTH_KEY and return HT_ERROR_SENTINEL.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{04523293-0f13-48a3-a3f6-73f5efa96a2b}">
+                <heading  textColor="#000000">htRecordImpact</heading>
+                <standardflag>lamp</standardflag>
+                <vymnote  fonthint="var">size_t htRecordImpact(HashTableRecord record)
+
+Returns the size in bytes occupied by a hash table record.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{80e1e8d1-62b6-4a97-888c-94b3d4bf4060}">
+                <heading  textColor="#000000">htCreateRecord</heading>
+                <standardflag>lamp</standardflag>
+                <vymnote  fonthint="var">HashTableRecord htCreateRecord(HashTable ht, size_t keyLength, double key, HashTableDataFlags keyHint, size_t valueLength, double value, HashTableDataFlags valueHint)
+
+Creates a new hash table record.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{e19888eb-06a3-4167-a138-d10bf4518f6f}">
+                <heading  textColor="#000000">htAutoFireItemEvent</heading>
+                <standardflag>flash</standardflag>
+                <vymnote  fonthint="var">htVirtualImmediateFunction (HashTableItem) htAutoFireItemEvent
+(
+	htDoc (does not check) HashTable ht,
+	htDoc (does not check) HashTableItem reference,
+	htDocFires (any registered) HashTableEvent withEvents,
+	htDoc (?:= ht-&amp;gt;private) void * private
+)
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{c754b903-b090-419d-a6dc-bfa5dac7a4b7}">
+                <heading  textColor="#000000">htCompareRecordToRealKey</heading>
+                <vymnote  fonthint="var">boolean htCompareRecordToRealKey(HashTable ht, HashTableRecord record, size_t keyLength, void * realKey)
+
+Compares a hash table record to a real key.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{2498cf7c-3d0f-4575-b030-a5103a13e1fb}">
+                <heading  textColor="#000000">htCreateHash</heading>
+                <vymnote  fonthint="var">size_t htCreateHash(size_t keyLength, void * realKey)
+
+Creates a hash of any data supplied, using the hash table library's hashing algorithm.
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{cf4a679c-b77a-4ffe-abe0-ed45649f8923}">
+                <heading  textColor="#000000">htFindKeyWithParent</heading>
+                <standardflag>lamp</standardflag>
+                <vymnote  fonthint="var">HashTableRecord htFindKeyWithParent(HashTable table, size_t keyLength, void * realKey, HashTableRecord primary, HashTableRecord * parent)
+
+Locate a key within the table beginning the search at primary, returning the results found, as well as the predecessor of the key found (or not found).
+</vymnote>
+            </branch>
+            <branch hideLink="false" uuid="{cf4a679c-b77a-4ffe-abe0-ed45649f8923}">
+                <heading  textColor="#000000">htFindKey</heading>
+                <standardflag>lamp</standardflag>
+                <vymnote  fonthint="var">HashTableRecord htFindKey(HashTable table, size_t keyLength, void * realKey)
+
+Locate a key within a table's records and return its 1 based index within the linear list or zero if not found.
+</vymnote>
+            </branch>
+        </branch>
+        <branch relPosX="223.825" relPosY="-1535.63" hideLink="true" uuid="{cf001b0b-92ff-45c6-9eed-4e838263d058}">
+            <heading  textColor="#000000">Hypersoft Systems HashTable</heading>
+        </branch>
+        <branch relPosX="257.48" relPosY="1340.39" hideLink="true" uuid="{cb60a057-6067-4d9a-9af3-6f5da9800caa}">
+            <heading  textColor="#000000">(C) 2014 Triston J. Taylor</heading>
+        </branch>
+    </mapcenter>
+    <setting  key="/treeeditor/visible" value="true" />
+    <setting  key="/export/last/exportPath" value="/home/triston/develop/c-skills/HashTable" />
+    <setting  key="/export/last/command" value="exportHTML" />
+    <setting  key="/export/last/description" value="HTML" />
+    <setting  key="/export/html/exportDir" value="/home/triston/develop/c-skills/HashTable/" />
+    <setting  key="/export/html/useImage" value="yes" />
+    <setting  key="/export/html/useTextColor" value="no" />
+    <setting  key="/export/html/css" value="/home/triston/develop/c-skills/HashTable/vym.css" />
+    <setting  key="/export/html/saveSettingsInMap" value="yes" />
+    <select>mc:1,bo:0,bo:16,bo:8</select>
+</vymmap>

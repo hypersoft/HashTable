@@ -4,8 +4,8 @@
 #include <stdio.h>
 
 void htItemReport(HashTable ht, HashTableItem item) {
-	const void * key = HashTableItemKey(ht, item);
-	HashTableItemFlags keyFlags = HashTableDataSettings(key);
+	HashTableData key = HashTableItemKey(ht, item);
+	HashTableDataFlags keyFlags = HashTableDataSettings(key);
 	printf("\tItem Reference: %i\n", item);
 	printf("\tItem Key Type: UTF8\n");
 	printf("\tItem Key Length: %i + (1 null) bytes\n",
