@@ -91,7 +91,7 @@ typedef struct sHashTableRecord {
 
 #define htRecordReference(r) varprvti (r->key)
 #define htRecordHash(r) varprvti (r->value)
-#define htRecordConfiguration(r) vartype(r->value)
+#define htRecordSettings(r) vartype(r->value)
 
 #define HashTableRecordSize sizeof(sHashTableRecord)
 #define HashTableRecord sHashTableRecord *
@@ -154,12 +154,12 @@ if ( !reference || reference > table->itemsMax || !table->item[--reference]) { \
 if (! (handler) ) { errno = HT_ERROR_NO_CALLBACK_HANDLER; return; }
 
 #define htReturnIfNotWritableItem(i)                                           \
-if (htRecordConfiguration(i) & HTI_NON_WRITABLE) {                             \
+if (htRecordSettings(i) & HTI_NON_WRITABLE) {                             \
     errno = HT_ERROR_NOT_WRITABLE_ITEM; return HT_ERROR_SENTINEL;              \
 }
 
 #define htReturnIfNotConfigurableItem(i)                                       \
-if (htRecordConfiguration(i) & HTI_NON_CONFIGURABLE) {                         \
+if (htRecordSettings(i) & HTI_NON_CONFIGURABLE) {                         \
     errno = HT_ERROR_NOT_CONFIGURABLE_ITEM; return HT_ERROR_SENTINEL;          \
 }
 
@@ -664,36 +664,7 @@ const void * HashTableItemKey
 	return ht->item[reference]->key;
 }
 
-size_t HashTableItemKeyLength
-(
-	HashTable ht,
-	HashTableItem reference
-) {
-	htReturnIfInvalidReference(ht, reference);
-	return varlen(ht->item[reference]->key);
-}
-
-HashTableItemFlags HashTableItemKeyType
-(
-	HashTable ht,
-	HashTableItem reference
-) {
-	htReturnIfInvalidReference(ht, reference);
-	return (vartype(ht->item[reference]->key) &
-		(HTI_INT | HTI_DOUBLE | HTI_POINTER | HTI_BLOCK)
-	);
-}
-
-HashTableItemFlags HashTableItemKeyConfiguration
-(
-	HashTable ht,
-	HashTableItem reference
-) {
-	htReturnIfInvalidReference(ht, reference);
-	return vartype(ht->item[reference]->key);
-}
-
-const void * HashTableItemValue
+const void * HashTableItemData
 (
 	HashTable ht,
 	HashTableItem reference
@@ -702,33 +673,30 @@ const void * HashTableItemValue
 	return ht->item[reference]->value;
 }
 
-size_t HashTableItemValueLength
+size_t HashTableDataLength
 (
-	HashTable ht,
-	HashTableItem reference
+	const void * data
 ) {
-	htReturnIfInvalidReference(ht, reference);
-	return varlen(ht->item[reference]->value);
+	if (data) return varlen(data);
+	return HT_ERROR_SENTINEL;
 }
 
-HashTableItemFlags HashTableItemValueType
+HashTableItemFlags HashTableDataType
 (
-	HashTable ht,
-	HashTableItem reference
+	const void * data
 ) {
-	htReturnIfInvalidReference(ht, reference);
-	return (vartype(ht->item[reference]->value) &
+	if (data) return (vartype(data) &
 		(HTI_INT | HTI_DOUBLE | HTI_POINTER | HTI_BLOCK)
 	);
+	return HT_ERROR_SENTINEL;
 }
 
-HashTableItemFlags HashTableItemValueConfiguration
+HashTableItemFlags HashTableDataSettings
 (
-	HashTable ht,
-	HashTableItem reference
+	const void * data
 ) {
-	htReturnIfInvalidReference(ht, reference);
-	return vartype(ht->item[reference]->value);
+	if (data) return vartype(data);
+	return HT_ERROR_SENTINEL;
 }
 
 bool HashTableItemGetEnumerable
@@ -738,7 +706,7 @@ bool HashTableItemGetEnumerable
 ) {
 	htReturnIfInvalidReference(ht, reference);
 	return \
-		(htRecordConfiguration(ht->item[reference]) & HTI_NON_ENUMERABLE) == 0;
+		(htRecordSettings(ht->item[reference]) & HTI_NON_ENUMERABLE) == 0;
 }
 
 bool HashTableItemSetEnumerable
@@ -751,9 +719,9 @@ bool HashTableItemSetEnumerable
 	HashTableRecord item = ht->item[reference];
 	htReturnIfNotConfigurableItem(item);
 	if (! value) {
-		htRecordConfiguration(item) &= ~HTI_NON_ENUMERABLE;
+		htRecordSettings(item) &= ~HTI_NON_ENUMERABLE;
 	} else {
-		htRecordConfiguration(item) |= HTI_NON_ENUMERABLE;
+		htRecordSettings(item) |= HTI_NON_ENUMERABLE;
 	}
 	return true;
 }
@@ -765,7 +733,7 @@ bool HashTableItemGetWritable
 ) {
 	htReturnIfInvalidReference(ht, reference);
 	return \
-		(htRecordConfiguration(ht->item[reference]) & HTI_NON_WRITABLE) == 0;
+		(htRecordSettings(ht->item[reference]) & HTI_NON_WRITABLE) == 0;
 }
 
 bool HashTableItemSetWritable
@@ -778,9 +746,9 @@ bool HashTableItemSetWritable
 	HashTableRecord item = ht->item[reference];
 	htReturnIfNotConfigurableItem(item);
 	if (! value) {
-		htRecordConfiguration(item) &= ~HTI_NON_WRITABLE;
+		htRecordSettings(item) &= ~HTI_NON_WRITABLE;
 	} else {
-		htRecordConfiguration(item) |= HTI_NON_WRITABLE;
+		htRecordSettings(item) |= HTI_NON_WRITABLE;
 	}
 	return true;
 }
@@ -792,7 +760,7 @@ bool HashTableItemGetConfigurable
 ) {
 	htReturnIfInvalidReference(ht, reference);
 	return \
-		(htRecordConfiguration(ht->item[reference]) & HTI_NON_CONFIGURABLE) == 0
+		(htRecordSettings(ht->item[reference]) & HTI_NON_CONFIGURABLE) == 0
 	;
 }
 
@@ -806,9 +774,9 @@ bool HashTableItemSetConfigurable
 	HashTableRecord item = ht->item[reference];
 	htReturnIfNotConfigurableItem(item);
 	if (! value) {
-		htRecordConfiguration(item) &= ~HTI_NON_CONFIGURABLE;
+		htRecordSettings(item) &= ~HTI_NON_CONFIGURABLE;
 	} else {
-		htRecordConfiguration(item) |= HTI_NON_CONFIGURABLE;
+		htRecordSettings(item) |= HTI_NON_CONFIGURABLE;
 	}
 	return true;
 }
@@ -829,7 +797,7 @@ void HashTableEnumerate
 	if (direction == HT_ENUMERATE_FORWARD) {
 		for (index = 0; index < maximum; index++) {
 			item = ht->item[index];
-			if (item && ! (htRecordConfiguration(item) & HTI_NON_ENUMERABLE)) {
+			if (item && ! (htRecordSettings(item) & HTI_NON_ENUMERABLE)) {
 				if ( ! handler(ht, direction, index + 1, private) ) break;
 			}
 		}
@@ -837,13 +805,13 @@ void HashTableEnumerate
 		index = maximum;
 		while (--index) {
 			item = ht->item[index];
-			if (item && ! (htRecordConfiguration(item) & HTI_NON_ENUMERABLE)) {
+			if (item && ! (htRecordSettings(item) & HTI_NON_ENUMERABLE)) {
 				if ( ! handler(ht, direction, index + 1, private) ) break;
 			}
 		}
 		/* manually enumerate the last item (0) */
 		item = ht->item[0];
-		if (item && ! (htRecordConfiguration(item) & HTI_NON_ENUMERABLE)) {
+		if (item && ! (htRecordSettings(item) & HTI_NON_ENUMERABLE)) {
 			handler(ht, direction, index + 1, private);
 		}
 	}
@@ -962,7 +930,7 @@ void HashTableEnumerateItemHash
 	if (direction == HT_ENUMERATE_FORWARD) {
 		for (index = 0; index < maximum; index++) {
 			item = array[index];
-			if (! (htRecordConfiguration(item) & HTI_NON_ENUMERABLE)) {
+			if (! (htRecordSettings(item) & HTI_NON_ENUMERABLE)) {
 				if ( ! handler(ht, direction, htRecordReference(item), private))
 					break;
 			}
@@ -971,7 +939,7 @@ void HashTableEnumerateItemHash
 		index = maximum;
 		while (--index) {
 			item = array[index];
-			if (! (htRecordConfiguration(item) & HTI_NON_ENUMERABLE)) {
+			if (! (htRecordSettings(item) & HTI_NON_ENUMERABLE)) {
 				if ( ! handler(
 					ht, direction, htRecordReference(item), private)
 				) break;
@@ -979,7 +947,7 @@ void HashTableEnumerateItemHash
 		}
 		/* manually enumerate the last item (0) */
 		item = array[0];
-		if (! (htRecordConfiguration(item) & HTI_NON_ENUMERABLE)) {
+		if (! (htRecordSettings(item) & HTI_NON_ENUMERABLE)) {
 			handler(ht, direction, htRecordReference(item), private);
 		}
 	}

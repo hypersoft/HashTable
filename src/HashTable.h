@@ -282,46 +282,25 @@ const void * HashTableItemKey
 	HashTableItem reference
 );
 
-size_t HashTableItemKeyLength
+const void * HashTableItemData
 (
 	HashTable hashTable,
 	HashTableItem reference
 );
 
-HashTableItemFlags HashTableItemKeyType
+size_t HashTableDataLength
 (
-	HashTable hashTable,
-	HashTableItem reference
+	const void * data
 );
 
-HashTableItemFlags HashTableItemKeyConfiguration
+HashTableItemFlags HashTableDataType
 (
-	HashTable hashTable,
-	HashTableItem reference
+	const void * data
 );
 
-const void * HashTableItemValue
+HashTableItemFlags HashTableDataSettings
 (
-	HashTable hashTable,
-	HashTableItem reference
-);
-
-size_t HashTableItemValueLength
-(
-	HashTable hashTable,
-	HashTableItem reference
-);
-
-HashTableItemFlags HashTableItemValueType
-(
-	HashTable hashTable,
-	HashTableItem reference
-);
-
-HashTableItemFlags HashTableItemValueConfiguration
-(
-	HashTable hashTable,
-	HashTableItem reference
+	const void * data
 );
 
 bool HashTableItemGetEnumerable

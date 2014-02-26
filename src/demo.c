@@ -4,14 +4,15 @@
 #include <stdio.h>
 
 void htItemReport(HashTable ht, HashTableItem item) {
-	HashTableItemFlags keyFlags = HashTableItemKeyConfiguration(ht, item);
+	const void * key = HashTableItemKey(ht, item);
+	HashTableItemFlags keyFlags = HashTableDataSettings(key);
 	printf("\tItem Reference: %i\n", item);
 	printf("\tItem Key Type: UTF8\n");
 	printf("\tItem Key Length: %i + (1 null) bytes\n",
-		HashTableItemKeyLength(ht, item)
+		HashTableDataLength(key)
 	);
 	if (keyFlags & HTI_UTF8) {
-		printf("\tItem Key Value: %s\n", HashTableItemKey(ht, item));
+		printf("\tItem Key Value: %s\n", key);
 	}
 	puts("");
 }
