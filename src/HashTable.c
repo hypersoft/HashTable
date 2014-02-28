@@ -32,8 +32,8 @@
 
 #include "HyperVariant.h"
 
-/* cast this stupid warning for nothing */
-#define varlength(p) varlen((void*)p)
+/* use byte lengths */
+#define varlength(p) varbytes((void*)p)
 
 /*
  * This value will be used to determine how many slots to allocate.
