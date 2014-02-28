@@ -77,6 +77,11 @@ int main ( int argc, char **argv )
 		x, utf8var("First Item"), utf8var("My first item")
 	);
 
+	if (!HashTableGet(x, utf8var("First Item"))) {
+		puts("Fuckered UP!");
+		return 0;
+	}
+
 	HashTableItem second = HashTablePut(
 		x, utf8var("Second Item"), utf8var("My second item")
 	);

@@ -189,8 +189,8 @@ if ( ! length ) {                                                              \
     errno = HT_ERROR_ZERO_LENGTH_KEY; return HT_ERROR_SENTINEL;                \
 }
 
-#define htCompareRecordToRealKey(e, l, k)                                      \
-((e->key == k) || ((varlength(e->key) == l) && (memcmp(e->key, k, l) == 0)))
+#define htCompareRecordToRealKey(e, l, k, h)                                   \
+(e->key == k || (varbytes(e->key) == l+(varpadding(e->key)) && (memcmp(e->key, k, l) == 0)))
 
 /* I wouldn't call this on an incomplete record if I were you... */
 #define htRecordImpact(r) (                                                    \
@@ -208,11 +208,11 @@ inline static size_t htCreateHash (size_t length, char * realKey)
 }
 
 inline static HashTableRecord htFindKeyWithParent (
-	HashTable ht, size_t keyLength, void * realKey,
+	HashTable ht, size_t keyLength, void * realKey, size_t keyHint,
 	HashTableRecord primary, HashTableRecord * parent
 ) {
 	while ( primary ) {
-		if (htCompareRecordToRealKey(primary, keyLength, realKey))
+		if (htCompareRecordToRealKey(primary, keyLength, realKey, keyHint))
 			return primary;
 		*parent = primary; primary = primary->successor;
 	}
@@ -220,11 +220,11 @@ inline static HashTableRecord htFindKeyWithParent (
 }
 
 inline static HashTableRecord htFindKey (
-	HashTable ht, size_t keyLength, void * realKey
+	HashTable ht, size_t keyLength, void * realKey, size_t keyHint
 ) {
 	HashTableRecord primary = ht->slot[htKeyHash(ht, keyLength, realKey)];
 	while ( primary ) {
-		if (htCompareRecordToRealKey(primary, keyLength, realKey))
+		if ((keyLength+varpadding(primary->key)) == varlength(primary->key) && (memcmp(primary->key, realKey, keyLength) == 0))
 			return primary;
 		primary = primary->successor;
 	}
@@ -506,7 +506,7 @@ HashTableItem HashTableHasKey
 	char * realKey = htRealKeyOrReturn(keyLength, key, hint);
 
 	size_t oldError = errno;
-	HashTableRecord item = htFindKey(ht, keyLength, realKey);
+	HashTableRecord item = htFindKey(ht, keyLength, realKey, hint);
 	if (item) return htRecordReference(item);
 	else errno = oldError;
 	return HT_ERROR_SENTINEL;
@@ -592,7 +592,7 @@ HashTableItem HashTablePut
 	size_t index = htKeyHash(ht, keyLength, realKey);
 
 	HashTableRecord root, parent = NULL, current = htFindKeyWithParent(
-		ht, keyLength, realKey, (root = ht->slot[index]), &parent
+		ht, keyLength, realKey, keyHint, (root = ht->slot[index]), &parent
 	);
 
 	if ( current ) {
@@ -720,7 +720,7 @@ HashTableItem HashTableGetItemByKey
 		errno = HT_ERROR_ZERO_LENGTH_KEY; return HT_ERROR_SENTINEL;
 	}
 
-	HashTableRecord item = htFindKey(ht, varlength(realKey), (void*) realKey);
+	HashTableRecord item = htFindKey(ht, varlength(realKey), (void*) realKey, vartype(realKey));
 
 	if (! item) return HT_ERROR_SENTINEL;
 
@@ -747,7 +747,7 @@ HashTableItem HashTableGet
 	htReturnIfTableUninitialized(ht);
 	char * realKey = htRealKeyOrReturn(keyLength, key, hint);
 
-	HashTableRecord item = htFindKey(ht, keyLength, realKey);
+	HashTableRecord item = htFindKey(ht, keyLength, realKey, hint);
 
 	if (! item) return HT_ERROR_SENTINEL;
 
@@ -783,7 +783,7 @@ bool HashTableDeleteItem
 
 	if (selection == currentSelection) {
 		item = htFindKeyWithParent(
-			ht, varlength(item->key), item->key,
+			ht, varlength(item->key), item->key, vartype(item->key),
 			ht->slot[htRecordHash(item)],
 			&parent
 		);
