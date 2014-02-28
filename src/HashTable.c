@@ -97,9 +97,9 @@ typedef struct sHashTableRecord {
 #define htRecordSettings(r) vartype(r->value)
 
 #define HashTableRecordSize sizeof(sHashTableRecord)
-#define HashTableRecord sHashTableRecord *
-#define HashTableRecordList sHashTableRecord **
-#define HashTableRecordItems sHashTableRecord **
+typedef sHashTableRecord * HashTableRecord;
+typedef sHashTableRecord ** HashTableRecordList;
+typedef sHashTableRecord ** HashTableRecordItems;
 
 typedef struct sHashTable {
 	HashTableRecordItems item;
@@ -116,7 +116,7 @@ typedef struct sHashTable {
 
 #define htGetEventMask(ht, withEvents) (ht->events & withEvents)
 #define HashTableSize sizeof(sHashTable)
-#define HashTable sHashTable *
+typedef sHashTable *  HashTable;
 
 #define HT_ERROR_SENTINEL 0
 
@@ -139,6 +139,13 @@ if ( ! (pointer) ) {                                                           \
     errno = HT_ERROR_ALLOCATION_FAILURE;                                       \
     __VA_ARGS__;                                                               \
     return HT_ERROR_SENTINEL;                                                  \
+}
+
+#define htReturnVoidIfAllocationFailure(pointer, ...)                              \
+if ( ! (pointer) ) {                                                           \
+    errno = HT_ERROR_ALLOCATION_FAILURE;                                       \
+    __VA_ARGS__;                                                               \
+    return;                                                  \
 }
 
 #define htReturnIfInvalidReference(table, reference)                           \
@@ -344,9 +351,56 @@ void OptimizeHashTable
 	size_t references
 ) {
 	htReturnVoidIfTableUninitialized(ht);
-	/* doesn't do anything yet */
-	slots+1;
-	htReturnVoidUnsupportedFunction();
+
+	{	/* sort by existence */
+		void * entry[ht->itemsTotal];
+		register size_t source = 0, dest = 0;
+		size_t len = ht->itemsTotal;
+		while (dest < len) {
+			void * val = ht->item[source];
+			if (val) ht->item[source] = NULL, entry[dest++] = val;
+			source++;
+		}
+		while (dest) ht->item[--dest] = entry[dest];
+		ht->itemsUsed = ht->itemsTotal;
+		if (references) { /* adjust padding */
+			size_t
+			index = ht->itemsTotal,
+				max = index + references,
+					bytes = max * sizeof(void*);
+			ht->item = realloc(ht->item, bytes);
+			ht->impact -= ht->itemsMax * sizeof(void*);
+			ht->itemsMax = max, ht->impact += bytes;
+			while(index < max) ht->item[index++] = NULL;
+		}
+	}
+
+	if (slots) {
+		size_t len = ht->itemsTotal;
+		HashTableRecord entry[len];
+		register size_t source = 0, dest = 0;
+		while (dest < len) {
+			void * val = ht->item[source];
+			if (val) entry[dest++] = val;
+			source++;
+		}
+		free(ht->slot);
+		ht->impact -= (ht->slotCount * sizeof(void*));
+		ht->slot = calloc(slots, sizeof(void*));
+		ht->impact += (slots * sizeof(void*));
+		ht->slotCount = slots;
+		while (dest) {
+			HashTableRecord record = entry[--dest];
+			record->successor = NULL;
+			size_t hash = htKeyHash(ht, varlength(record->key), record->key);
+			htRecordHash(record) = hash;
+			HashTableRecord parent = ht->slot[hash];
+			while (parent && parent->successor) parent = parent->successor;
+			if (parent) parent->successor = record;
+			else ht->slot[hash] = record;
+		}
+	}
+
 }
 
 void DestroyHashTable
@@ -357,7 +411,7 @@ void DestroyHashTable
 
 	htVoidExpression htAutoFireItemEvent(*ht, 0, HT_EVENT_DESTRUCTING, NULL);
 
-	sHashTable * xt = *ht;
+	HashTable xt = *ht;
 	*ht = NULL;
 
 	size_t item = 0, length = xt->itemsMax; HashTableRecord target = NULL;
@@ -537,7 +591,7 @@ HashTableItem HashTablePut
 
 	size_t index = htKeyHash(ht, keyLength, realKey);
 
-	HashTableRecord root, * parent = NULL, * current = htFindKeyWithParent(
+	HashTableRecord root, parent = NULL, current = htFindKeyWithParent(
 		ht, keyLength, realKey, (root = ht->slot[index]), &parent
 	);
 
@@ -739,7 +793,8 @@ bool HashTableDeleteItem
 			ht->slot[htRecordHash(item)] = item->successor;
 		}
 
-		ht->item[reference] = NULL, ht->itemsTotal--,
+		ht->item[reference] = NULL,
+		ht->itemsTotal--,
 		ht->impact -= htRecordImpact(item);
 		varfree(item->key); varfree(item->value); free(item);
 		return true;

@@ -50,16 +50,14 @@ bool htEnumerationCallBack
 }
 
 void DumpHashTableStats(HashTable ht) {
-	printf(
-		"HashTable Slot Count: %i slots\n"
-		"HashTable Slots Used: %i slots\n"
-		"HashTable Impact: %i bytes\n"
-		"HashTable Load: %.1g%%\n\n",
-		HashTableSlotCount(ht),
-		HashTableSlotsUsed(ht),
-		HashTableImpact(ht),
-		HashTableLoadFactor(ht) * 100
-	);
+	puts("HashTable Stats\n");
+	printf("      Items Max: %i\n", HashTableItemsMax(ht));
+	printf("     Items Used: %i\n", HashTableItemsUsed(ht));
+	printf("    Items Total: %i\n", HashTableItemsTotal(ht));
+	printf("          Slots: %i\n", HashTableSlotCount(ht));
+	printf("     Slots Used: %i\n", HashTableSlotsUsed(ht));
+	printf("    Load Factor: %0.2g%%\n", HashTableLoadFactor(ht)*100);
+	printf("  Memory Impact: %i bytes\n\n", HashTableImpact(ht));
 }
 
 int main ( int argc, char **argv )
@@ -98,6 +96,9 @@ int main ( int argc, char **argv )
 	HashTableEnumerate(x, HT_ENUMERATE_REVERSE, htEnumerationCallBack, NULL);
 	puts("");
 
+	DumpHashTableStats(x);
+
+	OptimizeHashTable(x, 5, 0);
 	DumpHashTableStats(x);
 
 	DestroyHashTable(&x);
