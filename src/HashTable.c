@@ -32,6 +32,9 @@
 
 #include "HyperVariant.h"
 
+/* cast this stupid warning for nothing */
+#define varlength(p) varlen((void*)p)
+
 /*
  * This value will be used to determine how many slots to allocate.
  */
@@ -89,8 +92,8 @@ typedef struct sHashTableRecord {
 	struct sHashTableRecord * successor;
 } sHashTableRecord;
 
-#define htRecordReference(r) varprvti (r->key)
-#define htRecordHash(r) varprvti (r->value)
+#define htRecordReference(r) varnote (r->key)
+#define htRecordHash(r) varnote (r->value)
 #define htRecordSettings(r) vartype(r->value)
 
 #define HashTableRecordSize sizeof(sHashTableRecord)
@@ -173,14 +176,14 @@ if (htRecordSettings(i) & HTI_NON_CONFIGURABLE) {                              \
 ( htCreateHash ( keyLength, realKey ) % (table->slotCount) )
 
 #define htRealKeyOrReturn(length, value, hint)                                 \
-(hint & HTI_DOUBLE)? &value : ptrVar(value);                                   \
-if ( ! length && (hint & HTI_UTF8)) length = strlen(ptrVar(value));            \
+(hint & HTI_DOUBLE)? &value : ptrval(value);                                   \
+if ( ! length && (hint & HTI_UTF8)) length = strlen(ptrval(value));            \
 if ( ! length ) {                                                              \
     errno = HT_ERROR_ZERO_LENGTH_KEY; return HT_ERROR_SENTINEL;                \
 }
 
 #define htCompareRecordToRealKey(e, l, k)                                      \
-((e->key == k) || ((varlen(e->key) == l) && (memcmp(e->key, k, l) == 0)))
+((e->key == k) || ((varlength(e->key) == l) && (memcmp(e->key, k, l) == 0)))
 
 /* I wouldn't call this on an incomplete record if I were you... */
 #define htRecordImpact(r) (                                                    \
@@ -302,7 +305,8 @@ void FreeHashTableUserData
 	if (! data && ! *data) {
 		errno = HT_ERROR_INVALID_REFERENCE; return;
 	}
-	varfree(*data);
+	varfree(*(void**)data);
+	*(void**)data = NULL;
 }
 
 HashTable NewHashTable
@@ -354,6 +358,8 @@ void DestroyHashTable
 	htVoidExpression htAutoFireItemEvent(*ht, 0, HT_EVENT_DESTRUCTING, NULL);
 
 	sHashTable * xt = *ht;
+	*ht = NULL;
+
 	size_t item = 0, length = xt->itemsMax; HashTableRecord target = NULL;
 	for (item = 0; item < length; item++) {
 		target = xt->item[item];
@@ -362,7 +368,6 @@ void DestroyHashTable
 		}
 	}
 	free(xt->item), free(xt->slot), free(xt);
-	*ht = NULL;
 	return;
 }
 
@@ -527,7 +532,7 @@ HashTableItem HashTablePut
 	char * realKey = htRealKeyOrReturn(keyLength, key, keyHint);
 
 	if (!valueLength) {
-		if (valueHint & HTI_UTF8) valueLength = strlen(ptrVar(value));
+		if (valueHint & HTI_UTF8) valueLength = strlen(ptrval(value));
 	}
 
 	size_t index = htKeyHash(ht, keyLength, realKey);
@@ -622,7 +627,7 @@ HashTableItem HashTablePutItemByKey
 	}
 
 	return HashTablePut(ht,
-		varlen(realKey), (double)(size_t)realKey, vartype(realKey),
+		varlength(realKey), (double)(size_t)realKey, vartype(realKey),
 		valueLength, value, valueHint
 	);
 
@@ -644,8 +649,8 @@ HashTableItem HashTablePutItemByKeyData
 	}
 
 	return HashTablePut(ht,
-		varlen(realKey), (double)(size_t)realKey, vartype(realKey),
-		varlen(realData), (double)(size_t)realData, vartype(realData)
+		varlength(realKey), (double)(size_t)realKey, vartype(realKey),
+		varlength(realData), (double)(size_t)realData, vartype(realData)
 	);
 
 }
@@ -661,7 +666,7 @@ HashTableItem HashTableGetItemByKey
 		errno = HT_ERROR_ZERO_LENGTH_KEY; return HT_ERROR_SENTINEL;
 	}
 
-	HashTableRecord item = htFindKey(ht, varlen(realKey), (void*) realKey);
+	HashTableRecord item = htFindKey(ht, varlength(realKey), (void*) realKey);
 
 	if (! item) return HT_ERROR_SENTINEL;
 
@@ -724,7 +729,7 @@ bool HashTableDeleteItem
 
 	if (selection == currentSelection) {
 		item = htFindKeyWithParent(
-			ht, varlen(item->key), item->key,
+			ht, varlength(item->key), item->key,
 			ht->slot[htRecordHash(item)],
 			&parent
 		);
@@ -766,7 +771,7 @@ size_t HashTableDataLength
 (
 	HashTableData data
 ) {
-	if (data) return varlen(data);
+	if (data) return varlength(data);
 	return HT_ERROR_SENTINEL;
 }
 
@@ -775,7 +780,7 @@ HashTableDataFlags HashTableDataType
 	HashTableData data
 ) {
 	if (data) return (vartype(data) &
-		(HTI_INT | HTI_DOUBLE | HTI_POINTER | HTI_BLOCK)
+		(HTI_NUMBER | HTI_DOUBLE | HTI_POINTER | HTI_BLOCK)
 	);
 	return HT_ERROR_SENTINEL;
 }

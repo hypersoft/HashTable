@@ -76,15 +76,15 @@ int main ( int argc, char **argv )
 	puts("");
 
 	HashTableItem first = HashTablePut(
-		x, htStr("First Item"), htStr("My first item")
+		x, utf8var("First Item"), utf8var("My first item")
 	);
 
 	HashTableItem second = HashTablePut(
-		x, htStr("Second Item"), htStr("My second item")
+		x, utf8var("Second Item"), utf8var("My second item")
 	);
 
 	HashTableItem third = HashTablePut(
-		x, htStr("Third Item"), htStr("My third item")
+		x, utf8var("Third Item"), utf8var("My third item")
 	);
 
 	puts("Enumerate forwards");

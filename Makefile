@@ -81,7 +81,7 @@ demo: $(BUILD_BIN)/demo
 $(BUILD_HYPER_VARIANT_PKG)/src/HyperVariant.c: $(BUILD_HYPER_VARIANT_PKG)/src
 
 $(BUILD_HYPER_VARIANT_PKG)/src: $(BUILD_HYPER_VARIANT_PKG)
-	@tar -xzf $<-0.0.23.tar.gz -C $<
+	@tar -xzf $<-0.0.85.tar.gz -C $<
 
 $(BUILD_HYPER_VARIANT_PKG):
 	@mkdir $@

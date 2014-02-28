@@ -39,7 +39,7 @@
 #include <stdbool.h>
 #include <errno.h>
 
-#define HashTableItem size_t
+typedef size_t HashTableItem;
 
 #define HashTableBitFlag(n) (1 << (n))
 
@@ -109,28 +109,32 @@ typedef HashTableItem (*HashTableSortHandler)
 typedef const void * HashTableData;
 
 typedef enum eHashTableDataFlags {
-	HTI_INT              = HashTableBitFlag(1),
-	HTI_DOUBLE           = HashTableBitFlag(2),
-	HTI_POINTER          = HashTableBitFlag(3),
-	HTI_UTF8             = HashTableBitFlag(4),
-	HTI_BLOCK            = HashTableBitFlag(5),
-	HTI_NON_ENUMERABLE   = HashTableBitFlag(6),
-	HTI_NON_WRITABLE     = HashTableBitFlag(7),
-	HTI_NON_CONFIGURABLE = HashTableBitFlag(8),
+	HTI_NUMBER = 1 << 1,
+	HTI_DOUBLE = 1 << 2,
+	HTI_POINTER = 1 << 3,
+	HTI_BLOCK = 1 << 4,
+	HTI_UTF8 = 1 << 5, HTI_UCS1 = HTI_UTF8,
+	HTI_UTF16 = 1 << 6,	HTI_UCS2 = HTI_UTF16,
+	HTI_UTF32 = 1 << 7, HTI_UCS4 = HTI_UTF32,
+	HTI_NON_ENUMERABLE   = HashTableBitFlag(8),
+	HTI_NON_WRITABLE     = HashTableBitFlag(9),
+	HTI_NON_CONFIGURABLE = HashTableBitFlag(10),
 } HashTableDataFlags;
 
-/* cast integer things to double */
-#define htIntVal(i) ((double)(uint)(i))
-
-/* Quick value parameter generators */
-#define htInt(i) sizeof(uint), htIntVal(i), HTI_INT
-#define htPtr(p) sizeof(void *), htIntVal(p), HTI_POINTER
-#define htDbl(d) sizeof(double), d, HTI_DOUBLE
-#define htStr(s) 0, htIntVal(s), HTI_UTF8
-#define htBlk(p, s) s, htIntVal((void*)p), HTI_BLOCK
-#define htStrN(s, l) l, htIntVal(s), HTI_UTF8
-
 #ifndef HashTable_c
+
+#define dblval(i) ((double)(size_t)(i))
+
+#define numvar(i) sizeof(size_t), dblval(i), HTI_NUMBER
+#define ptrvar(p) sizeof(void *), dblval(p), HTI_POINTER
+#define dblvar(d) sizeof(double), d, HTI_DOUBLE
+#define utf8var(p) 0, dblval(p), HTI_UTF8
+#define utf16var(p) 0, dblval(p), HTI_UTF16
+#define utf32var(p) 0, dblval(p), HTI_UTF32
+#define utf8blk(p, b) b, dblval(p), HTI_UTF8
+#define utf16blk(p, b) b, dblval(p), HTI_UTF16
+#define utf32blk(p, b) b, dblval(p), HTI_UTF32
+#define blkvar(p, b) b, dblval((void*)p), HTI_BLOCK
 
 extern const char * HashTableVendor;
 extern const char * HashTableVersion;
